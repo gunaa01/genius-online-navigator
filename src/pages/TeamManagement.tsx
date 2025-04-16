@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,9 @@ import {
   Edit,
   Clock,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Save,
+  Key
 } from "lucide-react";
 import { 
   Select, 
@@ -26,11 +28,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const TeamManagement = () => {
   const [showInviteForm, setShowInviteForm] = useState(false);
-
-  const teamMembers = [
+  const [loading, setLoading] = useState(false);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [pendingInvites, setPendingInvites] = useState([]);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('marketing');
+  const [inviteMessage, setInviteMessage] = useState('');
+  const { user } = useAuth();
+  
+  // Demo team members data - would be replaced with actual data from Supabase
+  const teamMembersDemo = [
     {
       id: 1,
       name: "John Smith",
@@ -69,7 +82,7 @@ const TeamManagement = () => {
     },
   ];
   
-  const pendingInvites = [
+  const pendingInvitesDemo = [
     {
       id: 1,
       email: "alex@example.com",
@@ -85,6 +98,12 @@ const TeamManagement = () => {
       expires: "2025-04-22T09:45:00"
     }
   ];
+
+  useEffect(() => {
+    // In a real implementation, this would fetch data from Supabase
+    setTeamMembers(teamMembersDemo);
+    setPendingInvites(pendingInvitesDemo);
+  }, []);
 
   const rolePermissions = {
     admin: {
@@ -153,6 +172,109 @@ const TeamManagement = () => {
     setShowInviteForm(!showInviteForm);
   };
 
+  const handleSendInvitation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail) {
+      toast({
+        title: "Error",
+        description: "Please enter an email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      // In a real implementation, this would send an invitation through Supabase
+      // For demo purposes, we're just adding the invite to the list
+      const newInvite = {
+        id: pendingInvites.length + 1,
+        email: inviteEmail,
+        role: inviteRole,
+        sentAt: new Date().toISOString(),
+        expires: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)).toISOString() // 7 days from now
+      };
+      
+      setPendingInvites([...pendingInvites, newInvite]);
+      
+      toast({
+        title: "Invitation sent",
+        description: `An invitation has been sent to ${inviteEmail}`,
+      });
+      
+      // Reset form
+      setInviteEmail('');
+      setInviteMessage('');
+      setShowInviteForm(false);
+      
+    } catch (error) {
+      console.error("Error sending invitation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send invitation. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendInvitation = (inviteId: number) => {
+    const invite = pendingInvites.find(invite => invite.id === inviteId);
+    if (invite) {
+      toast({
+        title: "Invitation resent",
+        description: `The invitation has been resent to ${invite.email}`,
+      });
+    }
+  };
+
+  const handleCancelInvitation = (inviteId: number) => {
+    setPendingInvites(pendingInvites.filter(invite => invite.id !== inviteId));
+    toast({
+      title: "Invitation cancelled",
+      description: "The invitation has been cancelled",
+    });
+  };
+
+  const handleEditMember = (memberId: number) => {
+    // In a real implementation, this would open a modal to edit the member
+    toast({
+      title: "Edit member",
+      description: "This feature is not yet implemented",
+    });
+  };
+
+  const handleRemoveMember = (memberId: number) => {
+    setTeamMembers(teamMembers.filter(member => member.id !== memberId));
+    toast({
+      title: "Member removed",
+      description: "The team member has been removed",
+    });
+  };
+
+  const handleCreateCustomRole = () => {
+    toast({
+      title: "Create custom role",
+      description: "This feature is not yet implemented",
+    });
+  };
+
+  const handleEditRole = (role: string) => {
+    toast({
+      title: "Edit role",
+      description: `Editing the ${rolePermissions[role].name} role`,
+    });
+  };
+
+  const handleToggleSecurity = (setting: string) => {
+    toast({
+      title: "Security setting updated",
+      description: `The ${setting} setting has been updated`,
+    });
+  };
+
   return (
     <DashboardLayout>
       <div className="flex flex-col space-y-8">
@@ -174,43 +296,64 @@ const TeamManagement = () => {
                 Send an invitation email to add someone to your team
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Email Address</label>
-                  <div className="flex">
-                    <div className="relative flex-grow">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                      <Input placeholder="colleague@example.com" className="pl-9" />
+            <form onSubmit={handleSendInvitation}>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Email Address</label>
+                    <div className="flex">
+                      <div className="relative flex-grow">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input 
+                          placeholder="colleague@example.com" 
+                          className="pl-9" 
+                          value={inviteEmail}
+                          onChange={(e) => setInviteEmail(e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
                   </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Role</label>
+                    <Select 
+                      value={inviteRole} 
+                      onValueChange={setInviteRole}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Administrator</SelectItem>
+                        <SelectItem value="marketing">Marketing Manager</SelectItem>
+                        <SelectItem value="analyst">Data Analyst</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Role</label>
-                  <Select defaultValue="marketing">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin">Administrator</SelectItem>
-                      <SelectItem value="marketing">Marketing Manager</SelectItem>
-                      <SelectItem value="analyst">Data Analyst</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="mt-6">
+                  <label className="text-sm font-medium">Personal Message (Optional)</label>
+                  <Input 
+                    placeholder="Add a personal note to the invitation email..."
+                    className="mt-2"
+                    value={inviteMessage}
+                    onChange={(e) => setInviteMessage(e.target.value)}
+                  />
                 </div>
-              </div>
-              <div className="mt-6">
-                <label className="text-sm font-medium">Personal Message (Optional)</label>
-                <Input 
-                  placeholder="Add a personal note to the invitation email..."
-                  className="mt-2"
-                />
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-              <Button variant="outline" onClick={toggleInviteForm}>Cancel</Button>
-              <Button>Send Invitation</Button>
-            </CardFooter>
+              </CardContent>
+              <CardFooter className="flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  type="button" 
+                  onClick={toggleInviteForm}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? 'Sending...' : 'Send Invitation'}
+                </Button>
+              </CardFooter>
+            </form>
           </Card>
         )}
 
@@ -279,11 +422,19 @@ const TeamManagement = () => {
                         )}
                       </div>
                       <div className="col-span-2 flex justify-end gap-2">
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleEditMember(member.id)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         {member.id !== 1 && (
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleRemoveMember(member.id)}
+                          >
                             <UserMinus className="h-4 w-4" />
                           </Button>
                         )}
@@ -332,11 +483,19 @@ const TeamManagement = () => {
                           </div>
                         </div>
                         <div className="col-span-2 flex justify-end gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleResendInvitation(invite.id)}
+                          >
                             <Mail className="mr-2 h-4 w-4" />
                             Resend
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleCancelInvitation(invite.id)}
+                          >
                             <UserMinus className="h-4 w-4" />
                           </Button>
                         </div>
@@ -385,7 +544,11 @@ const TeamManagement = () => {
                     <span className="text-sm text-muted-foreground">
                       Users: {teamMembers.filter(m => m.role === key).length}
                     </span>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleEditRole(key)}
+                    >
                       <Edit className="mr-2 h-4 w-4" /> Edit Role
                     </Button>
                   </CardFooter>
@@ -400,7 +563,7 @@ const TeamManagement = () => {
                 <p className="text-sm text-muted-foreground text-center mb-4">
                   Create a custom role with specific permissions
                 </p>
-                <Button variant="outline">
+                <Button variant="outline" onClick={handleCreateCustomRole}>
                   Create Custom Role
                 </Button>
               </Card>
@@ -421,7 +584,7 @@ const TeamManagement = () => {
                       Require 2FA for all team members
                     </p>
                   </div>
-                  <Switch />
+                  <Switch onChange={() => handleToggleSecurity('2FA')} />
                 </div>
                 
                 <div className="flex justify-between items-center">
@@ -452,7 +615,7 @@ const TeamManagement = () => {
                       Notify administrators of new logins
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch defaultChecked onChange={() => handleToggleSecurity('login notifications')} />
                 </div>
                 
                 <div className="flex justify-between items-center">
@@ -462,8 +625,20 @@ const TeamManagement = () => {
                       Limit access to specific IP addresses
                     </p>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleToggleSecurity('IP restrictions')}>
                     Configure
+                  </Button>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h4 className="text-sm font-medium">API Access</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Manage API keys and permissions
+                    </p>
+                  </div>
+                  <Button variant="outline" size="sm" className="flex items-center">
+                    <Key className="mr-2 h-4 w-4" /> Manage Keys
                   </Button>
                 </div>
 
@@ -480,6 +655,11 @@ const TeamManagement = () => {
                   </div>
                 </div>
               </CardContent>
+              <CardFooter className="flex justify-end">
+                <Button>
+                  <Save className="mr-2 h-4 w-4" /> Save Security Settings
+                </Button>
+              </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
