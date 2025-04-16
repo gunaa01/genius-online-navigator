@@ -1,13 +1,83 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import DashboardLayout from "@/components/layouts/DashboardLayout";
+import MetricsOverview from "@/components/dashboard/MetricsOverview";
+import AnalyticsPanel from "@/components/dashboard/AnalyticsPanel";
+import ReportGenerator from "@/components/dashboard/ReportGenerator";
+import SocialMediaConnect from "@/components/dashboard/SocialMediaConnect";
+import AIInsights from "@/components/dashboard/AIInsights";
+import IntegrationCard from "@/components/common/IntegrationCard";
+import { useDemoData } from "@/hooks/useDemoData";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, Bell, Plus } from "lucide-react";
 
 const Index = () => {
+  const { 
+    metrics, 
+    visitors, 
+    revenue, 
+    socialAccounts, 
+    integrations, 
+    reports, 
+    loading 
+  } = useDemoData();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <DashboardLayout>
+      <div className="flex flex-col space-y-8">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground">Welcome back! Here's an overview of your business.</p>
+          </div>
+          <div className="flex gap-2 w-full md:w-auto">
+            <div className="relative flex-1 md:flex-initial">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input 
+                placeholder="Search..." 
+                className="pl-9 w-full md:w-64"
+              />
+            </div>
+            <Button size="icon" variant="outline">
+              <Bell className="h-4 w-4" />
+            </Button>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              New Campaign
+            </Button>
+          </div>
+        </header>
+
+        <section>
+          <MetricsOverview metrics={metrics} loading={loading} />
+        </section>
+
+        <section>
+          <AnalyticsPanel 
+            visitors={visitors} 
+            revenue={revenue} 
+            loading={loading} 
+          />
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <section>
+            <ReportGenerator reports={reports} loading={loading} />
+          </section>
+          <section>
+            <AIInsights />
+          </section>
+        </div>
+
+        <section>
+          <SocialMediaConnect accounts={socialAccounts} loading={loading} />
+        </section>
+
+        <section>
+          <IntegrationCard integrations={integrations} loading={loading} />
+        </section>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
