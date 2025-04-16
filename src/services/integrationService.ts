@@ -108,9 +108,19 @@ export const getUserIntegrations = async () => {
 // Add new integration
 export const addIntegration = async (integration: Omit<Integration, "id" | "user_id" | "created_at" | "updated_at">) => {
   try {
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
     const { data, error } = await supabase
       .from("integrations")
-      .insert(integration)
+      .insert({
+        ...integration,
+        user_id: user.id
+      })
       .select()
       .single();
     
@@ -201,17 +211,26 @@ export const connectCurrencyApi = async (apiKey: string) => {
     
     const data = await response.json();
     
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+    
     // Save the integration if the API key is valid
-    return await addIntegration({
+    const integrationData = {
       name: "Currency API",
-      type: "currency_api",
+      type: "currency_api" as IntegrationType,
       api_key: apiKey,
       connected: true,
       configuration: {
         last_tested: new Date().toISOString(),
         currencies: data.data ? Object.keys(data.data) : []
       }
-    });
+    };
+    
+    return await addIntegration(integrationData);
     
   } catch (error: any) {
     toast({
@@ -231,20 +250,29 @@ export const connectKalvetSite = async (siteUrl: string, apiKey: string) => {
       siteUrl = 'https://' + siteUrl;
     }
     
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+    
     // Simulate API validation (in a real app, you would ping the site to verify)
     // Here we're just checking basic URL validity
     const urlObj = new URL(siteUrl);
     
-    return await addIntegration({
+    const integrationData = {
       name: "Kalvet Website",
-      type: "kalvet",
+      type: "kalvet" as IntegrationType,
       api_key: apiKey,
       connected: true,
       configuration: {
         site_url: siteUrl,
         domain: urlObj.hostname
       }
-    });
+    };
+    
+    return await addIntegration(integrationData);
     
   } catch (error: any) {
     toast({
