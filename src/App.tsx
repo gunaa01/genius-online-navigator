@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,29 +21,31 @@ import Upgrade from "./pages/Upgrade";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/ads" element={<AdCampaigns />} />
-          <Route path="/social" element={<SocialMedia />} />
-          <Route path="/content" element={<AiContent />} />
-          <Route path="/integrations" element={<Integrations />} />
-          <Route path="/team" element={<TeamManagement />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/upgrade" element={<Upgrade />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/ads" element={<AdCampaigns />} />
+            <Route path="/social" element={<SocialMedia />} />
+            <Route path="/content" element={<AiContent />} />
+            <Route path="/integrations" element={<Integrations />} />
+            <Route path="/team" element={<TeamManagement />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/upgrade" element={<Upgrade />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
