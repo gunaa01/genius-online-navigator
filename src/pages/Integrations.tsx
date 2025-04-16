@@ -1,7 +1,6 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -9,9 +8,11 @@ import { SearchIcon, Upload, Plug, BarChart, Facebook, ShoppingBag, ShoppingCart
 import { useDemoData } from "@/hooks/useDemoData";
 import IntegrationCard from "@/components/common/IntegrationCard";
 import { Badge } from "@/components/ui/badge";
+import IntegrationsList from '@/components/integrations/IntegrationsList';
 
 const Integrations = () => {
   const { integrations, loading } = useDemoData();
+  const [activeTab, setActiveTab] = useState("platforms");
 
   const apiKeys = [
     {
@@ -102,9 +103,10 @@ const Integrations = () => {
           </div>
         </header>
 
-        <Tabs defaultValue="platforms" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-8">
             <TabsTrigger value="platforms">Platforms</TabsTrigger>
+            <TabsTrigger value="custom">Custom Integrations</TabsTrigger>
             <TabsTrigger value="api-keys">API Keys</TabsTrigger>
             <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
             <TabsTrigger value="import">Data Import</TabsTrigger>
@@ -257,6 +259,10 @@ const Integrations = () => {
             </Card>
 
             <IntegrationCard integrations={integrations} loading={loading} />
+          </TabsContent>
+
+          <TabsContent value="custom">
+            <IntegrationsList />
           </TabsContent>
 
           <TabsContent value="api-keys">

@@ -1,97 +1,121 @@
 
-import { Link } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  PieChart, 
-  FileText, 
-  MessageSquare, 
-  Settings, 
-  Users, 
-  Share2,
+import { useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import {
   BarChart3,
-  Sparkles,
-  Upload
+  FileBarChart,
+  LayoutDashboard,
+  Settings,
+  Users,
+  MessageSquareText,
+  Target,
+  Share2,
+  Plug,
+  CreditCard,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import ProfileDropdown from "./ProfileDropdown";
+import { useMobile } from "@/hooks/use-mobile";
 
 const Sidebar = () => {
-  return (
-    <aside className="hidden lg:flex flex-col w-64 border-r bg-card h-screen sticky top-0 overflow-y-auto">
-      <div className="p-6">
-        <Link to="/" className="flex items-center gap-2">
-          <Sparkles className="h-6 w-6 text-accent" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Genius
-          </span>
-        </Link>
-        <p className="text-sm text-muted-foreground mt-1">
-          Marketing & Analytics Platform
-        </p>
-      </div>
-      
-      <nav className="flex-1 px-3 py-2">
-        <ul className="space-y-1">
-          <NavItem to="/" icon={<LayoutDashboard size={18} />} text="Dashboard" active />
-          <NavItem to="/analytics" icon={<PieChart size={18} />} text="Analytics" />
-          <NavItem to="/reports" icon={<FileText size={18} />} text="Reports" />
-          <NavItem to="/ads" icon={<BarChart3 size={18} />} text="Ad Campaigns" />
-          <NavItem to="/social" icon={<Share2 size={18} />} text="Social Media" />
-          <NavItem to="/content" icon={<MessageSquare size={18} />} text="AI Content" />
-          <NavItem to="/integrations" icon={<Upload size={18} />} text="Integrations" />
-          <NavItem to="/team" icon={<Users size={18} />} text="Team" />
-          <NavItem to="/settings" icon={<Settings size={18} />} text="Settings" />
-        </ul>
-      </nav>
-      
-      <div className="p-4 m-4 bg-accent/10 rounded-lg">
-        <h3 className="text-sm font-medium mb-1">Premium Features</h3>
-        <p className="text-xs text-muted-foreground mb-2">
-          Upgrade to access advanced AI tools and unlimited reports.
-        </p>
-        <Link
-          to="/upgrade"
-          className="text-xs flex justify-center items-center py-1.5 px-3 bg-accent text-white rounded-md hover:bg-accent/90 transition-colors"
-        >
-          Upgrade to Pro
-        </Link>
-      </div>
-      
-      <div className="p-4 border-t flex items-center">
-        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center mr-3">
-          JS
-        </div>
-        <div>
-          <p className="text-sm font-medium">John Smith</p>
-          <p className="text-xs text-muted-foreground">Free Trial</p>
-        </div>
-      </div>
-    </aside>
-  );
-};
+  const isMobile = useMobile();
+  const [isOpen, setIsOpen] = useState(false);
+  const { pathname } = useLocation();
 
-interface NavItemProps {
-  to: string;
-  icon: React.ReactNode;
-  text: string;
-  active?: boolean;
-}
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
 
-const NavItem = ({ to, icon, text, active }: NavItemProps) => {
+  const navigation = [
+    { name: "Dashboard", href: "/", icon: LayoutDashboard },
+    { name: "Analytics", href: "/analytics", icon: BarChart3 },
+    { name: "Reports", href: "/reports", icon: FileBarChart },
+    { name: "Ad Campaigns", href: "/ads", icon: Target },
+    { name: "Social Media", href: "/social", icon: Share2 },
+    { name: "AI Content", href: "/content", icon: MessageSquareText },
+    { name: "Integrations", href: "/integrations", icon: Plug },
+    { name: "Team", href: "/team", icon: Users },
+    { name: "Settings", href: "/settings", icon: Settings },
+  ];
+
   return (
-    <li>
-      <Link
-        to={to}
+    <>
+      {isMobile && (
+        <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 h-16 bg-background border-b">
+          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+            <Menu className="h-5 w-5" />
+          </Button>
+          <div className="font-bold text-lg">Genius</div>
+          <ProfileDropdown />
+        </div>
+      )}
+
+      <aside
         className={cn(
-          "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-          active 
-            ? "bg-primary text-primary-foreground" 
-            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-background transition-transform duration-300",
+          isMobile
+            ? isOpen
+              ? "translate-x-0 w-64"
+              : "-translate-x-full w-64"
+            : "w-64"
         )}
       >
-        {icon}
-        <span>{text}</span>
-      </Link>
-    </li>
+        <div className="flex items-center justify-between h-16 px-4 border-b">
+          <h2 className="text-lg font-bold">Genius</h2>
+          {isMobile && (
+            <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+              <X className="h-5 w-5" />
+            </Button>
+          )}
+        </div>
+
+        <div className="flex-1 overflow-auto py-2">
+          <nav className="grid gap-1 px-2">
+            {navigation.map((item) => (
+              <NavLink
+                key={item.name}
+                to={item.href}
+                onClick={() => isMobile && setIsOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                    isActive
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  )
+                }
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.name}</span>
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+
+        <div className="p-4 border-t">
+          <NavLink 
+            to="/upgrade"
+            onClick={() => isMobile && setIsOpen(false)}
+            className={cn(
+              "flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90",
+              pathname === "/upgrade" && "bg-primary/90"
+            )}
+          >
+            <CreditCard className="h-4 w-4" />
+            Upgrade Plan
+          </NavLink>
+        </div>
+
+        {!isMobile && (
+          <div className="p-4 border-t">
+            <ProfileDropdown />
+          </div>
+        )}
+      </aside>
+    </>
   );
 };
 
