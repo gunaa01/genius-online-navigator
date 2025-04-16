@@ -10,7 +10,7 @@ import {
   Share2,
   BarChart3,
   Sparkles,
-  FileUpload
+  Upload
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +37,7 @@ const Sidebar = () => {
           <NavItem to="/ads" icon={<BarChart3 size={18} />} text="Ad Campaigns" />
           <NavItem to="/social" icon={<Share2 size={18} />} text="Social Media" />
           <NavItem to="/content" icon={<MessageSquare size={18} />} text="AI Content" />
-          <NavItem to="/integrations" icon={<FileUpload size={18} />} text="Integrations" />
+          <NavItem to="/integrations" icon={<Upload size={18} />} text="Integrations" />
           <NavItem to="/team" icon={<Users size={18} />} text="Team" />
           <NavItem to="/settings" icon={<Settings size={18} />} text="Settings" />
         </ul>

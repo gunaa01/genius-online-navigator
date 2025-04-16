@@ -6,7 +6,7 @@ import {
   ShoppingCart,
   BarChart,
   Facebook,
-  FileUpload,
+  Upload,
   FileDown,
   Plug,
   Check,
@@ -65,7 +65,7 @@ const IntegrationCard = ({ integrations, loading }: IntegrationCardProps) => {
         </CardTitle>
         <div className="flex gap-2">
           <Button variant="outline" size="sm">
-            <FileUpload className="mr-2 h-4 w-4" />
+            <Upload className="mr-2 h-4 w-4" />
             Upload Data
           </Button>
           <Button size="sm">
