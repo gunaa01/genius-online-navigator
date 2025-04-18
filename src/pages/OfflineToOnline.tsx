@@ -316,10 +316,10 @@ const OfflineToOnline = () => {
             <p className="mb-6">Genius provides all the tools you need to establish and grow your online presence.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button asChild size="lg">
-                <Link to="/auth">Get Started with Genius</Link>
+                <Link to="/for-hire">View Hiring Guide</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link to="/upgrade">View Pricing Plans</Link>
+                <Link to="/auth">Get Started with Genius</Link>
               </Button>
             </div>
           </div>

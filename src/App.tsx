@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -37,6 +36,7 @@ const App = () => (
             <Routes>
               <Route path="/landing" element={<LandingPage />} />
               <Route path="/offline-to-online" element={<OfflineToOnline />} />
+              <Route path="/for-hire" element={<ForHire />} />
               <Route path="/auth" element={<Auth />} />
               
               <Route path="/" element={
