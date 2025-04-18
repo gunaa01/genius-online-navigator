@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -106,7 +105,7 @@ export const getUserIntegrations = async () => {
 };
 
 // Add new integration
-export const addIntegration = async (integration: Omit<Integration, "id" | "user_id" | "created_at" | "updated_at">) => {
+export const addIntegration = async (integration: Partial<Integration>) => {
   try {
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();

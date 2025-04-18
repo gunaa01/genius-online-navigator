@@ -9,10 +9,12 @@ import { useDemoData } from "@/hooks/useDemoData";
 import IntegrationCard from "@/components/common/IntegrationCard";
 import { Badge } from "@/components/ui/badge";
 import IntegrationsList from '@/components/integrations/IntegrationsList';
+import { useToast } from "@/hooks/use-toast";
 
 const Integrations = () => {
   const { integrations, loading } = useDemoData();
   const [activeTab, setActiveTab] = useState("platforms");
+  const { toast } = useToast();
 
   const apiKeys = [
     {
@@ -85,6 +87,48 @@ const Integrations = () => {
     }
   ];
 
+  const handleConnectIntegration = (integrationName: string) => {
+    toast({
+      title: "Connection Initiated",
+      description: `Connecting to ${integrationName}...`,
+    });
+  };
+
+  const handleConfigureIntegration = (integrationName: string) => {
+    toast({
+      title: "Configure Integration",
+      description: `Opening configuration for ${integrationName}`,
+    });
+  };
+
+  const handleImportData = () => {
+    toast({
+      title: "Import Data",
+      description: "Opening data import wizard",
+    });
+  };
+
+  const handleGenerateApiKey = () => {
+    toast({
+      title: "API Key Generated",
+      description: "A new API key has been created",
+    });
+  };
+
+  const handleRevokeApiKey = (keyId: number) => {
+    toast({
+      title: "API Key Revoked",
+      description: "The API key has been revoked",
+    });
+  };
+
+  const handleAddWebhook = () => {
+    toast({
+      title: "Add Webhook",
+      description: "Opening webhook configuration form",
+    });
+  };
+
   return (
     <DashboardLayout>
       <div className="flex flex-col space-y-8">
@@ -94,10 +138,10 @@ const Integrations = () => {
             <p className="text-muted-foreground">Connect your data sources and tools</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={handleImportData}>
               <Upload className="mr-2 h-4 w-4" /> Import Data
             </Button>
-            <Button>
+            <Button onClick={() => handleConnectIntegration("New Integration")}>
               <Plug className="mr-2 h-4 w-4" /> Add Integration
             </Button>
           </div>
@@ -148,7 +192,12 @@ const Integrations = () => {
                       <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Connected</Badge>
                     </CardContent>
                     <CardFooter className="pt-0">
-                      <Button variant="outline" size="sm" className="w-full text-primary border-primary/30">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full text-primary border-primary/30"
+                        onClick={() => handleConfigureIntegration("Google Analytics")}
+                      >
                         <Check className="mr-2 h-4 w-4" /> Configure
                       </Button>
                     </CardFooter>
@@ -170,7 +219,12 @@ const Integrations = () => {
                       <p className="text-xs text-muted-foreground">Connect your Facebook Ads account to manage campaigns</p>
                     </CardContent>
                     <CardFooter className="pt-0">
-                      <Button variant="secondary" size="sm" className="w-full">
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleConnectIntegration("Facebook Ads")}
+                      >
                         <ExternalLink className="mr-2 h-4 w-4" /> Connect
                       </Button>
                     </CardFooter>
@@ -192,7 +246,12 @@ const Integrations = () => {
                       <p className="text-xs text-muted-foreground">Sync product and customer data from your store</p>
                     </CardContent>
                     <CardFooter className="pt-0">
-                      <Button variant="secondary" size="sm" className="w-full">
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleConnectIntegration("Shopify")}
+                      >
                         <ExternalLink className="mr-2 h-4 w-4" /> Connect
                       </Button>
                     </CardFooter>
@@ -214,7 +273,12 @@ const Integrations = () => {
                       <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Connected</Badge>
                     </CardContent>
                     <CardFooter className="pt-0">
-                      <Button variant="outline" size="sm" className="w-full text-primary border-primary/30">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full text-primary border-primary/30"
+                        onClick={() => handleConfigureIntegration("WordPress")}
+                      >
                         <Check className="mr-2 h-4 w-4" /> Configure
                       </Button>
                     </CardFooter>
@@ -236,7 +300,12 @@ const Integrations = () => {
                       <p className="text-xs text-muted-foreground">Connect your WooCommerce store</p>
                     </CardContent>
                     <CardFooter className="pt-0">
-                      <Button variant="secondary" size="sm" className="w-full">
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleConnectIntegration("WooCommerce")}
+                      >
                         <ExternalLink className="mr-2 h-4 w-4" /> Connect
                       </Button>
                     </CardFooter>
@@ -250,7 +319,14 @@ const Integrations = () => {
                     <p className="text-xs text-muted-foreground text-center mb-3">
                       Browse more integration options
                     </p>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toast({
+                        title: "Explore Integrations",
+                        description: "Opening integration marketplace"
+                      })}
+                    >
                       Explore Integrations
                     </Button>
                   </Card>
@@ -295,14 +371,20 @@ const Integrations = () => {
                         {new Date(apiKey.lastUsed).toLocaleDateString()}
                       </div>
                       <div className="col-span-1 text-right">
-                        <Button variant="ghost" size="sm">Revoke</Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleRevokeApiKey(apiKey.id)}
+                        >
+                          Revoke
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
               </CardContent>
               <CardFooter>
-                <Button>
+                <Button onClick={handleGenerateApiKey}>
                   <Plus className="mr-2 h-4 w-4" /> Generate New API Key
                 </Button>
               </CardFooter>
@@ -349,14 +431,23 @@ const Integrations = () => {
                         )}
                       </div>
                       <div className="col-span-1 text-right">
-                        <Button variant="ghost" size="sm">Edit</Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => toast({
+                            title: "Edit Webhook",
+                            description: `Opening webhook editor for ${webhook.name}`
+                          })}
+                        >
+                          Edit
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
               </CardContent>
               <CardFooter>
-                <Button>
+                <Button onClick={handleAddWebhook}>
                   <Plus className="mr-2 h-4 w-4" /> Add Webhook
                 </Button>
               </CardFooter>
@@ -378,7 +469,7 @@ const Integrations = () => {
                   <p className="text-sm text-muted-foreground mb-4">
                     Supported formats: CSV, Excel, JSON
                   </p>
-                  <Button>
+                  <Button onClick={handleImportData}>
                     Select Files
                   </Button>
                 </div>

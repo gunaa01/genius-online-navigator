@@ -47,9 +47,18 @@ const KalvetIntegration = ({ onSuccess }: KalvetIntegrationProps) => {
       onSuccess();
     } catch (error) {
       console.error("Error connecting Kalvet site:", error);
+      // Error toast is already shown in the service function
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleVisitWebsite = () => {
+    window.open("https://kalvet.com", "_blank");
+    toast({
+      title: "Opening Website",
+      description: "Redirecting to Kalvet website",
+    });
   };
 
   return (
@@ -97,7 +106,7 @@ const KalvetIntegration = ({ onSuccess }: KalvetIntegrationProps) => {
       <CardFooter className="pt-0 flex justify-between">
         <Button
           variant="outline"
-          onClick={() => window.open("https://kalvet.com", "_blank")}
+          onClick={handleVisitWebsite}
         >
           <ExternalLink className="h-4 w-4 mr-2" />
           Visit Kalvet

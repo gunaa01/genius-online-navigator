@@ -29,6 +29,11 @@ const IntegrationsList = () => {
       setIntegrations(data);
     } catch (error) {
       console.error("Error loading integrations:", error);
+      toast({
+        title: "Error loading integrations",
+        description: "Failed to load your integrations. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -39,8 +44,17 @@ const IntegrationsList = () => {
       try {
         await deleteIntegration(id);
         setIntegrations(integrations.filter(i => i.id !== id));
+        toast({
+          title: "Integration disconnected",
+          description: `${name} has been successfully removed.`,
+        });
       } catch (error) {
         console.error("Error deleting integration:", error);
+        toast({
+          title: "Error removing integration",
+          description: "Failed to remove the integration. Please try again.",
+          variant: "destructive",
+        });
       }
     }
   };
@@ -48,6 +62,18 @@ const IntegrationsList = () => {
   const handleIntegrationAdded = () => {
     setAddDialogOpen(false);
     loadIntegrations();
+    toast({
+      title: "Integration added",
+      description: "Your new integration has been successfully connected.",
+    });
+  };
+
+  const handleConfigure = (integration: Integration) => {
+    toast({
+      title: "Configure Integration",
+      description: `Opening configuration for ${integration.name}`,
+    });
+    // In a real app, this would open a configuration modal for the specific integration
   };
 
   const getIntegrationIcon = (type: string) => {
@@ -152,7 +178,11 @@ const IntegrationsList = () => {
                 )}
               </CardContent>
               <CardFooter className="pt-0 flex justify-between">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleConfigure(integration)}
+                >
                   <Settings className="h-3.5 w-3.5 mr-1.5" />
                   Configure
                 </Button>

@@ -37,9 +37,18 @@ const CurrencyApiIntegration = ({ onSuccess }: CurrencyApiIntegrationProps) => {
       onSuccess();
     } catch (error) {
       console.error("Error connecting Currency API:", error);
+      // Error toast is already shown in the service function
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleVisitWebsite = () => {
+    window.open("https://currencyapi.com", "_blank");
+    toast({
+      title: "Opening Website",
+      description: "Redirecting to Currency API website",
+    });
   };
 
   return (
@@ -85,7 +94,7 @@ const CurrencyApiIntegration = ({ onSuccess }: CurrencyApiIntegrationProps) => {
       <CardFooter className="pt-0 flex justify-between">
         <Button
           variant="outline"
-          onClick={() => window.open("https://currencyapi.com", "_blank")}
+          onClick={handleVisitWebsite}
         >
           <ExternalLink className="h-4 w-4 mr-2" />
           Visit Website

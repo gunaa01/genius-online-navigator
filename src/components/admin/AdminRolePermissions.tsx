@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, CheckCircle2, Shield } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Role {
   name: string;
@@ -65,6 +66,16 @@ const AdminRolePermissions: React.FC<RolePermissionsProps> = ({
 export const CreateCustomRoleCard: React.FC<{
   onCreateRole: () => void;
 }> = ({ onCreateRole }) => {
+  const { toast } = useToast();
+  
+  const handleCreateRole = () => {
+    toast({
+      title: "Create Custom Role",
+      description: "Opening custom role creation dialog",
+    });
+    onCreateRole();
+  };
+  
   return (
     <Card className="border-dashed flex flex-col justify-center items-center p-6">
       <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center mb-3">
@@ -74,7 +85,7 @@ export const CreateCustomRoleCard: React.FC<{
       <p className="text-sm text-muted-foreground text-center mb-4">
         Create a custom role with specific permissions
       </p>
-      <Button variant="outline" onClick={onCreateRole}>
+      <Button variant="outline" onClick={handleCreateRole}>
         Create Custom Role
       </Button>
     </Card>
