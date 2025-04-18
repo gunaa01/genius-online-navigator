@@ -2,8 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, Globe, ShoppingBag, SearchCheck, Share, CreditCard, MessagesSquare, BarChart3 } from "lucide-react";
-import { target as Target } from 'lucide-react/dist/icons';
+import { 
+  ArrowLeft, 
+  CheckCircle2, 
+  Globe, 
+  ShoppingBag, 
+  SearchCheck, 
+  Share, 
+  CreditCard, 
+  MessagesSquare, 
+  BarChart3,
+  Target 
+} from "lucide-react";
 
 const OfflineToOnline = () => {
   return (
