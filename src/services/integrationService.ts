@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -114,12 +115,31 @@ export const addIntegration = async (integration: Partial<Integration>) => {
       throw new Error("User not authenticated");
     }
 
+    // Ensure required fields are present to match the Supabase table requirements
+    if (!integration.name) {
+      throw new Error("Integration name is required");
+    }
+
+    if (!integration.type) {
+      throw new Error("Integration type is required");
+    }
+
+    // Create a properly typed object for Supabase insert
+    const insertData = {
+      user_id: user.id,
+      name: integration.name,
+      type: integration.type,
+      api_key: integration.api_key || null,
+      access_token: integration.access_token || null,
+      refresh_token: integration.refresh_token || null,
+      credentials: integration.credentials || null,
+      configuration: integration.configuration || null,
+      connected: integration.connected !== undefined ? integration.connected : false
+    };
+
     const { data, error } = await supabase
       .from("integrations")
-      .insert({
-        ...integration,
-        user_id: user.id
-      })
+      .insert(insertData)
       .select()
       .single();
     
@@ -210,13 +230,6 @@ export const connectCurrencyApi = async (apiKey: string) => {
     
     const data = await response.json();
     
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
-    
     // Save the integration if the API key is valid
     const integrationData = {
       name: "Currency API",
@@ -249,17 +262,10 @@ export const connectKalvetSite = async (siteUrl: string, apiKey: string) => {
       siteUrl = 'https://' + siteUrl;
     }
     
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
-    
-    // Simulate API validation (in a real app, you would ping the site to verify)
-    // Here we're just checking basic URL validity
+    // Validate the URL is properly formatted
     const urlObj = new URL(siteUrl);
     
+    // Prepare integration data with required fields
     const integrationData = {
       name: "Kalvet Website",
       type: "kalvet" as IntegrationType,
