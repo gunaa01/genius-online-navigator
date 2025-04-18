@@ -9,7 +9,8 @@ import IntegrationCard from "@/components/common/IntegrationCard";
 import { useDemoData } from "@/hooks/useDemoData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Bell, Plus } from "lucide-react";
+import { Search, Bell, Plus, HelpCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const { 
@@ -75,6 +76,28 @@ const Index = () => {
 
         <section>
           <IntegrationCard integrations={integrations} loading={loading} />
+        </section>
+        
+        <section className="border rounded-lg p-6 bg-muted/30">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <HelpCircle className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium">New to Genius?</h3>
+                <p className="text-muted-foreground">Learn more about our features and how to take your business online.</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" asChild>
+                <Link to="/offline-to-online">Offline to Online Guide</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/landing">Platform Overview</Link>
+              </Button>
+            </div>
+          </div>
         </section>
       </div>
     </DashboardLayout>
