@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -13,6 +14,7 @@ import {
   CreditCard,
   Menu,
   X,
+  UsersRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,6 +37,7 @@ const Sidebar = () => {
     { name: "Ad Campaigns", href: "/ads", icon: Target },
     { name: "Social Media", href: "/social", icon: Share2 },
     { name: "AI Content", href: "/content", icon: MessageSquareText },
+    { name: "Community", href: "/community", icon: UsersRound },
     { name: "Integrations", href: "/integrations", icon: Plug },
     { name: "Team", href: "/team", icon: Users },
     { name: "Settings", href: "/settings", icon: Settings },

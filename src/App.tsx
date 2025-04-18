@@ -18,6 +18,7 @@ import TeamManagement from "./pages/TeamManagement";
 import Settings from "./pages/Settings";
 import Upgrade from "./pages/Upgrade";
 import Auth from "./pages/Auth";
+import Community from "./pages/Community";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./hooks/useAuth";
 
@@ -85,6 +86,12 @@ const App = () => (
               <Route path="/team" element={
                 <ProtectedRoute>
                   <TeamManagement />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/community" element={
+                <ProtectedRoute>
+                  <Community />
                 </ProtectedRoute>
               } />
               
