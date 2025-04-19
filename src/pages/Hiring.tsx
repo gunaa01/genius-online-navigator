@@ -1,49 +1,13 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowLeft,
-  Search,
-  Briefcase,
-  MapPin,
-  Clock,
-  Calendar,
-  BadgeDollarSign,
-  Filter,
-  ArrowUp,
-  ArrowDown,
-  Bookmark
-} from "lucide-react";
+import { ArrowLeft, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import JobFilterSidebar from "@/components/hiring/JobFilterSidebar";
+import JobsListing from "@/components/hiring/JobsListing";
+import JobPostForm from "@/components/hiring/JobPostForm";
 
 // Mock data for job listings
 const jobs = [
@@ -130,19 +94,8 @@ const Hiring = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Jobs");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const form = useForm({
-    defaultValues: {
-      title: "",
-      company: "",
-      location: "",
-      type: "",
-      budget: "",
-      description: "",
-      skills: "",
-    },
-  });
 
-  const onSubmit = (data) => {
+  const handleSubmit = (data: any) => {
     console.log(data);
     setIsDialogOpen(false);
   };
@@ -162,9 +115,7 @@ const Hiring = () => {
               <Button variant="outline">Find Freelancers</Button>
             </Link>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>Post a Job</Button>
-              </DialogTrigger>
+              <Button onClick={() => setIsDialogOpen(true)}>Post a Job</Button>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Post a New Job</DialogTitle>
@@ -172,139 +123,7 @@ const Hiring = () => {
                     Fill out the form below to post your job requirement. It will be visible to all freelancers.
                   </DialogDescription>
                 </DialogHeader>
-
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Job Title</FormLabel>
-                          <FormControl>
-                            <Input placeholder="E.g. WordPress Developer for E-commerce Site" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="company"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Company Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Your company name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="location"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Location</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select location" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="remote">Remote</SelectItem>
-                                <SelectItem value="onsite">On-Site</SelectItem>
-                                <SelectItem value="hybrid">Hybrid</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="type"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Job Type</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select job type" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="full-time">Full-time</SelectItem>
-                                <SelectItem value="part-time">Part-time</SelectItem>
-                                <SelectItem value="contract">Contract</SelectItem>
-                                <SelectItem value="project">Project-based</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="budget"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Budget</FormLabel>
-                            <FormControl>
-                              <Input placeholder="E.g. $1000-$2000 or $25/hr" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Job Description</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Describe the job requirements, responsibilities, and any other details." 
-                              className="min-h-[150px]"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="skills"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Required Skills</FormLabel>
-                          <FormControl>
-                            <Input placeholder="E.g. WordPress, PHP, CSS (comma separated)" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <DialogFooter>
-                      <Button type="submit">Post Job</Button>
-                    </DialogFooter>
-                  </form>
-                </Form>
+                <JobPostForm onSubmit={handleSubmit} onCancel={() => setIsDialogOpen(false)} />
               </DialogContent>
             </Dialog>
           </div>
@@ -338,152 +157,14 @@ const Hiring = () => {
         {/* Job Listings */}
         <div className="flex flex-col gap-6 lg:flex-row">
           {/* Filters sidebar */}
-          <div className="w-full lg:w-64 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Categories</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {jobCategories.map((category) => (
-                    <div key={category} className="flex items-center">
-                      <Button 
-                        variant={selectedCategory === category ? "default" : "ghost"} 
-                        className="w-full justify-start text-sm h-9"
-                        onClick={() => setSelectedCategory(category)}
-                      >
-                        {category}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Job Type</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center">
-                  <input id="full-time" type="checkbox" className="h-4 w-4 mr-2"/>
-                  <label htmlFor="full-time" className="text-sm">Full-time</label>
-                </div>
-                <div className="flex items-center">
-                  <input id="part-time" type="checkbox" className="h-4 w-4 mr-2"/>
-                  <label htmlFor="part-time" className="text-sm">Part-time</label>
-                </div>
-                <div className="flex items-center">
-                  <input id="contract" type="checkbox" className="h-4 w-4 mr-2"/>
-                  <label htmlFor="contract" className="text-sm">Contract</label>
-                </div>
-                <div className="flex items-center">
-                  <input id="project" type="checkbox" className="h-4 w-4 mr-2"/>
-                  <label htmlFor="project" className="text-sm">Project-based</label>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Budget Range</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center">
-                  <input id="budget-1" type="radio" name="budget" className="h-4 w-4 mr-2"/>
-                  <label htmlFor="budget-1" className="text-sm">Under $500</label>
-                </div>
-                <div className="flex items-center">
-                  <input id="budget-2" type="radio" name="budget" className="h-4 w-4 mr-2"/>
-                  <label htmlFor="budget-2" className="text-sm">$500 - $1,000</label>
-                </div>
-                <div className="flex items-center">
-                  <input id="budget-3" type="radio" name="budget" className="h-4 w-4 mr-2"/>
-                  <label htmlFor="budget-3" className="text-sm">$1,000 - $5,000</label>
-                </div>
-                <div className="flex items-center">
-                  <input id="budget-4" type="radio" name="budget" className="h-4 w-4 mr-2"/>
-                  <label htmlFor="budget-4" className="text-sm">$5,000+</label>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <JobFilterSidebar 
+            jobCategories={jobCategories} 
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
           
           {/* Job listings */}
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Available Jobs ({jobs.length})</h2>
-              <div className="flex items-center text-sm">
-                <span className="mr-2">Sort by:</span>
-                <Select defaultValue="newest">
-                  <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">Newest First</SelectItem>
-                    <SelectItem value="oldest">Oldest First</SelectItem>
-                    <SelectItem value="budget-high">Budget (High to Low)</SelectItem>
-                    <SelectItem value="budget-low">Budget (Low to High)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              {jobs.map((job) => (
-                <Card key={job.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-xl font-semibold mb-1">{job.title}</h3>
-                        <p className="text-muted-foreground mb-2">{job.company}</p>
-                        <div className="flex flex-wrap gap-1.5 mb-4">
-                          {job.skills.map((skill) => (
-                            <Badge key={skill} variant="secondary" className="font-normal">{skill}</Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="icon">
-                        <Bookmark className="h-5 w-5" />
-                      </Button>
-                    </div>
-                    
-                    <p className="mb-4 text-sm">{job.description}</p>
-                    
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm mb-4">
-                      <div className="flex items-center">
-                        <MapPin className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                        <span>{job.location}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Briefcase className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                        <span>{job.type}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Clock className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                        <span>{job.duration}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <BadgeDollarSign className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                        <span>{job.budget}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-2 border-t">
-                      <div className="flex items-center text-sm">
-                        <Calendar className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
-                        <span className="text-muted-foreground">Posted {job.posted}</span>
-                        <span className="mx-2">•</span>
-                        <span className="text-muted-foreground">{job.applicants} applicants</span>
-                      </div>
-                      
-                      <Button>Apply Now</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <JobsListing jobs={jobs} />
         </div>
       </div>
     </div>
