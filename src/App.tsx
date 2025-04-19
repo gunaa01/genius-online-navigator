@@ -8,7 +8,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
 import OfflineToOnline from "./pages/OfflineToOnline";
-import ForHire from "./pages/ForHire";  // Add this import
+import Hire from "./pages/Hire";  // Changed from ForHire to Hire
+import Hiring from "./pages/Hiring";  // Added new Hiring page
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import Analytics from "./pages/Analytics";
@@ -38,7 +39,8 @@ const App = () => (
             <Routes>
               <Route path="/landing" element={<LandingPage />} />
               <Route path="/offline-to-online" element={<OfflineToOnline />} />
-              <Route path="/for-hire" element={<ForHire />} />  {/* Add this route */}
+              <Route path="/hire" element={<Hire />} />  {/* Changed from for-hire to hire */}
+              <Route path="/hiring" element={<Hiring />} /> {/* Added new hiring route */}
               <Route path="/auth" element={<Auth />} />
               
               <Route path="/" element={
@@ -124,4 +126,3 @@ const App = () => (
 );
 
 export default App;
-

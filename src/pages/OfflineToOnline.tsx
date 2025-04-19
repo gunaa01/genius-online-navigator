@@ -1,17 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import { 
-  ArrowLeft, 
+  ArrowRightIcon, 
   CheckCircle2, 
-  Globe, 
-  ShoppingBag, 
-  SearchCheck, 
-  Share, 
-  CreditCard, 
-  MessagesSquare, 
-  BarChart3,
   Target 
 } from "lucide-react";
 
@@ -19,310 +11,254 @@ const OfflineToOnline = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" className="mb-6" asChild>
-          <Link to="/landing">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Link>
-        </Button>
+        <h1 className="text-3xl font-bold mb-2">Taking Your Business Online: The Complete Guide</h1>
+        <p className="text-muted-foreground mb-8">A step-by-step playbook for traditional businesses making the digital transition.</p>
         
-        <div className="max-w-3xl mx-auto">
-          <header className="mb-8 text-center">
-            <h1 className="text-3xl font-bold mb-4">Taking Your Offline Business Online</h1>
-            <p className="text-lg text-muted-foreground">A step-by-step guide to establishing an effective online presence for your business</p>
-          </header>
+        {/* Sections nav */}
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          <Card>
+            <CardHeader>
+              <CardTitle>Getting Started</CardTitle>
+              <CardDescription>Prepare your business for going online</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                <li className="flex items-center text-sm">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  <span>Assess your digital readiness</span>
+                </li>
+                <li className="flex items-center text-sm">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  <span>Research your online competitors</span>
+                </li>
+                <li className="flex items-center text-sm">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  <span>Define your digital goals</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
           
-          <Tabs defaultValue="planning" className="mb-8">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="planning">Planning & Setup</TabsTrigger>
-              <TabsTrigger value="marketing">Digital Marketing</TabsTrigger>
-              <TabsTrigger value="operations">Operations & Growth</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="planning" className="mt-6">
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                      <CardTitle>Define Your Online Goals</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Consider what you want to achieve with your online presence:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc ml-6 space-y-2">
-                      <li>Sell products online (e-commerce)</li>
-                      <li>Generate leads for your service-based business</li>
-                      <li>Increase brand awareness</li>
-                      <li>Offer online bookings and appointments</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <Globe className="h-5 w-5 text-primary" />
-                      <CardTitle>Domain & Hosting Setup</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Establish your online foundation:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc ml-6 space-y-2">
-                      <li><strong>Domain:</strong> Choose a simple, brandable name (e.g., YourBusinessName.com)</li>
-                      <li><strong>Providers:</strong> Namecheap, GoDaddy, Google Domains</li>
-                      <li><strong>Hosting:</strong> Bluehost, SiteGround, or Hostinger (for WordPress)</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <ShoppingBag className="h-5 w-5 text-primary" />
-                      <CardTitle>Build Your Website</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Choose the right platform for your business needs:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium mb-2">Website Options:</h4>
-                        <ul className="list-disc ml-6 space-y-2">
-                          <li><strong>Website Builders:</strong> Shopify (e-commerce), Wix/Squarespace (general)</li>
-                          <li><strong>WordPress + WooCommerce:</strong> More customizable but requires more setup</li>
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2">Essential Pages:</h4>
-                        <ul className="list-disc ml-6 space-y-2">
-                          <li>Homepage</li>
-                          <li>About Us</li>
-                          <li>Products/Services</li>
-                          <li>Contact Page (Phone, Email, Address, Google Maps)</li>
-                          <li>Booking/Purchase Options (if applicable)</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <CreditCard className="h-5 w-5 text-primary" />
-                      <CardTitle>Set Up Online Payments</CardTitle>
-                    </div>
-                    <CardDescription>
-                      If selling products or services online:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc ml-6 space-y-2">
-                      <li><strong>Payment Gateways:</strong> Stripe, PayPal, Razorpay (India), Square</li>
-                      <li><strong>POS Integration:</strong> Square, Shopify POS, Clover (if you need offline & online sync)</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="marketing" className="mt-6">
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <SearchCheck className="h-5 w-5 text-primary" />
-                      <CardTitle>Google My Business Listing</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Help local customers find you on Google Search & Maps:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ol className="list-decimal ml-6 space-y-2">
-                      <li>Go to <a href="https://www.google.com/business/" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Google Business Profile</a></li>
-                      <li>Add business name, address, phone, website, photos</li>
-                      <li>Verify via postcard or phone</li>
-                      <li>Keep information updated and respond to reviews</li>
-                    </ol>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <Share className="h-5 w-5 text-primary" />
-                      <CardTitle>Social Media Presence</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Build engagement and awareness:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium mb-2">Recommended Platforms:</h4>
-                        <ul className="list-disc ml-6 space-y-2">
-                          <li><strong>Facebook & Instagram:</strong> For engagement & ads</li>
-                          <li><strong>LinkedIn:</strong> For B2B businesses</li>
-                          <li><strong>YouTube/TikTok:</strong> If video content works for your niche</li>
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2">Content Ideas:</h4>
-                        <ul className="list-disc ml-6 space-y-2">
-                          <li>Product photos</li>
-                          <li>Behind-the-scenes content</li>
-                          <li>Promotions and special offers</li>
-                          <li>Customer testimonials</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <Target className="h-5 w-5 text-primary" />
-                      <CardTitle>Online Advertising</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Strategic advertising to reach your target audience:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc ml-6 space-y-2">
-                      <li><strong>Google Ads:</strong> For search traffic (e.g., "Best bakery near me")</li>
-                      <li><strong>Facebook/Instagram Ads:</strong> For brand awareness & sales</li>
-                      <li><strong>Retargeting Ads:</strong> To bring back website visitors who didn't convert</li>
-                      <li><strong>Local SEO:</strong> Optimize for "near me" searches</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <MessagesSquare className="h-5 w-5 text-primary" />
-                      <CardTitle>Email & SMS Marketing</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Direct communication with customers:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc ml-6 space-y-2">
-                      <li>Collect emails via website pop-ups or in-store sign-ups</li>
-                      <li>Use Mailchimp, Klaviyo, or Brevo for email campaigns</li>
-                      <li>Send discounts, newsletters, and updates</li>
-                      <li>Segment your audience for targeted messaging</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="operations" className="mt-6">
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <ShoppingBag className="h-5 w-5 text-primary" />
-                      <CardTitle>Online Booking & Ordering</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Make it easy for customers to do business with you:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc ml-6 space-y-2">
-                      <li><strong>Restaurants:</strong> Uber Eats, Zomato, or your own website (via Toast, GloriaFood)</li>
-                      <li><strong>Service Businesses:</strong> Calendly, Bookeo, or WordPress booking plugins</li>
-                      <li><strong>Retail:</strong> E-commerce with local pickup or delivery options</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <MessagesSquare className="h-5 w-5 text-primary" />
-                      <CardTitle>Customer Support</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Provide excellent service across channels:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc ml-6 space-y-2">
-                      <li><strong>Live Chat:</strong> Tawk.to, WhatsApp Business, or Facebook Messenger</li>
-                      <li><strong>FAQ Page:</strong> Reduce repetitive queries</li>
-                      <li><strong>Response Time:</strong> Aim to respond within 24 hours</li>
-                      <li><strong>Multi-channel Support:</strong> Email, phone, social media</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <BarChart3 className="h-5 w-5 text-primary" />
-                      <CardTitle>Track Performance & Optimize</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Monitor and improve your digital presence:
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc ml-6 space-y-2">
-                      <li><strong>Google Analytics:</strong> Track website traffic sources and behavior</li>
-                      <li><strong>Social Media Insights:</strong> Monitor engagement metrics</li>
-                      <li><strong>Google My Business Analytics:</strong> See how customers find you</li>
-                      <li><strong>A/B Testing:</strong> Test different ads, website layouts, and offers</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="border-b">
-                    <CardTitle>Final Tips for Success</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-6">
-                    <ul className="list-disc ml-6 space-y-3">
-                      <li><strong>Start simple</strong> – Don't overcomplicate; a basic website + Google My Business is a great start.</li>
-                      <li><strong>Leverage local SEO</strong> – Optimize for "near me" searches and local intent.</li>
-                      <li><strong>Encourage reviews</strong> – Ask happy customers to leave Google/Facebook reviews.</li>
-                      <li><strong>Be consistent</strong> – Post regularly on social media & update your website.</li>
-                      <li><strong>Track what works</strong> – Use analytics to understand which channels drive results.</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <Card>
+            <CardHeader>
+              <CardTitle>Building Your Presence</CardTitle>
+              <CardDescription>Create your digital storefront</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                <li className="flex items-center text-sm">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  <span>Choose your website platform</span>
+                </li>
+                <li className="flex items-center text-sm">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  <span>Set up payment processing</span>
+                </li>
+                <li className="flex items-center text-sm">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  <span>Create essential business pages</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
           
-          <div className="bg-muted p-6 rounded-lg text-center">
-            <h3 className="text-xl font-bold mb-3">Ready to take your business online?</h3>
-            <p className="mb-6">Genius provides all the tools you need to establish and grow your online presence.</p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button asChild size="lg">
-                <Link to="/for-hire">View Hiring Guide</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link to="/auth">Get Started with Genius</Link>
-              </Button>
+          <Card>
+            <CardHeader>
+              <CardTitle>Growing Your Business</CardTitle>
+              <CardDescription>Attract and convert customers</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                <li className="flex items-center text-sm">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  <span>Implement a digital marketing plan</span>
+                </li>
+                <li className="flex items-center text-sm">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  <span>Use analytics to improve performance</span>
+                </li>
+                <li className="flex items-center text-sm">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  <span>Scale your online operations</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Main content */}
+        <div className="max-w-4xl mx-auto space-y-10">
+          {/* Section 1 */}
+          <section>
+            <h2 className="text-2xl font-bold mb-4">Before You Begin: Digital Readiness</h2>
+            <p className="mb-4">Taking your business online isn't just about creating a website – it requires a strategic approach to ensure success in the digital landscape. Here are the essential steps to prepare:</p>
+            
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              <div className="bg-muted rounded-lg p-6">
+                <h3 className="font-semibold mb-3">Key Questions to Answer:</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">1.</span>
+                    <span>What are your specific goals for going online? (e.g., selling products, generating leads, building brand awareness)</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">2.</span>
+                    <span>Who is your target audience online? Is it the same as your offline customers?</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">3.</span>
+                    <span>What resources (budget, time, skills) can you allocate to your online presence?</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">4.</span>
+                    <span>Who will be responsible for maintaining your online channels?</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-muted rounded-lg p-6">
+                <h3 className="font-semibold mb-3">Common Challenges:</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span>Limited technical knowledge or digital skills</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span>Concerns about cyber security and data protection</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span>Uncertainty about which digital channels to focus on</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span>Time constraints while running day-to-day operations</span>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
+            
+            <div className="mt-6 border-l-4 border-primary pl-4 italic">
+              <p>"Going digital wasn't just about having a website – it was about transforming how we think about our business. Once we clarified our goals, everything else became easier."</p>
+              <p className="text-sm text-muted-foreground mt-2">– Sarah Chen, Local Bookstore Owner</p>
+            </div>
+          </section>
+          
+          {/* Hiring help section with button to Hire page */}
+          <section className="bg-muted p-6 rounded-lg">
+            <div className="flex flex-col md:flex-row md:items-center gap-4">
+              <div className="flex-1">
+                <h2 className="text-xl font-bold mb-2 flex items-center">
+                  <Target className="h-5 w-5 mr-2 text-primary" />
+                  Need help with your online transition?
+                </h2>
+                <p className="text-muted-foreground">
+                  If you don't have the time or skills to handle everything yourself, our platform connects you with pre-vetted freelancers specializing in digital transformation.
+                </p>
+              </div>
+              <div>
+                <Link to="/hire">
+                  <Button size="lg" className="w-full md:w-auto">
+                    Find Freelancers
+                    <ArrowRightIcon className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 2 */}
+          <section>
+            <h2 className="text-2xl font-bold mb-4">Building Your Online Presence</h2>
+            <p className="mb-4">With your goals defined, it's time to build your digital storefront. This involves choosing the right platform, setting up secure payment processing, and creating essential business pages.</p>
+            
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              <div className="bg-muted rounded-lg p-6">
+                <h3 className="font-semibold mb-3">Choosing Your Website Platform:</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>E-commerce Platforms (Shopify, WooCommerce):</b> Ideal for selling products online with built-in shopping cart and inventory management.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Website Builders (Squarespace, Wix):</b> User-friendly options for creating visually appealing websites without coding.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Content Management Systems (WordPress):</b> Flexible platform for blogs, business sites, and e-commerce with plugins.</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-muted rounded-lg p-6">
+                <h3 className="font-semibold mb-3">Setting Up Payment Processing:</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Payment Gateways (Stripe, PayPal):</b> Integrate secure payment processing directly into your website.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Point-of-Sale (POS) Systems:</b> Sync online and offline sales with a unified system.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Mobile Payment Options (Apple Pay, Google Pay):</b> Offer convenient payment methods for mobile users.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          
+          {/* Section 3 */}
+          <section>
+            <h2 className="text-2xl font-bold mb-4">Growing Your Online Business</h2>
+            <p className="mb-4">With your website up and running, it's time to attract and convert customers. This involves implementing a digital marketing plan, using analytics to improve performance, and scaling your online operations.</p>
+            
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              <div className="bg-muted rounded-lg p-6">
+                <h3 className="font-semibold mb-3">Digital Marketing Strategies:</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Search Engine Optimization (SEO):</b> Optimize your website to rank higher in search engine results.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Social Media Marketing:</b> Engage with customers on social media platforms.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Email Marketing:</b> Send targeted emails to promote products and services.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Paid Advertising (Google Ads, Facebook Ads):</b> Run targeted ads to reach potential customers.</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-muted rounded-lg p-6">
+                <h3 className="font-semibold mb-3">Analytics and Performance Improvement:</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Website Analytics (Google Analytics):</b> Track website traffic, user behavior, and conversions.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>A/B Testing:</b> Experiment with different website elements to improve performance.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-medium mr-2">•</span>
+                    <span><b>Customer Feedback:</b> Collect and analyze customer feedback to improve products and services.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
