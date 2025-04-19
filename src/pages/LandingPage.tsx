@@ -1,8 +1,8 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ArrowRight, LayoutDashboard, BarChart3, FileBarChart, Target, Share2, MessageSquareText, UsersRound, Plug, Users, Settings, Store } from "lucide-react";
+import { Helmet } from 'react-helmet';
 
 const LandingPage = () => {
   const pages = [
@@ -69,7 +69,23 @@ const LandingPage = () => {
   ];
 
   return (
+    <>
+      <Helmet>
+        <title>Genius - All-in-One Business Platform</title>
+        <meta name="description" content="Genius is an all-in-one platform designed to help businesses grow online." />
+      </Helmet>
     <div className="min-h-screen bg-background">
+        <nav className="bg-background p-4">
+          <div className="container mx-auto flex justify-between">
+            <Link to="/" className="text-lg font-bold">Genius</Link>
+            <div className="flex gap-4">
+              <Link to="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link>
+              <Link to="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link>
+              <Link to="/contact" className="text-muted-foreground hover:text-foreground">Contact</Link>
+            </div>
+          </div>
+        </nav>
+
       <header className="bg-primary text-primary-foreground py-12">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">Welcome to Genius</h1>
@@ -111,6 +127,15 @@ const LandingPage = () => {
         </div>
       </section>
 
+        <section className="py-16 bg-muted">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold mb-4">What Our Users Say</h2>
+            <p className="text-lg mb-8">"Genius has transformed the way we do business!" - Happy Customer</p>
+            <p className="text-lg mb-8">"The analytics tools are incredibly powerful." - Satisfied User</p>
+            {/* Add more testimonials as needed */}
+          </div>
+        </section>
+
       <section className="py-16 bg-muted">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Business?</h2>
@@ -120,6 +145,25 @@ const LandingPage = () => {
           </Button>
         </div>
       </section>
+
+        <section className="py-16 container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
+          <div className="space-y-4">
+            <div className="bg-white p-4 rounded shadow">
+              <h3 className="font-semibold">Q: What is Genius?</h3>
+              <p>A: Genius is an all-in-one platform designed to help businesses grow online.</p>
+            </div>
+            <div className="bg-white p-4 rounded shadow">
+              <h3 className="font-semibold">Q: How can I get started?</h3>
+              <p>A: You can get started by signing up for a free account on our website.</p>
+            </div>
+            <div className="bg-white p-4 rounded shadow">
+              <h3 className="font-semibold">Q: Is there a mobile app?</h3>
+              <p>A: Yes, we offer a mobile app for both iOS and Android devices.</p>
+            </div>
+            {/* Add more FAQs as needed */}
+          </div>
+        </section>
 
       <footer className="bg-background border-t py-8">
         <div className="container mx-auto px-4">
@@ -134,6 +178,7 @@ const LandingPage = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 
