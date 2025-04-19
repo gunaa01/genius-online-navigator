@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
 import OfflineToOnline from "./pages/OfflineToOnline";
+import ForHire from "./pages/ForHire";  // Add this import
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import Analytics from "./pages/Analytics";
@@ -36,7 +38,7 @@ const App = () => (
             <Routes>
               <Route path="/landing" element={<LandingPage />} />
               <Route path="/offline-to-online" element={<OfflineToOnline />} />
-              <Route path="/for-hire" element={<ForHire />} />
+              <Route path="/for-hire" element={<ForHire />} />  {/* Add this route */}
               <Route path="/auth" element={<Auth />} />
               
               <Route path="/" element={
@@ -122,3 +124,4 @@ const App = () => (
 );
 
 export default App;
+
