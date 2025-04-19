@@ -1,0 +1,20 @@
+
+{
+  "email": "info@geniusplatform.com",
+  "phone": "+1 (555) 123-4567",
+  "address": "123 Market Street, Suite 101, San Francisco, CA 94103",
+  "social_media": [
+    {
+      "platform": "Facebook",
+      "url": "https://facebook.com/genius"
+    },
+    {
+      "platform": "Twitter",
+      "url": "https://twitter.com/genius"
+    },
+    {
+      "platform": "LinkedIn",
+      "url": "https://linkedin.com/company/genius"
+    }
+  ]
+}

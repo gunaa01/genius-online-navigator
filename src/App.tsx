@@ -8,8 +8,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
 import OfflineToOnline from "./pages/OfflineToOnline";
-import Hire from "./pages/Hire";  // Changed from ForHire to Hire
-import Hiring from "./pages/Hiring";  // Added new Hiring page
+import Hire from "./pages/Hire";
+import Hiring from "./pages/Hiring";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import Analytics from "./pages/Analytics";
@@ -23,6 +23,7 @@ import Settings from "./pages/Settings";
 import Upgrade from "./pages/Upgrade";
 import Auth from "./pages/Auth";
 import Community from "./pages/Community";
+import Admin from "./pages/Admin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./hooks/useAuth";
 
@@ -39,8 +40,8 @@ const App = () => (
             <Routes>
               <Route path="/landing" element={<LandingPage />} />
               <Route path="/offline-to-online" element={<OfflineToOnline />} />
-              <Route path="/hire" element={<Hire />} />  {/* Changed from for-hire to hire */}
-              <Route path="/hiring" element={<Hiring />} /> {/* Added new hiring route */}
+              <Route path="/hire" element={<Hire />} />
+              <Route path="/hiring" element={<Hiring />} />
               <Route path="/auth" element={<Auth />} />
               
               <Route path="/" element={
@@ -112,6 +113,12 @@ const App = () => (
               <Route path="/upgrade" element={
                 <ProtectedRoute>
                   <Upgrade />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <Admin />
                 </ProtectedRoute>
               } />
               
