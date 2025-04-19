@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -6,13 +5,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 
+interface JobPostData {
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  budget: string;
+  description: string;
+  skills: string;
+}
+
 interface JobPostFormProps {
-  onSubmit: (data: any) => void;
+  onSubmit: (data: JobPostData) => void;
   onCancel: () => void;
 }
 
 const JobPostForm = ({ onSubmit, onCancel }: JobPostFormProps) => {
-  const form = useForm({
+  const form = useForm<JobPostData>({
     defaultValues: {
       title: "",
       company: "",
@@ -24,7 +33,7 @@ const JobPostForm = ({ onSubmit, onCancel }: JobPostFormProps) => {
     },
   });
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = (data: JobPostData) => {
     onSubmit(data);
   };
 

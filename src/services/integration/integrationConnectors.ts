@@ -1,4 +1,3 @@
-
 import { toast } from "@/hooks/use-toast";
 import { addIntegration } from "./integrationApi";
 import { IntegrationType } from "./types";
@@ -29,7 +28,7 @@ export const connectCurrencyApi = async (apiKey: string) => {
     
     return await addIntegration(integrationData);
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast({
       title: "Error connecting to Currency API",
       description: error.message,
@@ -64,7 +63,7 @@ export const connectKalvetSite = async (siteUrl: string, apiKey: string) => {
     
     return await addIntegration(integrationData);
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast({
       title: "Error connecting to Kalvet website",
       description: error.message || "Invalid URL format",
