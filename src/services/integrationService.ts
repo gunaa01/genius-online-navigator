@@ -4,9 +4,8 @@ import { getUserIntegrations, addIntegration, updateIntegration, deleteIntegrati
 import { connectCurrencyApi, connectKalvetSite } from "./integration/integrationConnectors";
 
 // Export all the integration types and functions
-export {
-  Integration,
-  IntegrationType,
+export type { Integration, IntegrationType };
+export { 
   availableIntegrations,
   getUserIntegrations,
   addIntegration,

@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import IntegrationPlatforms from '@/components/integrations/IntegrationPlatforms';
 import ApiKeysTab from '@/components/integrations/ApiKeysTab';
 import WebhooksTab from '@/components/integrations/WebhooksTab';
-import DataImportTab from '@/components/integrations/DataImportTab';
+import DataImportTab, { DataImport } from '@/components/integrations/DataImportTab';
 
 // Mock data
 const apiKeys = [
@@ -55,7 +55,7 @@ const webhooks = [
   }
 ];
 
-const dataImports = [
+const dataImports: DataImport[] = [
   {
     id: 1,
     filename: "customer_data_march.csv",

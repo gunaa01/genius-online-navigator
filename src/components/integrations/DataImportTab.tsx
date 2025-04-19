@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 
-interface DataImport {
+export interface DataImport {
   id: number;
   filename: string;
   type: string;

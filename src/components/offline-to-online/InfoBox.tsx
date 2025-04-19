@@ -3,7 +3,7 @@ interface InfoBoxProps {
   title: string;
   items: Array<{
     id: string | number;
-    content: string;
+    content: string | JSX.Element;
   }>;
   numbered?: boolean;
 }
