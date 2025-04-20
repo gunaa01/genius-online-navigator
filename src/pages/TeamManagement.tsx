@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -283,7 +282,7 @@ const TeamManagement = () => {
             <h1 className="text-2xl font-bold">Team Management</h1>
             <p className="text-muted-foreground">Manage your team members and their permissions</p>
           </div>
-          <Button onClick={toggleInviteForm}>
+          <Button onClick={() => window.location.href = '/team/invite'}>
             <UserPlus className="mr-2 h-4 w-4" /> Invite Team Member
           </Button>
         </header>
@@ -509,7 +508,7 @@ const TeamManagement = () => {
                     <p className="text-muted-foreground mb-4">
                       All invitations have been accepted or have expired.
                     </p>
-                    <Button onClick={toggleInviteForm}>
+                    <Button onClick={() => window.location.href = '/team/invite'}>
                       <UserPlus className="mr-2 h-4 w-4" /> Invite Team Member
                     </Button>
                   </div>

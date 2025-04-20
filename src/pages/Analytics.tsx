@@ -1,4 +1,3 @@
-
 import React from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,9 +26,58 @@ const Analytics = () => {
     { name: 'Referral', value: 750 },
     { name: 'Email', value: 400 },
   ];
-  
+
+  const [showFilter, setShowFilter] = React.useState(false);
+  const [showCalendar, setShowCalendar] = React.useState(false);
+  const [dateRange, setDateRange] = React.useState({ start: '', end: '' });
+  const dateRangeLabel = dateRange.start && dateRange.end
+    ? `${dateRange.start} to ${dateRange.end}`
+    : 'Last 7 days';
+
   return (
     <DashboardLayout>
+      {showFilter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-xl p-8 min-w-[320px]">
+            <h2 className="text-lg font-bold mb-4">Filter Analytics</h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Date Range</label>
+              <input type="date" className="border rounded p-2 w-full mb-2" />
+              <input type="date" className="border rounded p-2 w-full" />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Metric</label>
+              <select className="border rounded p-2 w-full">
+                <option>All</option>
+                <option>Visitors</option>
+                <option>Revenue</option>
+                <option>Engagement</option>
+              </select>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowFilter(false)}>Cancel</Button>
+              <Button onClick={() => setShowFilter(false)}>Apply</Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showCalendar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-xl p-8 min-w-[320px]">
+            <h2 className="text-lg font-bold mb-4">Select Date Range</h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Start Date</label>
+              <input type="date" className="border rounded p-2 w-full mb-2" value={dateRange.start} onChange={e => setDateRange(r => ({ ...r, start: e.target.value }))} />
+              <label className="block text-sm font-medium mb-1">End Date</label>
+              <input type="date" className="border rounded p-2 w-full" value={dateRange.end} onChange={e => setDateRange(r => ({ ...r, end: e.target.value }))} />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowCalendar(false)}>Cancel</Button>
+              <Button onClick={() => setShowCalendar(false)}>Apply</Button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col space-y-8">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -37,19 +85,62 @@ const Analytics = () => {
             <p className="text-muted-foreground">Detailed insights about your online performance</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setShowCalendar(true)}>
               <Calendar className="h-4 w-4" />
-              Last 7 days
+              {dateRangeLabel}
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => setShowFilter(true)}>
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: 'Genius Analytics',
+                  text: 'Check out these analytics insights from Genius!',
+                  url: window.location.href
+                });
+              } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link copied to clipboard!');
+              }
+            }}>
               <Share2 className="h-4 w-4 mr-2" />
               Share
             </Button>
-            <Button>
+            <Button onClick={() => {
+              // Export analytics data as CSV (expanded)
+              const csvRows = [];
+              csvRows.push(["Metric","Value"]);
+              visitors.forEach(row => {
+                csvRows.push([row.name, row.value]);
+              });
+              csvRows.push([""]);
+              csvRows.push(["Revenue"]);
+              revenue.forEach(row => {
+                csvRows.push([row.name, row.value]);
+              });
+              csvRows.push([""]);
+              csvRows.push(["Device Breakdown"]);
+              deviceData.forEach(row => {
+                csvRows.push([row.name, row.value]);
+              });
+              csvRows.push([""]);
+              csvRows.push(["Source Breakdown"]);
+              sourceData.forEach(row => {
+                csvRows.push([row.name, row.value]);
+              });
+              const csvContent = csvRows.map(e => e.join(",")).join("\n");
+              const blob = new Blob([csvContent], { type: 'text/csv' });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.setAttribute('hidden', '');
+              a.setAttribute('href', url);
+              a.setAttribute('download', 'analytics_export.csv');
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            }}>
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>

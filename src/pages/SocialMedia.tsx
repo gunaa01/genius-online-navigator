@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import axios from 'axios';
 
 const SocialMedia = () => {
   const { socialAccounts, loading } = useDemoData();
@@ -116,6 +116,66 @@ const SocialMedia = () => {
     });
   };
 
+  const [accounts, setAccounts] = React.useState(socialAccounts);
+  const [showCalendar, setShowCalendar] = React.useState(false);
+  const [showCreatePost, setShowCreatePost] = React.useState(false);
+  const [showConnect, setShowConnect] = React.useState(false);
+  const [postContent, setPostContent] = React.useState('');
+  const [postImage, setPostImage] = React.useState(null);
+  const [postPlatforms, setPostPlatforms] = React.useState([]);
+  const [message, setMessage] = React.useState('');
+
+  function handleViewAnalytics(account) {
+    // Replace with navigation or modal as needed
+    alert(`Viewing analytics for @${account.username}`);
+  }
+
+  function handleCreatePost() {
+    setMessage('');
+    // Simulate API call
+    setTimeout(() => {
+      setShowCreatePost(false);
+      setMessage('Post created and scheduled!');
+      setPostContent('');
+      setPostImage(null);
+      setPostPlatforms([]);
+    }, 1200);
+  }
+
+  function handleConnectAccount() {
+    setMessage('');
+    setTimeout(() => {
+      setShowConnect(false);
+      setMessage('Account connected!');
+    }, 1000);
+  }
+
+  function handleToggleAccount(id) {
+    // Find the account to toggle
+    const updated = accounts.find(acc => acc.id === id);
+    // Optimistically update UI
+    setAccounts(prev =>
+      prev.map(acc =>
+        acc.id === id ? { ...acc, connected: !acc.connected } : acc
+      )
+    );
+    setMessage('Account connection toggled!');
+    // Send request to backend
+    axios.post(`http://localhost:8000/api/social-accounts/${id}/toggle`, {
+      connected: !updated.connected
+    })
+      .then(() => setMessage('Account connection updated on server!'))
+      .catch(() => {
+        setMessage('Failed to update account on server.');
+        // Optionally revert UI
+        setAccounts(prev =>
+          prev.map(acc =>
+            acc.id === id ? { ...acc, connected: updated.connected } : acc
+          )
+        );
+      });
+  }
+
   return (
     <DashboardLayout>
       <div className="flex flex-col space-y-8">
@@ -125,17 +185,17 @@ const SocialMedia = () => {
             <p className="text-muted-foreground">Manage your social media accounts and content</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => setShowCalendar(true)}>
               <Calendar className="mr-2 h-4 w-4" /> View Calendar
             </Button>
-            <Button>
+            <Button onClick={() => setShowCreatePost(true)}>
               <Plus className="mr-2 h-4 w-4" /> Create Post
             </Button>
           </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {socialAccounts.map((account) => (
+          {accounts.map((account) => (
             <Card key={account.id} className="card-shadow">
               <CardContent className="p-6">
                 <div className="flex justify-between items-center mb-4">
@@ -148,7 +208,7 @@ const SocialMedia = () => {
                       <p className="text-xs text-muted-foreground">{account.username}</p>
                     </div>
                   </div>
-                  <Switch checked={account.connected} />
+                  <Switch checked={account.connected} onCheckedChange={() => handleToggleAccount(account.id)} />
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
@@ -166,7 +226,7 @@ const SocialMedia = () => {
                 </div>
               </CardContent>
               <CardFooter className="border-t px-6 py-4">
-                <Button variant="ghost" size="sm" className="w-full">
+                <Button variant="ghost" size="sm" className="w-full" onClick={() => handleViewAnalytics(account)}>
                   View Analytics
                 </Button>
               </CardFooter>
@@ -179,7 +239,7 @@ const SocialMedia = () => {
               </div>
               <p className="font-medium mb-1">Connect New Account</p>
               <p className="text-xs text-muted-foreground mb-4">Add more social platforms to your Genius dashboard</p>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => setShowConnect(true)}>
                 Connect Platform
               </Button>
             </CardContent>
@@ -225,7 +285,7 @@ const SocialMedia = () => {
                   <div>
                     <h4 className="text-sm font-medium mb-3">Post to:</h4>
                     <div className="flex flex-wrap gap-3">
-                      {socialAccounts
+                      {accounts
                         .filter(account => account.connected)
                         .map((account) => (
                           <div key={account.id} className="flex items-center gap-2 p-2 border rounded-md">
@@ -340,6 +400,59 @@ const SocialMedia = () => {
           </TabsContent>
         </Tabs>
       </div>
+      {showCalendar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-xl p-8 min-w-[340px]">
+            <h2 className="text-lg font-bold mb-4">Calendar</h2>
+            <p className="mb-4">(Calendar view goes here)</p>
+            <div className="flex justify-end gap-2">
+              <Button onClick={() => setShowCalendar(false)}>Close</Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showCreatePost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-xl p-8 min-w-[340px]">
+            <h2 className="text-lg font-bold mb-4">Create Social Post</h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Content</label>
+              <Textarea className="w-full mb-2" value={postContent} onChange={e => setPostContent(e.target.value)} />
+              <label className="block text-sm font-medium mb-1">Image (optional)</label>
+              <input type="file" className="w-full mb-2" onChange={e => setPostImage(e.target.files[0])} />
+              <label className="block text-sm font-medium mb-1">Platforms</label>
+              <div className="flex gap-2 mb-2">
+                {['twitter','facebook','instagram','linkedin'].map(p => (
+                  <label key={p} className="flex items-center gap-1">
+                    <input type="checkbox" checked={postPlatforms.includes(p)} onChange={e => {
+                      setPostPlatforms(prev => e.target.checked ? [...prev, p] : prev.filter(x => x !== p));
+                    }} /> {getPlatformName(p)}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowCreatePost(false)}>Cancel</Button>
+              <Button onClick={handleCreatePost}>Create & Schedule</Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showConnect && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-xl p-8 min-w-[340px]">
+            <h2 className="text-lg font-bold mb-4">Connect New Account</h2>
+            <p className="mb-4">(Social account connection form goes here)</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowConnect(false)}>Cancel</Button>
+              <Button onClick={handleConnectAccount}>Connect</Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {message && (
+        <div className="fixed top-4 right-4 z-50 bg-green-100 text-green-900 p-3 rounded shadow">{message}</div>
+      )}
     </DashboardLayout>
   );
 };

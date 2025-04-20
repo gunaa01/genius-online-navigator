@@ -64,11 +64,11 @@ const IntegrationCard = ({ integrations, loading }: IntegrationCardProps) => {
           Data Integrations
         </CardTitle>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => window.location.href = '/integrations/connect'}>
             <Upload className="mr-2 h-4 w-4" />
             Upload Data
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={() => window.location.href = '/integrations/connect'}>
             <Plug className="mr-2 h-4 w-4" />
             Add Integration
           </Button>
@@ -92,6 +92,9 @@ const IntegrationCard = ({ integrations, loading }: IntegrationCardProps) => {
                 variant={integration.connected ? "outline" : "secondary"} 
                 size="sm"
                 className={integration.connected ? "text-primary border-primary/30" : ""}
+                onClick={() => {
+                  if (!integration.connected) window.location.href = '/integrations/connect';
+                }}
               >
                 {integration.connected ? (
                   <>
