@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   BarChart3,
@@ -30,8 +29,21 @@ const Sidebar = () => {
     setIsOpen(!isOpen);
   };
 
+  useEffect(() => {
+    if (!isMobile || !isOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      const sidebar = document.getElementById('mobile-sidebar');
+      if (sidebar && !sidebar.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isMobile, isOpen]);
+
   const navigation = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
+    { name: "Home", href: "/" },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
     { name: "Reports", href: "/reports", icon: FileBarChart },
     { name: "Ad Campaigns", href: "/ads", icon: Target },
@@ -47,7 +59,7 @@ const Sidebar = () => {
     <>
       {isMobile && (
         <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 h-16 bg-background border-b">
-          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+          <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Open sidebar" aria-expanded={isOpen}>
             <Menu className="h-5 w-5" />
           </Button>
           <div className="font-bold text-lg">Genius</div>
@@ -55,20 +67,26 @@ const Sidebar = () => {
         </div>
       )}
 
+      {isMobile && isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 z-40 transition-opacity duration-300" onClick={() => setIsOpen(false)}></div>
+      )}
+
       <aside
+        id={isMobile ? "mobile-sidebar" : undefined}
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-background transition-transform duration-300",
           isMobile
             ? isOpen
-              ? "translate-x-0 w-64"
+              ? "translate-x-0 w-64 animate-slideIn"
               : "-translate-x-full w-64"
             : "w-64"
         )}
+        style={{ willChange: 'transform' }}
       >
         <div className="flex items-center justify-between h-16 px-4 border-b">
           <h2 className="text-lg font-bold">Genius</h2>
           {isMobile && (
-            <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+            <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Close sidebar">
               <X className="h-5 w-5" />
             </Button>
           )}
@@ -90,7 +108,7 @@ const Sidebar = () => {
                   )
                 }
               >
-                <item.icon className="h-4 w-4" />
+                {item.icon && <item.icon className="h-4 w-4" />}
                 <span>{item.name}</span>
               </NavLink>
             ))}

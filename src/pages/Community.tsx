@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -72,6 +71,9 @@ const Community = () => {
               <Shield className="h-4 w-4 mr-2" />
               Moderation
             </TabsTrigger>
+            <TabsTrigger value="community" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              Community
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6">
@@ -101,6 +103,29 @@ const Community = () => {
 
             <TabsContent value="moderation">
               <CommunityModerationTools />
+            </TabsContent>
+
+            <TabsContent value="community">
+              <main className="container mx-auto px-4 py-16 min-h-screen text-foreground">
+                <h1 className="text-4xl font-bold mb-6">Community</h1>
+                <p className="mb-8 text-lg">Join the Genius community to connect, share, and grow together. Discover forums, events, and more.</p>
+                <section className="mb-10">
+                  <h2 className="text-2xl font-semibold mb-2">Forums & Groups</h2>
+                  <p>Ask questions, share tips, and collaborate with other users in our discussion forums (coming soon!).</p>
+                </section>
+                <section className="mb-10">
+                  <h2 className="text-2xl font-semibold mb-2">Events</h2>
+                  <ul className="list-disc ml-6 text-lg">
+                    <li>Monthly webinars on business growth</li>
+                    <li>Live Q&A with the Genius team</li>
+                    <li>Community meetups (virtual & in-person)</li>
+                  </ul>
+                </section>
+                <section>
+                  <h2 className="text-2xl font-semibold mb-2">Get Involved</h2>
+                  <p>Want to contribute? Email us at <a href="mailto:community@genius.com" className="text-green-600 underline">community@genius.com</a>.</p>
+                </section>
+              </main>
             </TabsContent>
           </div>
         </Tabs>

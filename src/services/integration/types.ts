@@ -1,4 +1,3 @@
-
 // Integration types
 export type IntegrationType = 
   | "wordpress" 
@@ -21,8 +20,8 @@ export interface Integration {
   api_key?: string | null;
   access_token?: string | null;
   refresh_token?: string | null;
-  credentials?: any;
-  configuration?: any;
+  credentials?: unknown;
+  configuration?: unknown;
   connected: boolean;
   created_at: string;
   updated_at: string;

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Search, Filter } from "lucide-react";
@@ -95,7 +94,7 @@ const Hiring = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Jobs");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = (data: Record<string, unknown>) => {
     console.log(data);
     setIsDialogOpen(false);
   };
