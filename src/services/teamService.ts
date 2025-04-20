@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -53,7 +52,7 @@ export const fetchTeamMembers = async (): Promise<TeamMember[]> => {
         lastActive: "2025-04-16T09:15:00",
       }
     ];
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching team members:", error);
     toast({
       title: "Error",
@@ -83,7 +82,7 @@ export const fetchPendingInvites = async (): Promise<PendingInvite[]> => {
         expires: "2025-04-22T09:45:00"
       }
     ];
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching pending invites:", error);
     toast({
       title: "Error",
@@ -118,7 +117,7 @@ export const sendInvitation = async (
     
     return newInvite;
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error sending invitation:", error);
     toast({
       title: "Error",
@@ -139,7 +138,7 @@ export const resendInvitation = async (inviteId: string): Promise<void> => {
       description: "The invitation has been resent",
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error resending invitation:", error);
     toast({
       title: "Error",
@@ -160,7 +159,7 @@ export const cancelInvitation = async (inviteId: string): Promise<void> => {
       description: "The invitation has been cancelled",
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error cancelling invitation:", error);
     toast({
       title: "Error",
@@ -188,7 +187,7 @@ export const editTeamMember = async (
       description: "The team member has been updated",
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating team member:", error);
     toast({
       title: "Error",
@@ -209,7 +208,7 @@ export const removeTeamMember = async (memberId: string): Promise<void> => {
       description: "The team member has been removed",
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error removing team member:", error);
     toast({
       title: "Error",
@@ -237,7 +236,7 @@ export const updateSecuritySettings = async (
       description: "Security settings have been updated",
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating security settings:", error);
     toast({
       title: "Error",

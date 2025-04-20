@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Integration } from "./types";
@@ -14,10 +13,10 @@ export const getUserIntegrations = async () => {
     if (error) throw error;
     
     return data as Integration[];
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast({
       title: "Error fetching integrations",
-      description: error.message,
+      description: error as string,
       variant: "destructive",
     });
     return [];
@@ -70,10 +69,10 @@ export const addIntegration = async (integration: Partial<Integration>) => {
     });
     
     return data as Integration;
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast({
       title: "Error adding integration",
-      description: error.message,
+      description: error as string,
       variant: "destructive",
     });
     throw error;
@@ -101,10 +100,10 @@ export const updateIntegration = async (id: string, updates: Partial<Integration
     });
     
     return data as Integration;
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast({
       title: "Error updating integration",
-      description: error.message,
+      description: error as string,
       variant: "destructive",
     });
     throw error;
@@ -127,10 +126,10 @@ export const deleteIntegration = async (id: string) => {
     });
     
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast({
       title: "Error removing integration",
-      description: error.message,
+      description: error as string,
       variant: "destructive",
     });
     throw error;

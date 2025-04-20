@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   BarChart3,
@@ -68,7 +67,8 @@ const Sidebar = ({ onCollapse }: { onCollapse?: (collapsed: boolean) => void }) 
   }, [isMobile, isOpen]);
 
   const navigation = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
+    { name: "Home", href: "/" },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
     { name: "Reports", href: "/reports", icon: FileBarChart },
     { name: "Ad Campaigns", href: "/ads", icon: Target },
@@ -84,7 +84,7 @@ const Sidebar = ({ onCollapse }: { onCollapse?: (collapsed: boolean) => void }) 
     <>
       {isMobile && (
         <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 h-16 bg-background border-b">
-          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+          <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Open sidebar" aria-expanded={isOpen}>
             <Menu className="h-5 w-5" />
           </Button>
           <div className="font-bold text-lg">Genius</div>
@@ -92,7 +92,12 @@ const Sidebar = ({ onCollapse }: { onCollapse?: (collapsed: boolean) => void }) 
         </div>
       )}
 
+      {isMobile && isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 z-40 transition-opacity duration-300" onClick={() => setIsOpen(false)}></div>
+      )}
+
       <aside
+        id={isMobile ? "mobile-sidebar" : undefined}
         className={cn(
           // Shared core styles
           "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-white/80 backdrop-blur-md shadow-2xl",
@@ -126,7 +131,7 @@ const Sidebar = ({ onCollapse }: { onCollapse?: (collapsed: boolean) => void }) 
             </div>
           )}
           {isMobile && (
-            <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+            <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Close sidebar">
               <X className="h-5 w-5" />
             </Button>
           )}
