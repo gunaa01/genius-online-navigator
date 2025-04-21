@@ -1,0 +1,34 @@
+backend:
+  name: git-gateway
+  branch: main
+media_folder: "static/uploads"
+public_folder: "/uploads"
+collections:
+  - name: "pages"
+    label: "Pages"
+    folder: "content/pages"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "Featured Image", name: "image", widget: "image", required: false }
+  - name: "guides"
+    label: "Offline-to-Online Guides"
+    folder: "content/guides"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Steps", name: "steps", widget: "list", field: { label: "Step", name: "step", widget: "markdown" } }
+  - name: "community"
+    label: "Community Posts"
+    folder: "content/community"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Author", name: "author", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "Event Date", name: "event_date", widget: "datetime", required: false }
+      - { label: "Image", name: "image", widget: "image", required: false }
