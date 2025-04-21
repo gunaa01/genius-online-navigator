@@ -25,6 +25,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
+      <div style={{background: 'yellow', padding: 20, fontWeight: 'bold'}}>Hello from Dashboard (debug test)</div>
       <div className="flex flex-col space-y-8">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
