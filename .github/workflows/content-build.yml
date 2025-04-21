@@ -1,0 +1,35 @@
+name: Build & Deploy Content
+
+on:
+  push:
+    paths:
+      - 'content/**'
+      - 'scripts/md-to-json.js'
+      - '.github/workflows/content-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build-content:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Markdown to JSON
+        run: node scripts/md-to-json.js
+
+      - name: Commit and push generated JSON
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/content/
+          git commit -m "chore: update generated JSON content [skip ci]" || echo "No changes to commit"
+          git push
