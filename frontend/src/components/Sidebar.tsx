@@ -15,6 +15,7 @@ import {
   X,
   UsersRound,
   Sparkle,
+  Brain,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,7 @@ const Sidebar = ({ onCollapse }: { onCollapse?: (collapsed: boolean) => void }) 
     { name: "Home", href: "/" },
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
+    { name: "AI Insights", href: "/admin/insights", icon: Brain },
     { name: "Reports", href: "/reports", icon: FileBarChart },
     { name: "Ad Campaigns", href: "/ads", icon: Target },
     { name: "Social Media", href: "/social", icon: Share2 },

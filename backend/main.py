@@ -16,6 +16,8 @@ from api.ai_reports import router as ai_reports_router
 from api.content_generation import router as content_generation_router
 from api.ab_tests import router as ab_tests_router
 from api.email_campaigns import router as email_campaigns_router
+from api.seo import router as seo_router
+from api.local_discovery import router as local_discovery_router
 
 app = FastAPI()
 
@@ -47,6 +49,8 @@ app.include_router(ai_reports_router)
 app.include_router(content_generation_router)
 app.include_router(ab_tests_router)
 app.include_router(email_campaigns_router)
+app.include_router(seo_router)
+app.include_router(local_discovery_router)
 
 try:
     from api.webhooks import router as webhooks_router

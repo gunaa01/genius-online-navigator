@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { ArrowRight, LayoutDashboard, BarChart3, FileBarChart, Target, Share2, MessageSquareText, UsersRound, Plug, Users, Settings, Store } from "lucide-react";
+import { ArrowRight, LayoutDashboard, BarChart3, FileBarChart, Target, Share2, MessageSquareText, UsersRound, Plug, Users, Settings, Store, Facebook, Twitter, Linkedin, Youtube, Instagram } from "lucide-react";
 import { Helmet } from 'react-helmet';
 import Menu from "@/components/Menu";
 import { useAuth } from "@/hooks/useAuth";
@@ -77,6 +77,15 @@ const Index = () => {
       <Helmet>
         <title>Genius - All-in-One Business Platform</title>
         <meta name="description" content="Genius is an all-in-one platform designed to help businesses grow online." />
+        <meta property="og:title" content="Genius - All-in-One Business Platform" />
+        <meta property="og:description" content="Genius is an all-in-one platform designed to help businesses grow online." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://yourdomain.com" />
+        <meta property="og:image" content="/logo.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Genius - All-in-One Business Platform" />
+        <meta name="twitter:description" content="Genius is an all-in-one platform designed to help businesses grow online." />
+        <meta name="twitter:image" content="/logo.png" />
       </Helmet>
       <Menu />
       <main className="pt-20 bg-background min-h-screen text-foreground transition-colors duration-300">
@@ -97,20 +106,19 @@ const Index = () => {
           </div>
           <div className="flex flex-col gap-4 items-center">
             {/* Social Icons row */}
-            <div className="flex gap-3 text-2xl">
-              <a href="#" className="hover:text-green-400"><i className="fab fa-discord"></i></a>
-              <a href="#" className="hover:text-green-400"><i className="fab fa-tiktok"></i></a>
-              <a href="#" className="hover:text-green-400"><i className="fab fa-x-twitter"></i></a>
-              <a href="#" className="hover:text-green-400"><i className="fab fa-linkedin"></i></a>
-              <a href="#" className="hover:text-green-400"><i className="fab fa-youtube"></i></a>
-              <a href="#" className="hover:text-green-400"><i className="fab fa-instagram"></i></a>
+            <div className="flex gap-3 text-2xl" aria-label="Social links">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><Facebook className="hover:text-green-400" /></a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><Twitter className="hover:text-green-400" /></a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><Linkedin className="hover:text-green-400" /></a>
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><Youtube className="hover:text-green-400" /></a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Instagram className="hover:text-green-400" /></a>
             </div>
           </div>
         </section>
         <section className="py-16 container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center">Explore Our Platform Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pages.slice(0, 3).map((page) => (
+            {pages.map((page) => (
               <Card key={page.title} className="h-full flex flex-col">
                 <CardHeader>
                   <div className="flex items-center gap-3">

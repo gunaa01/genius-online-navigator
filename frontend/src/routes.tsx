@@ -18,6 +18,7 @@ import UserManagement from './pages/Admin/UserManagement';
 import GigModeration from './pages/Admin/GigModeration';
 import JobModeration from './pages/Admin/JobModeration';
 import Analytics from './pages/Admin/Analytics';
+import AIInsights from './pages/Admin/AIInsights';
 import CMS from './pages/Admin/CMS';
 import GuideList from './pages/Guides/GuideList';
 import GuideDetail from './pages/Guides/GuideDetail';
@@ -49,6 +50,7 @@ const RoutesComponent: React.FC = () => (
       <Route path="/admin/gigs" element={<GigModeration />} />
       <Route path="/admin/jobs" element={<JobModeration />} />
       <Route path="/admin/analytics" element={<Analytics />} />
+      <Route path="/admin/insights" element={<AIInsights />} />
       <Route path="/admin/cms" element={<CMS />} />
       {/* Guides & Community */}
       <Route path="/guides" element={<GuideList />} />
