@@ -4,284 +4,132 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Index from "./pages/Index";
-import OfflineToOnline from "./pages/OfflineToOnline";
-import Hire from "./pages/Hire";
-import Hiring from "./pages/Hiring";
-import Onboarding from "./pages/Onboarding";
-import NotFound from "./pages/NotFound";
-import Analytics from "./pages/Analytics";
-import Reports from "./pages/Reports";
-import AdCampaigns from "./pages/AdCampaigns";
-import SocialMedia from "./pages/SocialMedia";
-import AiContent from "./pages/AiContent";
-import Integrations from "./pages/Integrations";
-import TeamManagement from "./pages/TeamManagement";
-import Settings from "./pages/Settings";
-import Upgrade from "./pages/Upgrade";
-import Auth from "./pages/Auth";
-import Community from "./pages/Community";
-import Admin from "./pages/Admin";
+import { Suspense } from 'react';
+import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { AuthProvider } from "./hooks/useAuth";
-import Dashboard from "./pages/Dashboard";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import AboutUs from "./pages/AboutUs";
-import Contact from "./pages/Contact";
-import Blog from "./pages/Blog";
-import Careers from "./pages/Careers";
-import Pricing from "./pages/Pricing";
-import FAQ from "./pages/FAQ";
-import Docs from "./pages/Docs";
-import Dashboard from "./pages/Dashboard";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import AboutUs from "./pages/AboutUs";
-import Contact from "./pages/Contact";
-import Blog from "./pages/Blog";
-import Careers from "./pages/Careers";
-import Pricing from "./pages/Pricing";
-import FAQ from "./pages/FAQ";
-import Docs from "./pages/Docs";
-import AdminCreate from "./pages/AdminCreate";
-import TeamInvite from "./pages/TeamInvite";
-import IntegrationsConnect from "./pages/IntegrationsConnect";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { useAppDispatch } from '@/store/hooks';
+import { checkAuthStatus } from '@/store/slices/authSlice';
+
+// Lazy-loaded components for better performance
+const Dashboard = React.lazy(() => import("./pages/Dashboard"));
+const AdCampaigns = React.lazy(() => import("./pages/AdCampaigns"));
+const SocialMedia = React.lazy(() => import("./pages/SocialMedia"));
+const AiContent = React.lazy(() => import("./pages/AiContent"));
+const Analytics = React.lazy(() => import("./pages/Analytics"));
+const Settings = React.lazy(() => import("./pages/Settings"));
+const Auth = React.lazy(() => import("./pages/Auth"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
+const Onboarding = React.lazy(() => import("./pages/Onboarding"));
+const Reports = React.lazy(() => import("./pages/Reports"));
+const Integrations = React.lazy(() => import("./pages/Integrations"));
+const TeamManagement = React.lazy(() => import("./pages/TeamManagement"));
+const Community = React.lazy(() => import("./pages/Community"));
+const Admin = React.lazy(() => import("./pages/Admin"));
+const AdminCreate = React.lazy(() => import("./pages/AdminCreate"));
+const TeamInvite = React.lazy(() => import("./pages/TeamInvite"));
+const IntegrationsConnect = React.lazy(() => import("./pages/IntegrationsConnect"));
+const Upgrade = React.lazy(() => import("./pages/Upgrade"));
+const Index = React.lazy(() => import("./pages/Index"));
+const OfflineToOnline = React.lazy(() => import("./pages/OfflineToOnline"));
+const Hire = React.lazy(() => import("./pages/Hire"));
+const Hiring = React.lazy(() => import("./pages/Hiring"));
+const AboutUs = React.lazy(() => import("./pages/AboutUs"));
+const Contact = React.lazy(() => import("./pages/Contact"));
+const Blog = React.lazy(() => import("./pages/Blog"));
+const Careers = React.lazy(() => import("./pages/Careers"));
+const Pricing = React.lazy(() => import("./pages/Pricing"));
+const FAQ = React.lazy(() => import("./pages/FAQ"));
+const Docs = React.lazy(() => import("./pages/Docs"));
+
+// Loading component for Suspense
+const PageLoader = () => (
+  <div className="flex h-screen w-full items-center justify-center">
+    <div className="h-16 w-16 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
+    <span className="ml-2 text-lg font-medium">Loading...</span>
+  </div>
+);
 
 const queryClient = new QueryClient();
 
+const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const dispatch = useAppDispatch();
+  
+  React.useEffect(() => {
+    // Check authentication status when app loads
+    dispatch(checkAuthStatus());
+  }, [dispatch]);
+  
+  return <>{children}</>;
+};
+
 const App = () => (
   <React.StrictMode>
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/landing" element={<Index />} />
-                <Route path="/offline-to-online" element={<OfflineToOnline />} />
-                <Route path="/hire" element={<Hire />} />
-                <Route path="/hiring" element={<Hiring />} />
-                <Route path="/auth" element={<Auth />} />
-                
-                {/* Set Index as new home page */}
-                <Route path="/" element={<Index />} />
-
-                {/* Move dashboard to /dashboard, protected */}
-                <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/onboarding" element={
-                  <ProtectedRoute>
-                    <Onboarding />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/analytics" element={
-                  <ProtectedRoute>
-                    <Analytics />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/reports" element={
-                  <ProtectedRoute>
-                    <Reports />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/ads" element={
-                  <ProtectedRoute>
-                    <AdCampaigns />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/social" element={
-                  <ProtectedRoute>
-                    <SocialMedia />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/content" element={
-                  <ProtectedRoute>
-                    <AiContent />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/integrations" element={
-                  <ProtectedRoute>
-                    <Integrations />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/team" element={
-                  <ProtectedRoute>
-                    <TeamManagement />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/community" element={
-                  <ProtectedRoute>
-                    <Community />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/upgrade" element={
-                  <ProtectedRoute>
-                    <Upgrade />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/admin" element={
-                  <ProtectedRoute>
-                    <Admin />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/about-us" element={<AboutUs />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/careers" element={<Careers />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/docs" element={<Docs />} />
-                
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/landing" element={<Index />} />
-                <Route path="/offline-to-online" element={<OfflineToOnline />} />
-                <Route path="/hire" element={<Hire />} />
-                <Route path="/hiring" element={<Hiring />} />
-                <Route path="/auth" element={<Auth />} />
-                
-                {/* Set Index as new home page */}
-                <Route path="/" element={<Index />} />
-
-                {/* Make dashboard and community PUBLIC for testing */}
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/community" element={<Community />} />
-
-                {/* Move dashboard to /dashboard, protected */}
-                {/* <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } /> */}
-                {/* <Route path="/community" element={
-                  <ProtectedRoute>
-                    <Community />
-                  </ProtectedRoute>
-                } /> */}
-                
-                <Route path="/onboarding" element={
-                  <ProtectedRoute>
-                    <Onboarding />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/analytics" element={
-                  <ProtectedRoute>
-                    <Analytics />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/reports" element={
-                  <ProtectedRoute>
-                    <Reports />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/ads" element={
-                  <ProtectedRoute>
-                    <AdCampaigns />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/social" element={
-                  <ProtectedRoute>
-                    <SocialMedia />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/content" element={
-                  <ProtectedRoute>
-                    <AiContent />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/integrations" element={
-                  <ProtectedRoute>
-                    <Integrations />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/team" element={
-                  <ProtectedRoute>
-                    <TeamManagement />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/upgrade" element={
-                  <ProtectedRoute>
-                    <Upgrade />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/admin" element={
-                  <ProtectedRoute>
-                    <Admin />
-                  </ProtectedRoute>
-                } />
-                
-                {/* Custom pages for button navigation */}
-                <Route path="/admin/create" element={<AdminCreate />} />
-                <Route path="/team/invite" element={<TeamInvite />} />
-                <Route path="/integrations/connect" element={<IntegrationsConnect />} />
-                
-                <Route path="/about-us" element={<AboutUs />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/careers" element={<Careers />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/docs" element={<Docs />} />
-                
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ReduxProvider>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <AppInitializer>
+                    <Suspense fallback={<PageLoader />}>
+                      <Routes>
+                        {/* Public routes */}
+                        <Route path="/auth" element={<Auth />} />
+                        
+                        {/* Protected routes */}
+                        <Route path="/" element={
+                          <ProtectedRoute>
+                            <Layout />
+                          </ProtectedRoute>
+                        }>
+                          <Route index element={<Navigate to="/dashboard" replace />} />
+                          <Route path="dashboard" element={<Dashboard />} />
+                          <Route path="ad-campaigns" element={<AdCampaigns />} />
+                          <Route path="social-media" element={<SocialMedia />} />
+                          <Route path="ai-content" element={<AiContent />} />
+                          <Route path="analytics" element={<Analytics />} />
+                          <Route path="settings" element={<Settings />} />
+                          <Route path="onboarding" element={<Onboarding />} />
+                          <Route path="reports" element={<Reports />} />
+                          <Route path="integrations" element={<Integrations />} />
+                          <Route path="team" element={<TeamManagement />} />
+                          <Route path="community" element={<Community />} />
+                          <Route path="admin" element={<Admin />} />
+                          <Route path="admin/create" element={<AdminCreate />} />
+                          <Route path="team/invite" element={<TeamInvite />} />
+                          <Route path="integrations/connect" element={<IntegrationsConnect />} />
+                          <Route path="upgrade" element={<Upgrade />} />
+                        </Route>
+                        
+                        {/* Other routes */}
+                        <Route path="/landing" element={<Index />} />
+                        <Route path="/offline-to-online" element={<OfflineToOnline />} />
+                        <Route path="/hire" element={<Hire />} />
+                        <Route path="/hiring" element={<Hiring />} />
+                        <Route path="/about-us" element={<AboutUs />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/blog" element={<Blog />} />
+                        <Route path="/careers" element={<Careers />} />
+                        <Route path="/pricing" element={<Pricing />} />
+                        <Route path="/faq" element={<FAQ />} />
+                        <Route path="/docs" element={<Docs />} />
+                        
+                        {/* 404 route */}
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Suspense>
+                  </AppInitializer>
+                </BrowserRouter>
+              </TooltipProvider>
+            </AuthProvider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </ReduxProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
 

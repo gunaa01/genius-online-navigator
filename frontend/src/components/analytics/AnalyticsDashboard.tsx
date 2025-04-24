@@ -21,16 +21,16 @@ import {
   Activity,
   Users,
   Calendar,
-  Search,
-  Share2,
-  Globe,
   FileText,
-  Loader2
+  Loader2,
+  Globe,
+  Search
 } from "lucide-react";
-import CrossChannelDashboard from '@/components/analytics/CrossChannelDashboard';
-import RealTimeMetricsCard from '@/components/analytics/RealTimeMetricsCard';
+import CrossChannelDashboard from './CrossChannelDashboard';
+import RealTimeMetricsCard from './RealTimeMetricsCard';
+import SEOAnalyticsDashboard from './SEOAnalyticsDashboard';
 
-export default function AnalyticsPage() {
+export default function AnalyticsDashboard() {
   const [loading, setLoading] = useState(false);
   const [timeFrame, setTimeFrame] = useState("7days");
   
@@ -40,9 +40,9 @@ export default function AnalyticsPage() {
     await new Promise(resolve => setTimeout(resolve, 1500));
     setLoading(false);
   };
-
+  
   return (
-    <div className="container mx-auto px-4 py-6 space-y-8">
+    <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
@@ -58,8 +58,8 @@ export default function AnalyticsPage() {
             <RefreshCw className="mr-2 h-4 w-4" />
           )}
           Refresh Data
-            </Button>
-          </div>
+        </Button>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <RealTimeMetricsCard
@@ -117,20 +117,24 @@ export default function AnalyticsPage() {
           }}
         />
       </div>
-
+      
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 md:w-auto w-full">
+        <TabsList className="grid grid-cols-2 md:grid-cols-6 md:w-auto w-full">
           <TabsTrigger value="overview" className="flex items-center">
             <Activity className="mr-2 h-4 w-4" />
             Overview
           </TabsTrigger>
           <TabsTrigger value="channels" className="flex items-center">
-            <Share2 className="mr-2 h-4 w-4" />
+            <BarChart3 className="mr-2 h-4 w-4" />
             Channels
           </TabsTrigger>
           <TabsTrigger value="content" className="flex items-center">
             <FileText className="mr-2 h-4 w-4" />
             Content
+          </TabsTrigger>
+          <TabsTrigger value="seo" className="flex items-center">
+            <Search className="mr-2 h-4 w-4" />
+            SEO
           </TabsTrigger>
           <TabsTrigger value="audience" className="flex items-center">
             <Users className="mr-2 h-4 w-4" />
@@ -140,8 +144,8 @@ export default function AnalyticsPage() {
             <Calendar className="mr-2 h-4 w-4" />
             Campaigns
           </TabsTrigger>
-          </TabsList>
-
+        </TabsList>
+        
         {/* Overview Tab - Shows key metrics across all channels */}
         <TabsContent value="overview" className="space-y-4">
           <Card>
@@ -150,17 +154,17 @@ export default function AnalyticsPage() {
               <CardDescription>
                 Key metrics across all marketing channels and campaigns
               </CardDescription>
-                </CardHeader>
-                <CardContent>
+            </CardHeader>
+            <CardContent>
               <div className="h-[300px] flex items-center justify-center border rounded-md">
                 <div className="text-center">
                   <BarChart3 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">Interactive charts will appear here</p>
                 </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
+              </div>
+            </CardContent>
+          </Card>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
@@ -168,36 +172,36 @@ export default function AnalyticsPage() {
                 <CardDescription>
                   Visitor journey from awareness to conversion
                 </CardDescription>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                 <div className="h-[250px] flex items-center justify-center border rounded-md">
                   <div className="text-center">
                     <PieChart className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground">Interactive funnel will appear here</p>
                   </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
+                </div>
+              </CardContent>
+            </Card>
+            
             <Card>
               <CardHeader>
                 <CardTitle>Revenue Trends</CardTitle>
                 <CardDescription>
                   Revenue patterns over time
                 </CardDescription>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                 <div className="h-[250px] flex items-center justify-center border rounded-md">
                   <div className="text-center">
                     <LineChart className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground">Interactive chart will appear here</p>
                   </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
         {/* Channels Tab - Shows the cross-channel dashboard */}
         <TabsContent value="channels">
           <CrossChannelDashboard enableRealTime={true} />
@@ -206,13 +210,13 @@ export default function AnalyticsPage() {
         {/* Content Tab */}
         <TabsContent value="content">
           <Card>
-              <CardHeader>
+            <CardHeader>
               <CardTitle>Content Performance</CardTitle>
               <CardDescription>
                 Analyze engagement and conversion metrics for your content
               </CardDescription>
-              </CardHeader>
-              <CardContent>
+            </CardHeader>
+            <CardContent>
               <div className="h-[400px] flex items-center justify-center border rounded-md">
                 <div className="text-center">
                   <FileText className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
@@ -223,20 +227,25 @@ export default function AnalyticsPage() {
                   </p>
                 </div>
               </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
+        {/* SEO Tab */}
+        <TabsContent value="seo">
+          <SEOAnalyticsDashboard enableRealTime={true} />
+        </TabsContent>
+        
         {/* Audience Tab */}
         <TabsContent value="audience">
           <Card>
-              <CardHeader>
+            <CardHeader>
               <CardTitle>Audience Insights</CardTitle>
               <CardDescription>
                 Understand your audience demographics and behavior
               </CardDescription>
-              </CardHeader>
-              <CardContent>
+            </CardHeader>
+            <CardContent>
               <div className="h-[400px] flex items-center justify-center border rounded-md">
                 <div className="text-center">
                   <Users className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
@@ -247,20 +256,20 @@ export default function AnalyticsPage() {
                   </p>
                 </div>
               </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
         {/* Campaigns Tab */}
         <TabsContent value="campaigns">
           <Card>
-              <CardHeader>
+            <CardHeader>
               <CardTitle>Campaign Performance</CardTitle>
               <CardDescription>
                 Track and optimize your marketing campaigns
               </CardDescription>
-              </CardHeader>
-              <CardContent>
+            </CardHeader>
+            <CardContent>
               <div className="h-[400px] flex items-center justify-center border rounded-md">
                 <div className="text-center">
                   <Calendar className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
@@ -271,10 +280,10 @@ export default function AnalyticsPage() {
                   </p>
                 </div>
               </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

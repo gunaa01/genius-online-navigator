@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { 
   Card, 
@@ -42,6 +42,11 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { 
   Calendar, 
   Clock, 
@@ -53,7 +58,8 @@ import {
   Info,
   ArrowLeft,
   RefreshCw,
-  Eye
+  Eye,
+  AlertTriangle
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { WorkflowRun } from '@/services/automation/workflowService';
@@ -63,6 +69,7 @@ interface WorkflowRunsProps {
   workflowName: string;
   runs: WorkflowRun[];
   loading: boolean;
+  error?: string;
   onRefresh: () => void;
   onBack: () => void;
 }
@@ -77,6 +84,7 @@ export default function WorkflowRuns({
   workflowName,
   runs,
   loading,
+  error,
   onRefresh,
   onBack
 }: WorkflowRunsProps) {
@@ -85,13 +93,32 @@ export default function WorkflowRuns({
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [selectedRun, setSelectedRun] = useState<WorkflowRun | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
   
-  // Filter runs
-  const filteredRuns = runs.filter(run => {
+  // Reset local error when parent error changes
+  useEffect(() => {
+    if (error) {
+      setLocalError(error);
+    } else {
+      setLocalError(null);
+    }
+  }, [error]);
+  
+  // Filter runs - with error handling for malformed data
+  const filteredRuns = React.useMemo(() => {
+    try {
+      if (!Array.isArray(runs)) {
+        throw new Error("Runs data is not in expected format");
+      }
+      
+      return runs.filter(run => {
+        // Validate run object has required properties
+        if (!run || typeof run !== 'object') return false;
+        
     // Search term filter (by trigger or ID)
     if (searchTerm && 
-        !run.id.toLowerCase().includes(searchTerm.toLowerCase()) && 
-        !run.triggeredBy.toLowerCase().includes(searchTerm.toLowerCase())) {
+            !(run.id?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            run.triggeredBy?.toLowerCase().includes(searchTerm.toLowerCase()))) {
       return false;
     }
     
@@ -102,6 +129,12 @@ export default function WorkflowRuns({
     
     return true;
   });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Error filtering workflow runs";
+      setLocalError(errorMessage);
+      return [];
+    }
+  }, [runs, searchTerm, filterStatus]);
   
   // Handle search
   const handleSearch = (e: React.FormEvent) => {
@@ -121,6 +154,12 @@ export default function WorkflowRuns({
     setShowDetailsDialog(true);
   };
   
+  // Handle error retry
+  const handleErrorRetry = () => {
+    setLocalError(null);
+    onRefresh();
+  };
+  
   // Get status badge
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -137,12 +176,42 @@ export default function WorkflowRuns({
   
   // Format duration
   const formatDuration = (ms: number) => {
+    if (!ms || isNaN(ms)) return "N/A";
+    
     if (ms < 1000) return `${ms}ms`;
     if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
     const minutes = Math.floor(ms / 60000);
     const seconds = ((ms % 60000) / 1000).toFixed(1);
     return `${minutes}m ${seconds}s`;
   };
+  
+  // If there's an error, show error message with retry option
+  if (localError) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Workflow Runs: {workflowName}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{localError}</AlertDescription>
+          </Alert>
+          <div className="flex gap-4">
+            <Button onClick={handleErrorRetry} variant="default">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Retry
+            </Button>
+            <Button onClick={onBack} variant="outline">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Workflows
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
   
   return (
     <div className="space-y-6">

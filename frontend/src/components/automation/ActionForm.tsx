@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Control, Controller, useWatch } from 'react-hook-form';
 import { 
   FormControl, 
@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/card";
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
+import { Label as UILabel } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { 
   AlertCircle, 
@@ -44,8 +44,15 @@ import {
   BellRing, 
   Code, 
   Settings,
-  Wand
+  Wand,
+  AlertTriangle,
+  Info
 } from 'lucide-react';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { ActionType, ActionTemplate } from '@/services/automation/actionService';
 
 interface ActionFormProps {
@@ -53,6 +60,7 @@ interface ActionFormProps {
   index: number;
   actionTypes: ActionType[];
   actionTemplates: ActionTemplate[];
+  onValidationError?: (error: string | null) => void;
 }
 
 /**
@@ -64,13 +72,18 @@ export default function ActionForm({
   control,
   index,
   actionTypes,
-  actionTemplates
+  actionTemplates,
+  onValidationError
 }: ActionFormProps) {
   // Watch action type to conditionally render fields
   const actionType = useWatch({
     control,
     name: `actions.${index}.type`
   });
+  
+  const [jsonError, setJsonError] = useState<string | null>(null);
+  const [parameterValue, setParameterValue] = useState<string>('');
+  const [headersValue, setHeadersValue] = useState<string>('');
   
   // Update config when action type changes
   useEffect(() => {
@@ -119,8 +132,57 @@ export default function ActionForm({
     }
   }, [actionType, control, index]);
   
+  // Notify parent of validation errors
+  useEffect(() => {
+    if (onValidationError) {
+      onValidationError(jsonError);
+    }
+  }, [jsonError, onValidationError]);
+  
   // Get templates for current action type
   const filteredTemplates = actionTemplates.filter(template => template.actionType === actionType);
+  
+  // Parse JSON with error handling
+  const parseJsonSafely = (value: string, onChange: (val: any) => void, setStateValue: (val: string) => void) => {
+    setStateValue(value);
+    
+    if (!value.trim()) {
+      setJsonError(null);
+      onChange('');
+      return;
+    }
+    
+    try {
+      // Check for common JSON syntax errors before parsing
+      if (!value.match(/^\s*[{\[]/)) {
+        setJsonError('JSON must start with { or [');
+        onChange(value);
+        return;
+      }
+      
+      if ((value.match(/{/g) || []).length !== (value.match(/}/g) || []).length) {
+        setJsonError('Mismatched curly braces');
+        onChange(value);
+        return;
+      }
+      
+      if ((value.match(/\[/g) || []).length !== (value.match(/\]/g) || []).length) {
+        setJsonError('Mismatched square brackets');
+        onChange(value);
+        return;
+      }
+      
+      const parsed = JSON.parse(value);
+      setJsonError(null);
+      onChange(parsed);
+    } catch (error) {
+      const message = error instanceof Error 
+        ? `Invalid JSON: ${error.message.replace(/^JSON\.parse: /, '')}`
+        : 'Invalid JSON format';
+      setJsonError(message);
+      onChange(value);
+    }
+  };
   
   // Apply template
   const applyTemplate = (templateId: string) => {
@@ -142,15 +204,29 @@ export default function ActionForm({
     }
   };
   
+  // Format JSON for display
+  const formatJson = (value: any): string => {
+    if (typeof value === 'object' && value !== null) {
+      try {
+        return JSON.stringify(value, null, 2);
+      } catch (error) {
+        console.error('Error formatting JSON:', error);
+        return '';
+      }
+    }
+    return value || '';
+  };
+  
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Action Name */}
       <FormField
         control={control}
         name={`actions.${index}.name`}
+        rules={{ required: "Name is required" }}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Action Name</FormLabel>
+            <FormLabel>Name</FormLabel>
             <FormControl>
               <Input placeholder="Enter action name" {...field} />
             </FormControl>
@@ -166,6 +242,7 @@ export default function ActionForm({
       <FormField
         control={control}
         name={`actions.${index}.type`}
+        rules={{ required: "Action type is required" }}
         render={({ field }) => (
           <FormItem>
             <FormLabel>Action Type</FormLabel>
@@ -180,14 +257,14 @@ export default function ActionForm({
               </FormControl>
               <SelectContent>
                 {actionTypes.map((type) => (
-                  <SelectItem key={type.id} value={type.id}>
+                  <SelectItem key={type.type} value={type.type}>
                     {type.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <FormDescription>
-              {actionTypes.find(t => t.id === field.value)?.description || 'Select an action type'}
+              {actionTypes.find(t => t.type === field.value)?.description || 'Choose the type of action to perform'}
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -242,9 +319,9 @@ export default function ActionForm({
                           field.onChange(newValues);
                         }}
                       />
-                      <Label htmlFor={`${platform}-${index}`} className="capitalize">
+                      <UILabel htmlFor={`${platform}-${index}`} className="capitalize">
                         {platform}
-                      </Label>
+                      </UILabel>
                     </div>
                   ))}
                 </div>
@@ -408,22 +485,25 @@ export default function ActionForm({
                   <Textarea 
                     placeholder="Enter parameters in JSON format" 
                     className="font-mono text-sm min-h-[100px]"
-                    {...field} 
-                    value={typeof field.value === 'object' ? JSON.stringify(field.value, null, 2) : field.value}
-                    onChange={(e) => {
-                      try {
-                        const parsed = JSON.parse(e.target.value);
-                        field.onChange(parsed);
-                      } catch (error) {
-                        // If not valid JSON, store as string
-                        field.onChange(e.target.value);
-                      }
-                    }}
+                    value={typeof field.value === 'object' ? formatJson(field.value) : parameterValue || field.value}
+                    onChange={(e) => parseJsonSafely(e.target.value, field.onChange, setParameterValue)}
                   />
                 </FormControl>
                 <FormDescription>
                   Parameters for content generation in JSON format. Use {{variable}} syntax for dynamic values.
                 </FormDescription>
+                {jsonError && (
+                  <Alert variant="destructive" className="mt-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription className="text-xs">{jsonError}</AlertDescription>
+                  </Alert>
+                )}
+                <Alert variant="outline" className="mt-2">
+                  <Info className="h-4 w-4" />
+                  <AlertDescription className="text-xs">
+                    Example: {"{ \"temperature\": 0.7, \"maxTokens\": 500 }"}
+                  </AlertDescription>
+                </Alert>
                 <FormMessage />
               </FormItem>
             )}
@@ -464,6 +544,7 @@ export default function ActionForm({
           <FormField
             control={control}
             name={`actions.${index}.config.channels`}
+            rules={{ required: "At least one channel is required" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Notification Channels</FormLabel>
@@ -481,9 +562,9 @@ export default function ActionForm({
                           field.onChange(newValues);
                         }}
                       />
-                      <Label htmlFor={`${channel}-${index}`} className="capitalize">
+                      <UILabel htmlFor={`${channel}-${index}`} className="capitalize">
                         {channel}
-                      </Label>
+                      </UILabel>
                     </div>
                   ))}
                 </div>
@@ -496,6 +577,7 @@ export default function ActionForm({
           <FormField
             control={control}
             name={`actions.${index}.config.subject`}
+            rules={{ required: "Subject is required" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Subject</FormLabel>
@@ -514,6 +596,7 @@ export default function ActionForm({
           <FormField
             control={control}
             name={`actions.${index}.config.message`}
+            rules={{ required: "Message is required" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Message</FormLabel>
@@ -536,6 +619,7 @@ export default function ActionForm({
           <FormField
             control={control}
             name={`actions.${index}.config.recipients`}
+            rules={{ required: "At least one recipient is required" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Recipients</FormLabel>
@@ -544,10 +628,15 @@ export default function ActionForm({
                     placeholder="Enter recipients (one per line)" 
                     {...field} 
                     onChange={(e) => {
+                      try {
                       const recipients = e.target.value.split('\n').filter(r => r.trim() !== '');
                       field.onChange(recipients);
+                      } catch (error) {
+                        // If parsing fails, store the raw text
+                        field.onChange(e.target.value);
+                      }
                     }}
-                    value={Array.isArray(field.value) ? field.value.join('\n') : field.value}
+                    value={Array.isArray(field.value) ? field.value.join('\n') : field.value || ''}
                   />
                 </FormControl>
                 <FormDescription>
@@ -569,6 +658,13 @@ export default function ActionForm({
           <FormField
             control={control}
             name={`actions.${index}.config.url`}
+            rules={{ 
+              required: "URL is required",
+              pattern: {
+                value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
+                message: "Please enter a valid URL"
+              }
+            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>URL</FormLabel>
@@ -587,6 +683,7 @@ export default function ActionForm({
           <FormField
             control={control}
             name={`actions.${index}.config.method`}
+            rules={{ required: "HTTP method is required" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Method</FormLabel>
@@ -623,22 +720,25 @@ export default function ActionForm({
                   <Textarea 
                     placeholder="Enter headers in JSON format" 
                     className="font-mono text-sm"
-                    {...field} 
-                    value={typeof field.value === 'object' ? JSON.stringify(field.value, null, 2) : field.value}
-                    onChange={(e) => {
-                      try {
-                        const parsed = JSON.parse(e.target.value);
-                        field.onChange(parsed);
-                      } catch (error) {
-                        // If not valid JSON, store as string
-                        field.onChange(e.target.value);
-                      }
-                    }}
+                    value={typeof field.value === 'object' ? formatJson(field.value) : headersValue || field.value}
+                    onChange={(e) => parseJsonSafely(e.target.value, field.onChange, setHeadersValue)}
                   />
                 </FormControl>
                 <FormDescription>
-                  Request headers in JSON format. Use {{variable}} syntax for dynamic values.
+                  HTTP headers in JSON format. Use {{variable}} syntax for dynamic values.
                 </FormDescription>
+                {jsonError && (
+                  <Alert variant="destructive" className="mt-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription className="text-xs">{jsonError}</AlertDescription>
+                  </Alert>
+                )}
+                <Alert variant="outline" className="mt-2">
+                  <Info className="h-4 w-4" />
+                  <AlertDescription className="text-xs">
+                    Example: {"{ \"Content-Type\": \"application/json\", \"Authorization\": \"Bearer {{token}}\" }"}
+                  </AlertDescription>
+                </Alert>
                 <FormMessage />
               </FormItem>
             )}
@@ -650,7 +750,7 @@ export default function ActionForm({
             name={`actions.${index}.config.body`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Request Body</FormLabel>
+                <FormLabel>Body</FormLabel>
                 <FormControl>
                   <Textarea 
                     placeholder="Enter request body" 
@@ -659,7 +759,28 @@ export default function ActionForm({
                   />
                 </FormControl>
                 <FormDescription>
-                  Request body content. Use {{variable}} syntax for dynamic values.
+                  Request body. Use {{variable}} syntax for dynamic values.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          {/* Response Variable */}
+          <FormField
+            control={control}
+            name={`actions.${index}.config.responseVariable`}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Response Variable Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="e.g. apiResponse" 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormDescription>
+                  Variable name to store the API response for use in later actions
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -691,7 +812,7 @@ export default function ActionForm({
                       id={`transform-map-${index}`}
                       className="peer sr-only"
                     />
-                    <Label
+                    <UILabel
                       htmlFor={`transform-map-${index}`}
                       className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                     >
@@ -702,7 +823,7 @@ export default function ActionForm({
                           Transform data structure
                         </p>
                       </div>
-                    </Label>
+                    </UILabel>
                   </div>
                   
                   <div>
@@ -711,7 +832,7 @@ export default function ActionForm({
                       id={`transform-filter-${index}`}
                       className="peer sr-only"
                     />
-                    <Label
+                    <UILabel
                       htmlFor={`transform-filter-${index}`}
                       className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                     >
@@ -722,7 +843,7 @@ export default function ActionForm({
                           Filter data elements
                         </p>
                       </div>
-                    </Label>
+                    </UILabel>
                   </div>
                 </RadioGroup>
                 <FormMessage />
@@ -755,6 +876,36 @@ export default function ActionForm({
           />
         </div>
       )}
+      
+      {/* Error Handling */}
+      <FormField
+        control={control}
+        name={`actions.${index}.errorBehavior`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>On Error</FormLabel>
+            <Select
+              value={field.value || 'stop'}
+              onValueChange={field.onChange}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select error behavior" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="stop">Stop workflow execution</SelectItem>
+                <SelectItem value="continue">Continue to next action</SelectItem>
+                <SelectItem value="retry">Retry (max 3 attempts)</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormDescription>
+              What to do if this action fails
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
