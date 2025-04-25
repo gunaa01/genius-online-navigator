@@ -1,27 +1,46 @@
-
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { Loader2 } from "lucide-react";
+import React, { useEffect } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { checkAuthStatus } from '@/store/slices/authSlice';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  redirectTo?: string;
 }
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
+/**
+ * ProtectedRoute component
+ * Ensures that only authenticated users can access certain routes
+ * Redirects unauthenticated users to the login page
+ */
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  redirectTo = '/auth' 
+}) => {
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
+  
+  // Check authentication status when component mounts
+  useEffect(() => {
+    dispatch(checkAuthStatus());
+  }, [dispatch]);
+  
+  // Show loading state while checking authentication
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="h-16 w-16 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
   }
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
+  
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
-
+  
+  // Render children if authenticated
   return <>{children}</>;
 };
 

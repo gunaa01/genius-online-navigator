@@ -4,218 +4,134 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Index from "./pages/Index";
-import OfflineToOnline from "./pages/OfflineToOnline";
-import Hire from "./pages/Hire";
-import Hiring from "./pages/Hiring";
-import Onboarding from "./pages/Onboarding";
-import NotFound from "./pages/NotFound";
-import Analytics from "./pages/Analytics";
-import Reports from "./pages/Reports";
-import AdCampaigns from "./pages/AdCampaigns";
-import SocialMedia from "./pages/SocialMedia";
-import AiContent from "./pages/AiContent";
-import Integrations from "./pages/Integrations";
-import TeamManagement from "./pages/TeamManagement";
-import Settings from "./pages/Settings";
-import Upgrade from "./pages/Upgrade";
-import Auth from "./pages/Auth";
-import Community from "./pages/Community";
-import Admin from "./pages/Admin";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { AuthProvider } from "./hooks/useAuth";
-import Dashboard from "./pages/Dashboard";
+import { Suspense } from 'react';
+import Layout from "@/components/Layout";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { useAppDispatch } from '@/store/hooks';
+import { checkAuthStatus } from '@/store/slices/authSlice';
+import { ReduxProvider } from "@/components/ReduxProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import AboutUs from "./pages/AboutUs";
-import Contact from "./pages/Contact";
-import Blog from "./pages/Blog";
-import Careers from "./pages/Careers";
-import Pricing from "./pages/Pricing";
-import FAQ from "./pages/FAQ";
-import Docs from "./pages/Docs";
-import AdminCreate from "./pages/AdminCreate";
-import TeamInvite from "./pages/TeamInvite";
-import IntegrationsConnect from "./pages/IntegrationsConnect";
-import SEOHead from "./components/SEOHead";
-import LocalDiscovery from "./pages/LocalDiscovery";
-import { FeatureFlagProvider, FeatureFlagged } from '@/contexts/FeatureFlagContext';
-import FeedbackWidget from '@/components/common/FeedbackWidget';
-import ErrorBoundary from '@/components/common/ErrorBoundary';
-import LoadingScreen from '@/components/common/LoadingScreen';
+import { AuthProvider } from "@/components/AuthProvider";
+
+// Lazy-loaded components for better performance
+const Dashboard = React.lazy(() => import("@/pages/Dashboard"));
+const AdCampaigns = React.lazy(() => import("@/pages/AdCampaigns"));
+const SocialMedia = React.lazy(() => import("@/pages/SocialMedia"));
+const AiContent = React.lazy(() => import("@/pages/AiContent"));
+const Analytics = React.lazy(() => import("@/pages/Analytics"));
+const Settings = React.lazy(() => import("@/pages/Settings"));
+const Auth = React.lazy(() => import("@/pages/Auth"));
+const NotFound = React.lazy(() => import("@/pages/NotFound"));
+const Onboarding = React.lazy(() => import("./pages/Onboarding"));
+const Reports = React.lazy(() => import("./pages/Reports"));
+const Integrations = React.lazy(() => import("./pages/Integrations"));
+const TeamManagement = React.lazy(() => import("./pages/TeamManagement"));
+const Community = React.lazy(() => import("./pages/Community"));
+const Admin = React.lazy(() => import("./pages/Admin"));
+const AdminCreate = React.lazy(() => import("./pages/AdminCreate"));
+const TeamInvite = React.lazy(() => import("./pages/TeamInvite"));
+const IntegrationsConnect = React.lazy(() => import("./pages/IntegrationsConnect"));
+const Upgrade = React.lazy(() => import("./pages/Upgrade"));
+const Index = React.lazy(() => import("./pages/Index"));
+const OfflineToOnline = React.lazy(() => import("./pages/OfflineToOnline"));
+const Hire = React.lazy(() => import("./pages/Hire"));
+const Hiring = React.lazy(() => import("./pages/Hiring"));
+const AboutUs = React.lazy(() => import("./pages/AboutUs"));
+const Contact = React.lazy(() => import("./pages/Contact"));
+const Blog = React.lazy(() => import("./pages/Blog"));
+const Careers = React.lazy(() => import("./pages/Careers"));
+const Pricing = React.lazy(() => import("./pages/Pricing"));
+const FAQ = React.lazy(() => import("./pages/FAQ"));
+const Docs = React.lazy(() => import("./pages/Docs"));
+
+// Loading component for Suspense
+const PageLoader = () => (
+  <div className="flex h-screen w-full items-center justify-center">
+    <div className="h-16 w-16 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
+    <span className="ml-2 text-lg font-medium">Loading...</span>
+  </div>
+);
 
 const queryClient = new QueryClient();
 
-// Mock user for feature flags
-const mockUser = {
-  id: 'user-001',
-  email: 'admin@example.com',
-  role: 'admin' as const,
-  teams: ['development', 'management']
+const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const dispatch = useAppDispatch();
+  
+  React.useEffect(() => {
+    // Check authentication status when app loads
+    dispatch(checkAuthStatus());
+  }, [dispatch]);
+  
+  return <>{children}</>;
 };
-
-// Eagerly load critical components
-const IndexPage = Index;
-const NotFoundPage = NotFound;
-
-// Lazy load other components
-const DashboardPage = React.lazy(() => import('./pages/Dashboard'));
-const OfflineToOnlinePage = React.lazy(() => import('./pages/OfflineToOnline'));
-const HirePage = React.lazy(() => import('./pages/Hire'));
-const HiringPage = React.lazy(() => import('./pages/Hiring'));
-const OnboardingPage = React.lazy(() => import('./pages/Onboarding'));
-const AnalyticsPage = React.lazy(() => import('./pages/Analytics'));
-const ReportsPage = React.lazy(() => import('./pages/Reports'));
-const AdCampaignsPage = React.lazy(() => import('./pages/AdCampaigns'));
-const SocialMediaPage = React.lazy(() => import('./pages/SocialMedia'));
-const AiContentPage = React.lazy(() => import('./pages/AiContent'));
-const IntegrationsPage = React.lazy(() => import('./pages/Integrations'));
-const TeamManagementPage = React.lazy(() => import('./pages/TeamManagement'));
-const SettingsPage = React.lazy(() => import('./pages/Settings'));
-const UpgradePage = React.lazy(() => import('./pages/Upgrade'));
-const AuthPage = React.lazy(() => import('./pages/Auth'));
-const CommunityPage = React.lazy(() => import('./pages/Community'));
-const AdminPage = React.lazy(() => import('./pages/Admin'));
-const AboutUsPage = React.lazy(() => import('./pages/AboutUs'));
-const ContactPage = React.lazy(() => import('./pages/Contact'));
-const BlogPage = React.lazy(() => import('./pages/Blog'));
-const CareersPage = React.lazy(() => import('./pages/Careers'));
-const PricingPage = React.lazy(() => import('./pages/Pricing'));
-const FAQPage = React.lazy(() => import('./pages/FAQ'));
-const DocsPage = React.lazy(() => import('./pages/Docs'));
-const AdminCreatePage = React.lazy(() => import('./pages/AdminCreate'));
-const TeamInvitePage = React.lazy(() => import('./pages/TeamInvite'));
-const IntegrationsConnectPage = React.lazy(() => import('./pages/IntegrationsConnect'));
-const LocalDiscoveryPage = React.lazy(() => import('./pages/LocalDiscovery'));
 
 const App = () => (
   <React.StrictMode>
     <ErrorBoundary>
-      <ThemeProvider>
-        <FeatureFlagProvider initialUser={mockUser}>
+      <ReduxProvider>
+        <ThemeProvider>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
-                  <SEOHead />
-                  <React.Suspense fallback={<LoadingScreen />}>
-                    <Routes>
-                      <Route path="/landing" element={<IndexPage />} />
-                      <Route path="/offline-to-online" element={<OfflineToOnlinePage />} />
-                      <Route path="/hire" element={<HirePage />} />
-                      <Route path="/hiring" element={<HiringPage />} />
-                      <Route path="/auth" element={<AuthPage />} />
-                      <Route path="/local-discovery" element={<LocalDiscoveryPage />} />
-                      
-                      {/* Set Index as new home page */}
-                      <Route path="/" element={<IndexPage />} />
-
-                      {/* Move dashboard to /dashboard, protected */}
-                      <Route path="/dashboard" element={
-                        <ProtectedRoute>
-                          <DashboardPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/onboarding" element={
-                        <ProtectedRoute>
-                          <OnboardingPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/analytics" element={
-                        <ProtectedRoute>
-                          <AnalyticsPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/reports" element={
-                        <ProtectedRoute>
-                          <ReportsPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/ads" element={
-                        <ProtectedRoute>
-                          <AdCampaignsPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/social" element={
-                        <ProtectedRoute>
-                          <SocialMediaPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/content" element={
-                        <ProtectedRoute>
-                          <AiContentPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/integrations" element={
-                        <ProtectedRoute>
-                          <IntegrationsPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/team" element={
-                        <ProtectedRoute>
-                          <TeamManagementPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/community" element={
-                        <ProtectedRoute>
-                          <CommunityPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/settings" element={
-                        <ProtectedRoute>
-                          <SettingsPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/upgrade" element={
-                        <ProtectedRoute>
-                          <UpgradePage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/admin" element={
-                        <ProtectedRoute>
-                          <AdminPage />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/about-us" element={<AboutUsPage />} />
-                      <Route path="/contact" element={<ContactPage />} />
-                      <Route path="/blog" element={<BlogPage />} />
-                      <Route path="/careers" element={<CareersPage />} />
-                      <Route path="/pricing" element={<PricingPage />} />
-                      <Route path="/faq" element={<FAQPage />} />
-                      <Route path="/docs" element={<DocsPage />} />
-                      
-                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                      <Route path="*" element={<NotFoundPage />} />
-                    </Routes>
-                    
-                    {/* Global Components */}
-                    <Toaster />
-                    
-                    {/* Feature Flagged Components */}
-                    <FeatureFlagged flagId="feedback-widget">
-                      <FeedbackWidget position="bottom-right" />
-                    </FeatureFlagged>
-                  </React.Suspense>
+                  <AppInitializer>
+                    <Suspense fallback={<PageLoader />}>
+                      <Routes>
+                        {/* Public routes */}
+                        <Route path="/auth" element={<Auth />} />
+                        
+                        {/* Protected routes */}
+                        <Route path="/" element={
+                          <ProtectedRoute>
+                            <Layout />
+                          </ProtectedRoute>
+                        }>
+                          <Route index element={<Navigate to="/dashboard" replace />} />
+                          <Route path="dashboard" element={<Dashboard />} />
+                          <Route path="ad-campaigns" element={<AdCampaigns />} />
+                          <Route path="social-media" element={<SocialMedia />} />
+                          <Route path="ai-content" element={<AiContent />} />
+                          <Route path="analytics" element={<Analytics />} />
+                          <Route path="settings" element={<Settings />} />
+                          <Route path="onboarding" element={<Onboarding />} />
+                          <Route path="reports" element={<Reports />} />
+                          <Route path="integrations" element={<Integrations />} />
+                          <Route path="team" element={<TeamManagement />} />
+                          <Route path="community" element={<Community />} />
+                          <Route path="admin" element={<Admin />} />
+                          <Route path="admin/create" element={<AdminCreate />} />
+                          <Route path="team/invite" element={<TeamInvite />} />
+                          <Route path="integrations/connect" element={<IntegrationsConnect />} />
+                          <Route path="upgrade" element={<Upgrade />} />
+                        </Route>
+                        
+                        {/* Other routes */}
+                        <Route path="/landing" element={<Index />} />
+                        <Route path="/offline-to-online" element={<OfflineToOnline />} />
+                        <Route path="/hire" element={<Hire />} />
+                        <Route path="/hiring" element={<Hiring />} />
+                        <Route path="/about-us" element={<AboutUs />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/blog" element={<Blog />} />
+                        <Route path="/careers" element={<Careers />} />
+                        <Route path="/pricing" element={<Pricing />} />
+                        <Route path="/faq" element={<FAQ />} />
+                        <Route path="/docs" element={<Docs />} />
+                        
+                        {/* 404 route */}
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Suspense>
+                  </AppInitializer>
                 </BrowserRouter>
               </TooltipProvider>
             </AuthProvider>
           </QueryClientProvider>
-        </FeatureFlagProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </ReduxProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );

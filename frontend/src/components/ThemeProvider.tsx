@@ -1,17 +1,14 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { useEffect } from "react";
+import { type ThemeProviderProps } from "next-themes/dist/types";
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    // Set default theme to dark if not set
-    if (!localStorage.getItem("theme")) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
-  }, []);
+/**
+ * ThemeProvider component for handling light/dark mode
+ * Uses next-themes for theme management
+ */
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="dark" enableSystem>
+    <NextThemesProvider {...props}>
       {children}
     </NextThemesProvider>
   );
