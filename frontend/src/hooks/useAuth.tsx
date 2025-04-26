@@ -1,110 +1,84 @@
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
-import { toast } from "@/hooks/use-toast";
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+type User = {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  avatar?: string;
+} | null;
 
 type AuthContextType = {
-  user: User | null;
-  session: Session | null;
-  signIn: (email: string, password: string) => Promise<{
-    error: Error | null;
-    data: { user: User | null; session: Session | null };
-  }>;
-  signUp: (email: string, password: string, userData: {
-    first_name?: string;
-    last_name?: string;
-    company?: string;
-  }) => Promise<{
-    error: Error | null;
-    data: { user: User | null; session: Session | null };
-  }>;
-  signOut: () => Promise<void>;
+  user: User;
   loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  signup: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
 
+  // Check if user is logged in on mount
   useEffect(() => {
-    // Set up the auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        setLoading(false);
-
-        if (event === "SIGNED_IN") {
-          toast({
-            title: "Welcome back!",
-            description: "You have successfully signed in.",
-          });
-        } else if (event === "SIGNED_OUT") {
-          toast({
-            title: "Signed out",
-            description: "You have successfully signed out.",
-          });
+    const checkAuth = async () => {
+      try {
+        // Simulate auth check
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
         }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setLoading(false);
       }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => {
-      subscription.unsubscribe();
     };
+
+    checkAuth();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const login = async (email: string, password: string) => {
+    setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      return { data, error };
+      // This is just a placeholder - replace with actual API call
+      const mockUser = { id: '1', email, firstName: 'Demo', lastName: 'User' };
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
     } catch (error) {
-      return { data: { user: null, session: null }, error: error as Error };
+      console.error('Login failed:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const signUp = async (email: string, password: string, userData: {
-    first_name?: string;
-    last_name?: string;
-    company?: string;
-  }) => {
+  const signup = async (email: string, password: string, firstName: string, lastName: string) => {
+    setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: userData,
-        },
-      });
-      
-      return { data, error };
+      // This is just a placeholder - replace with actual API call
+      const mockUser = { id: '1', email, firstName, lastName };
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
     } catch (error) {
-      return { data: { user: null, session: null }, error: error as Error };
+      console.error('Signup failed:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, session, signIn, signUp, signOut, loading }}
-    >
+    <AuthContext.Provider value={{ user, loading, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );
@@ -112,8 +86,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

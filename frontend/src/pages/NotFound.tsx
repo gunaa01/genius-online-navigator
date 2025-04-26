@@ -1,5 +1,9 @@
-import { useLocation } from "react-router-dom";
+
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Home } from "lucide-react";
+import Menu from "@/components/Menu";
 
 const NotFound = () => {
   const location = useLocation();
@@ -12,15 +16,40 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
+    <>
+      <Menu />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <div className="max-w-md w-full px-4 py-8 text-center space-y-6">
+          <div className="rounded-full bg-muted w-20 h-20 mx-auto flex items-center justify-center">
+            <span className="text-4xl font-bold">404</span>
+          </div>
+          
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold">Page not found</h1>
+            <p className="text-muted-foreground">
+              We couldn't find the page you're looking for. The page may have been moved or deleted.
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+            <Button asChild variant="default" className="gap-2">
+              <Link to="/">
+                <Home className="h-4 w-4" /> Back to Home
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="gap-2">
+              <Link to="/for-hire">
+                <ArrowLeft className="h-4 w-4" /> Back to For Hire
+              </Link>
+            </Button>
+          </div>
+        </div>
+        
+        <div className="mt-8 text-muted-foreground text-sm">
+          <p>Need assistance? <Link to="/contact" className="text-primary hover:underline">Contact our support team</Link></p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

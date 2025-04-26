@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import GigList from './pages/ForHire/GigList';
 import GigDetail from './pages/ForHire/GigDetail';
 import PostGig from './pages/ForHire/PostGig';
@@ -25,25 +26,40 @@ import GuideDetail from './pages/Guides/GuideDetail';
 import CommunityList from './pages/Community/CommunityList';
 import CommunityDetail from './pages/Community/CommunityDetail';
 import PageDetail from './pages/Pages/PageDetail';
+import NotFound from './pages/NotFound';
+import ForHire from './pages/ForHire';
+import Hire from './pages/Hire';
+import Hiring from './pages/Hiring';
+import Index from './pages/Index';
+import OfflineToOnline from './pages/OfflineToOnline';
 
-const RoutesComponent: React.FC = () => (
-  <Router>
+const RoutesComponent = () => (
+  <BrowserRouter>
     <Routes>
+      {/* Main Routes */}
+      <Route path="/" element={<Index />} />
+      <Route path="/offline-to-online" element={<OfflineToOnline />} />
+      <Route path="/for-hire" element={<ForHire />} />
+      <Route path="/hire" element={<Hire />} />
+      <Route path="/hiring" element={<Hiring />} />
+      
       {/* For Hire */}
-      <Route path="/for-hire" element={<GigList />} />
+      <Route path="/for-hire/gigs" element={<GigList />} />
       <Route path="/for-hire/gig/:id" element={<GigDetail />} />
       <Route path="/for-hire/post" element={<PostGig />} />
       <Route path="/for-hire/profile/:userId" element={<FreelancerProfile />} />
       <Route path="/for-hire/orders" element={<Orders userId="me" />} />
       <Route path="/for-hire/messages/:orderId" element={<MessagesForHire />} />
+      
       {/* Hiring */}
-      <Route path="/hiring" element={<JobList />} />
+      <Route path="/hiring/jobs" element={<JobList />} />
       <Route path="/hiring/job/:id" element={<JobDetail />} />
       <Route path="/hiring/post" element={<PostJob />} />
       <Route path="/hiring/profile/:userId" element={<RecruiterProfile />} />
       <Route path="/hiring/applicant/:userId" element={<ApplicantProfile />} />
       <Route path="/hiring/applications/:userId" element={<Applications userId="me" />} />
       <Route path="/hiring/messages/:applicationId" element={<MessagesHiring />} />
+      
       {/* Admin */}
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/users" element={<UserManagement />} />
@@ -52,15 +68,20 @@ const RoutesComponent: React.FC = () => (
       <Route path="/admin/analytics" element={<Analytics />} />
       <Route path="/admin/insights" element={<AIInsights />} />
       <Route path="/admin/cms" element={<CMS />} />
+      
       {/* Guides & Community */}
       <Route path="/guides" element={<GuideList />} />
       <Route path="/guides/:slug" element={<GuideDetail />} />
       <Route path="/community" element={<CommunityList />} />
       <Route path="/community/:slug" element={<CommunityDetail />} />
+      
       {/* Static CMS-managed pages */}
       <Route path="/pages/:slug" element={<PageDetail />} />
+      
+      {/* 404 route - must be last */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
-  </Router>
+  </BrowserRouter>
 );
 
 export default RoutesComponent;
