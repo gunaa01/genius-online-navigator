@@ -2,7 +2,6 @@
 import * as React from "react";
 import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "./hooks/useAuth";
 import { ThemeProvider } from "./components/ThemeProvider";
 import RoutesComponent from "./routes";
 
@@ -13,10 +12,8 @@ const App = () => (
   <React.StrictMode>
     <ThemeProvider defaultTheme="light">
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <Toaster richColors position="top-right" />
-          <RoutesComponent />
-        </AuthProvider>
+        <Toaster richColors position="top-right" />
+        <RoutesComponent />
       </QueryClientProvider>
     </ThemeProvider>
   </React.StrictMode>
