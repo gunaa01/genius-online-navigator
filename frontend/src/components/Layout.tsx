@@ -42,7 +42,8 @@ import {
  * Main layout component with navigation and content area
  * Implements accessibility features for WCAG 2.1 AA compliance
  */
-const Layout: React.FC = () => {
+const Layout: React.FC = (props) => {
+  console.log('[Layout] Mounted', props);
   const dispatch = useAppDispatch();
   const { theme, setTheme } = useTheme();
   const { sidebarOpen } = useAppSelector((state) => state.ui);
