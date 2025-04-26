@@ -15,35 +15,35 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/AuthProvider";
 
 // Lazy-loaded components for better performance
-const Dashboard = React.lazy(() => import("@/pages/Dashboard"));
+const AboutUs = React.lazy(() => import("@/pages/AboutUs"));
 const AdCampaigns = React.lazy(() => import("@/pages/AdCampaigns"));
-const SocialMedia = React.lazy(() => import("@/pages/SocialMedia"));
+const Admin = React.lazy(() => import("@/pages/Admin"));
+const AdminCreate = React.lazy(() => import("@/pages/AdminCreate"));
 const AiContent = React.lazy(() => import("@/pages/AiContent"));
 const Analytics = React.lazy(() => import("@/pages/Analytics"));
-const Settings = React.lazy(() => import("@/pages/Settings"));
 const Auth = React.lazy(() => import("@/pages/Auth"));
+const Blog = React.lazy(() => import("@/pages/Blog"));
+const Careers = React.lazy(() => import("@/pages/Careers"));
+const Community = React.lazy(() => import("@/pages/Community"));
+const Contact = React.lazy(() => import("@/pages/Contact"));
+const Dashboard = React.lazy(() => import("@/pages/Dashboard"));
+const Docs = React.lazy(() => import("@/pages/Docs"));
+const FAQ = React.lazy(() => import("@/pages/FAQ"));
+const Hire = React.lazy(() => import("@/pages/Hire"));
+const Hiring = React.lazy(() => import("@/pages/Hiring"));
+const Index = React.lazy(() => import("@/pages/Index"));
+const Integrations = React.lazy(() => import("@/pages/Integrations"));
+const IntegrationsConnect = React.lazy(() => import("@/pages/IntegrationsConnect"));
 const NotFound = React.lazy(() => import("@/pages/NotFound"));
-const Onboarding = React.lazy(() => import("./pages/Onboarding"));
-const Reports = React.lazy(() => import("./pages/Reports"));
-const Integrations = React.lazy(() => import("./pages/Integrations"));
-const TeamManagement = React.lazy(() => import("./pages/TeamManagement"));
-const Community = React.lazy(() => import("./pages/Community"));
-const Admin = React.lazy(() => import("./pages/Admin"));
-const AdminCreate = React.lazy(() => import("./pages/AdminCreate"));
-const TeamInvite = React.lazy(() => import("./pages/TeamInvite"));
-const IntegrationsConnect = React.lazy(() => import("./pages/IntegrationsConnect"));
-const Upgrade = React.lazy(() => import("./pages/Upgrade"));
-const Index = React.lazy(() => import("./pages/Index"));
-const OfflineToOnline = React.lazy(() => import("./pages/OfflineToOnline"));
-const Hire = React.lazy(() => import("./pages/Hire"));
-const Hiring = React.lazy(() => import("./pages/Hiring"));
-const AboutUs = React.lazy(() => import("./pages/AboutUs"));
-const Contact = React.lazy(() => import("./pages/Contact"));
-const Blog = React.lazy(() => import("./pages/Blog"));
-const Careers = React.lazy(() => import("./pages/Careers"));
-const Pricing = React.lazy(() => import("./pages/Pricing"));
-const FAQ = React.lazy(() => import("./pages/FAQ"));
-const Docs = React.lazy(() => import("./pages/Docs"));
+const Offline = React.lazy(() => import("@/pages/OfflineToOnline"));
+const Onboarding = React.lazy(() => import("@/pages/Onboarding"));
+const Pricing = React.lazy(() => import("@/pages/Pricing"));
+const Reports = React.lazy(() => import("@/pages/Reports"));
+const Settings = React.lazy(() => import("@/pages/Settings"));
+const SocialMedia = React.lazy(() => import("@/pages/SocialMedia"));
+const TeamInvite = React.lazy(() => import("@/pages/TeamInvite"));
+const TeamManagement = React.lazy(() => import("@/pages/TeamManagement"));
+const Upgrade = React.lazy(() => import("@/pages/Upgrade"));
 
 // Loading component for Suspense
 const PageLoader = () => (
@@ -110,7 +110,7 @@ const App = () => (
                         
                         {/* Other routes */}
                         <Route path="/landing" element={<Index />} />
-                        <Route path="/offline-to-online" element={<OfflineToOnline />} />
+                        <Route path="/offline-to-online" element={<Offline />} />
                         <Route path="/hire" element={<Hire />} />
                         <Route path="/hiring" element={<Hiring />} />
                         <Route path="/about-us" element={<AboutUs />} />
