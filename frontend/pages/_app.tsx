@@ -3,6 +3,8 @@ import type { AppProps } from 'next/app';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Provider } from 'react-redux';
+import { store } from '../src/redux/store';
 import '@/index.css';
 
 // Create a client
@@ -21,12 +23,14 @@ const queryClient = new QueryClient({
  */
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AccessibilityProvider>
-          <Component {...pageProps} />
-        </AccessibilityProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AccessibilityProvider>
+            <Component {...pageProps} />
+          </AccessibilityProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </Provider>
   );
 }

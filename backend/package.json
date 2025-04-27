@@ -1,0 +1,11 @@
+{
+  "name": "genius-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "typescript": "^5.3.3"
+  }
+}

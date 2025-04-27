@@ -1,0 +1,23 @@
+.bst-node {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #4CAF50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+}
+
+.bst-line {
+  position: absolute;
+  border-left: 2px solid #2196F3;
+  height: 20px;
+}
+
+.bst-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}

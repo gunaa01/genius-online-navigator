@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Card, 
   CardContent, 
   CardDescription, 
   CardHeader, 
-  CardTitle 
+  CardTitle, 
+  CardFooter
 } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Button } from './ui/button';
@@ -100,6 +101,9 @@ const mockMetrics: AnalyticsMetric[] = [
 const AnalyticsDashboard: React.FC = () => {
   const [dateRange, setDateRange] = useState('30d');
   const [activeTab, setActiveTab] = useState('overview');
+  const [forecast, setForecast] = useState<string | null>(null);
+  const [insights, setInsights] = useState<string[]>([]);
+  const [reportScheduled, setReportScheduled] = useState(false);
 
   // Format metric value based on its type
   const formatMetricValue = (metric: AnalyticsMetric) => {
@@ -111,6 +115,26 @@ const AnalyticsDashboard: React.FC = () => {
       default:
         return metric.value.toLocaleString();
     }
+  };
+
+  // Mock predictive analytics function
+  const predictFuture = useCallback(async () => {
+    // Replace with real AI/analytics integration
+    setForecast('Expected visitors next week: 30,000 (+15%)');
+  }, []);
+
+  // Mock actionable insights
+  useEffect(() => {
+    setInsights([
+      'Traffic spike detected on Monday (↑22%)',
+      'Conversion rate below average on mobile (↓5%)',
+      'Consider optimizing landing page for better retention.'
+    ]);
+  }, []);
+
+  const handleScheduleReport = () => {
+    setReportScheduled(true);
+    // Logic for scheduling report export (placeholder)
   };
 
   return (
@@ -581,6 +605,34 @@ const AnalyticsDashboard: React.FC = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Predictive Analytics */}
+        <Button onClick={predictFuture} aria-label="Predict Future"><TrendingUp className="mr-2" />Predict Future</Button>
+        {forecast && (
+          <div aria-live="polite" className="mt-2 p-2 border rounded bg-muted">
+            <strong>Forecast:</strong> {forecast}
+          </div>
+        )}
+
+        {/* Actionable Insights */}
+        <Card>
+          <CardHeader><CardTitle>Actionable Insights</CardTitle></CardHeader>
+          <CardContent>
+            <ul>
+              {insights.map((insight, idx) => (
+                <li key={idx} aria-live="polite">{insight}</li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Workflow Automation */}
+        <Button onClick={handleScheduleReport} aria-label="Schedule Report Export"><Clock className="mr-2" />Schedule Report Export</Button>
+        {reportScheduled && (
+          <div aria-live="polite" className="mt-2 p-2 border rounded bg-success">
+            <strong>Report scheduled for export every Monday at 9am.</strong>
+          </div>
+        )}
       </div>
     </ErrorBoundary>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -189,6 +189,39 @@ const AdCampaignManager: React.FC = () => {
       },
       creatives: [],
     });
+  };
+
+  // --- Innovation: AI Optimization, Predictive Analytics, Workflow Automation ---
+  const [aiSuggestions, setAiSuggestions] = useState<{audience?: string; budget?: string; creative?: string; timing?: string;} | null>(null);
+  const [forecast, setForecast] = useState<string | null>(null);
+  const [autoPaused, setAutoPaused] = useState(false);
+  const [autoDuplicated, setAutoDuplicated] = useState(false);
+
+  // Mock AI optimization function
+  const optimizeCampaign = useCallback(async (campaign: Campaign) => {
+    // Replace with real AI/analytics integration
+    setAiSuggestions({
+      audience: 'Target age 25-40, interests: AI, Business, Marketing',
+      budget: 'Increase daily budget to $50 for better reach',
+      creative: 'Use short video with a strong CTA',
+      timing: 'Schedule for weekdays at 11am and 7pm'
+    });
+  }, []);
+
+  // Mock predictive analytics function
+  const predictCampaignPerformance = useCallback(async (campaign: Campaign) => {
+    // Replace with real analytics integration
+    setForecast('Forecast: 120,000 impressions, 3,500 clicks, 250 conversions, ROI +22%');
+  }, []);
+
+  const handleAutoPause = () => {
+    setAutoPaused(true);
+    // Logic to auto-pause underperforming campaigns (placeholder)
+  };
+
+  const handleAutoDuplicate = () => {
+    setAutoDuplicated(true);
+    // Logic to auto-duplicate high-performing campaigns (placeholder)
   };
 
   return (
@@ -597,6 +630,38 @@ const AdCampaignManager: React.FC = () => {
         </Tabs>
 
         {/* Campaign Detail Modal would be implemented here */}
+        {selectedCampaign && (
+          <div className="mt-4">
+            <Button onClick={() => optimizeCampaign(selectedCampaign)} aria-label="AI Optimize Campaign"><TrendingUp className="mr-2" />AI Optimize Campaign</Button>
+            {aiSuggestions && (
+              <div aria-live="polite" className="mt-2 p-2 border rounded bg-muted">
+                <strong>AI Suggestions:</strong>
+                <div>Audience: {aiSuggestions.audience}</div>
+                <div>Budget: {aiSuggestions.budget}</div>
+                <div>Creative: {aiSuggestions.creative}</div>
+                <div>Timing: {aiSuggestions.timing}</div>
+              </div>
+            )}
+            <Button onClick={() => predictCampaignPerformance(selectedCampaign)} aria-label="Predict Campaign Performance"><BarChart3 className="mr-2" />Predict Performance</Button>
+            {forecast && (
+              <div aria-live="polite" className="mt-2 p-2 border rounded bg-muted">
+                <strong>{forecast}</strong>
+              </div>
+            )}
+            <Button onClick={handleAutoPause} aria-label="Auto-Pause Underperforming"><Megaphone className="mr-2" />Auto-Pause Underperforming</Button>
+            {autoPaused && (
+              <div aria-live="polite" className="mt-2 p-2 border rounded bg-warning">
+                <strong>Auto-pause enabled for underperforming campaigns.</strong>
+              </div>
+            )}
+            <Button onClick={handleAutoDuplicate} aria-label="Auto-Duplicate High Performers"><Megaphone className="mr-2" />Auto-Duplicate High Performers</Button>
+            {autoDuplicated && (
+              <div aria-live="polite" className="mt-2 p-2 border rounded bg-success">
+                <strong>Auto-duplicate enabled for high-performing campaigns.</strong>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </ErrorBoundary>
   );

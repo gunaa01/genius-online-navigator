@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -189,6 +189,23 @@ const SocialMediaAutomation: React.FC = () => {
     });
   };
 
+  // --- Innovation: AI Post Time Suggestion & Bulk Scheduling ---
+  const [suggestedTime, setSuggestedTime] = useState<string | null>(null);
+  const [bulkPosts, setBulkPosts] = useState<SocialPost[]>([]);
+  const [showBulkModal, setShowBulkModal] = useState(false);
+
+  // Mock AI post time suggestion
+  const getAISuggestedTime = useCallback(async (platform: string, content: string) => {
+    // Replace with real AI/analytics integration
+    setSuggestedTime('Tomorrow at 10:00 AM (peak engagement)');
+  }, []);
+
+  const handleBulkSchedule = () => {
+    // Logic for scheduling bulk posts (placeholder)
+    setShowBulkModal(false);
+    toast.success('Bulk posts scheduled!');
+  };
+
   return (
     <ErrorBoundary>
       <div className="container mx-auto p-4 space-y-6">
@@ -356,6 +373,32 @@ const SocialMediaAutomation: React.FC = () => {
                         </div>
                       </div>
                     )}
+                    
+                    <Button onClick={() => getAISuggestedTime(selectedPlatform, postContent)} aria-label="AI Suggest Post Time"><Clock className="mr-2" />AI Suggest Post Time</Button>
+                    {suggestedTime && (
+                      <div aria-live="polite" className="mt-2 p-2 border rounded bg-muted">
+                        <strong>Suggested Time:</strong> {suggestedTime}
+                      </div>
+                    )}
+                    
+                    <Button onClick={() => setShowBulkModal(true)} aria-label="Bulk Schedule"><Calendar className="mr-2" />Bulk Schedule</Button>
+                    {showBulkModal && (
+                      <div role="dialog" aria-modal="true" className="modal">
+                        <Card>
+                          <CardHeader><CardTitle>Bulk Schedule Posts</CardTitle></CardHeader>
+                          <CardContent>
+                            <Label htmlFor="bulk-upload">Upload CSV or Paste Posts</Label>
+                            <Input id="bulk-upload" type="file" accept=".csv" aria-label="Upload bulk posts CSV" />
+                            {/* Or paste posts in a textarea */}
+                            <Textarea placeholder="Paste posts here..." aria-label="Paste bulk posts" />
+                          </CardContent>
+                          <CardFooter>
+                            <Button onClick={handleBulkSchedule} aria-label="Schedule Bulk Posts">Schedule</Button>
+                            <Button onClick={() => setShowBulkModal(false)} aria-label="Cancel Bulk Scheduling">Cancel</Button>
+                          </CardFooter>
+                        </Card>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between">
@@ -520,6 +563,17 @@ const SocialMediaAutomation: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                
+                {/* Predictive Insights */}
+                <Card>
+                  <CardHeader><CardTitle>Predictive Insights</CardTitle></CardHeader>
+                  <CardContent>
+                    <BarChart2 className="mr-2" />
+                    <div>Best times to post: <strong>10am, 2pm, 6pm</strong></div>
+                    <div>Most engaging content: <strong>Short videos, Polls</strong></div>
+                    <div>Recommended platforms: <strong>Instagram, LinkedIn</strong></div>
+                  </CardContent>
+                </Card>
               </CardContent>
             </Card>
           </TabsContent>

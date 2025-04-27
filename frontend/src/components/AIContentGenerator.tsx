@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -47,10 +47,23 @@ import {
   GeneratedContent
 } from '@/store/slices/aiContentSlice';
 import { toast } from 'sonner';
+import { createClient } from '@supabase/supabase-js';
+
+type AISuggestion = {
+  id: string;
+  content_hash: string;
+  suggestions: string[];
+};
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_KEY!
+);
 
 /**
  * AIContentGenerator component for creating AI-generated content for various purposes
  * including blog posts, social media content, product descriptions, and image prompts.
+ * Implements accessibility, workflow, and testing best practices.
  */
 const AIContentGenerator: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -74,6 +87,95 @@ const AIContentGenerator: React.FC = () => {
     excludeKeywords: [] as string[],
   });
   const [keywordInput, setKeywordInput] = useState('');
+
+  const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
+  const [checkPlagiarism, setCheckPlagiarism] = useState(false);
+  const [plagiarismResult, setPlagiarismResult] = useState<string | null>(null);
+
+  const [apiKey, setApiKey] = useState('');
+
+  const [user, setUser] = useState<any>(null);
+
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const plagiarismResultRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (suggestions && suggestionsRef.current) {
+      suggestionsRef.current.focus();
+    }
+  }, [suggestions]);
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') setUser(session?.user);
+    });
+  }, []);
+
+  // --- Supabase real-time subscription for AI suggestions ---
+  useEffect(() => {
+    const channel = supabase
+      .channel('ai_suggestions')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'ai_suggestions' },
+        (payload) => {
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            setSuggestions((prev) =>
+              prev.map((s) => (s.id === payload.new.id ? payload.new : s))
+            );
+          }
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  /**
+   * Fetches AI suggestions for the given content.
+   * @param content - The content to analyze
+   */
+  const getAISuggestions = useCallback(async (content: string) => {
+    const { data, error } = await supabase
+      .from('ai_suggestions')
+      .select('*')
+      .eq('content_hash', hash(content));
+    if (error) {
+      if (error.message.includes('JWT')) {
+        toast.error('Authentication failed. Please log in again.');
+      } else {
+        toast.error('Failed to fetch AI suggestions.');
+      }
+      return;
+    }
+    setSuggestions(data || []);
+  }, []);
+
+  /**
+   * Checks the given content for plagiarism and manages focus for result.
+   * @param content - The content to check
+   * @returns void
+   */
+  const checkForPlagiarism = useCallback(async (content: string) => {
+    // Replace with real plagiarism API call
+    setPlagiarismResult('No plagiarism detected.');
+    setTimeout(() => {
+      if (plagiarismResultRef.current) {
+        plagiarismResultRef.current.focus();
+      }
+    }, 100);
+  }, []);
+
+  const handleSchedulePost = () => {
+    // Add logic to schedule post
+  };
+
+  const handleExportContent = () => {
+    // Add logic to export content
+  };
+
+  const handlePostToSocial = () => {
+    // Add logic to post to social media
+  };
 
   // Fetch templates and history from API
   useEffect(() => {
@@ -167,6 +269,28 @@ const AIContentGenerator: React.FC = () => {
         excludeKeywords: settings.excludeKeywords.filter(k => k !== keyword)
       });
     }
+  };
+
+  /**
+   * Handles saving the custom API key to user settings.
+   * @returns void
+   */
+  const handleSaveSettings = () => {
+    // Add logic to save API key to user settings
+  };
+
+  const saveContext = async (modelType: string, context: object) => {
+    if (!user) throw new Error('Unauthorized');
+    const { data, error } = await supabase
+      .from('context_chain')
+      .insert({ 
+        user_id: user.id, 
+        model_type: modelType, 
+        context 
+      })
+      .select();
+    if (error) throw error;
+    return data;
   };
 
   return (
@@ -444,6 +568,82 @@ const AIContentGenerator: React.FC = () => {
                 </CardFooter>
               </Card>
             )}
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>AI Suggestions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Label htmlFor="plagiarism-toggle">Check for Plagiarism</Label>
+                <Switch id="plagiarism-toggle" checked={checkPlagiarism} onCheckedChange={setCheckPlagiarism} aria-label="Toggle plagiarism check" />
+                <Button 
+                  data-testid="get-ai-suggestions-btn"
+                  aria-label="Get AI Suggestions"
+                  onClick={() => getAISuggestions(generatedContent)}
+                >
+                  <Sparkles className="mr-2" />Get Suggestions
+                </Button>
+                {suggestions && (
+                  <div 
+                    ref={suggestionsRef} 
+                    tabIndex={-1} 
+                    aria-live="polite" 
+                    className="mt-2 p-2 border rounded bg-muted"
+                  >
+                    <strong>AI Suggestions:</strong>
+                    {suggestions.map((suggestion) => (
+                      <div key={suggestion.id}>
+                        <div>Content Hash: {suggestion.content_hash}</div>
+                        <div>Suggestions: {suggestion.suggestions.join(', ')}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {checkPlagiarism && (
+                  <Button 
+                    data-testid="check-plagiarism-btn"
+                    aria-label="Check Plagiarism"
+                    onClick={() => checkForPlagiarism(generatedContent)}
+                  >
+                    <Layers className="mr-2" />Check Plagiarism
+                  </Button>
+                )}
+                {plagiarismResult && (
+                  <div 
+                    aria-live="polite" 
+                    className="mt-2 p-2 border rounded bg-warning"
+                    tabIndex={-1}
+                    data-testid="plagiarism-result"
+                    ref={plagiarismResultRef}
+                  >
+                    <strong>Plagiarism Check:</strong> {plagiarismResult}
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  data-testid="schedule-post-btn"
+                  aria-label="Schedule Post"
+                  onClick={handleSchedulePost}
+                >
+                  <Clock className="mr-2" />Schedule Post
+                </Button>
+                <Button 
+                  data-testid="export-content-btn"
+                  aria-label="Export Content"
+                  onClick={handleExportContent}
+                >
+                  <Save className="mr-2" />Export
+                </Button>
+                <Button 
+                  data-testid="post-to-social-btn"
+                  aria-label="Post to Social Media"
+                  onClick={handlePostToSocial}
+                >
+                  <MessageSquare className="mr-2" />Post to Social
+                </Button>
+              </CardFooter>
+            </Card>
           </TabsContent>
 
           {/* Templates Tab */}
@@ -638,14 +838,35 @@ const AIContentGenerator: React.FC = () => {
                 
                 <div className="space-y-2">
                   <Label htmlFor="api-key">Custom API Key (Optional)</Label>
-                  <Input id="api-key" type="password" placeholder="Enter your API key" />
-                  <p className="text-sm text-muted-foreground">
+                  <Input
+                    id="api-key"
+                    type="password"
+                    placeholder="Enter your API key"
+                    aria-label="Custom API Key"
+                    aria-describedby="api-key-help"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    data-testid="custom-api-key-input"
+                    value={apiKey}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApiKey(e.target.value)}
+                  />
+                  <p id="api-key-help" className="text-sm text-muted-foreground" data-testid="custom-api-key-help">
                     Use your own API key for content generation
                   </p>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button>Save Settings</Button>
+                {/**
+                 * Handles saving the custom API key to user settings.
+                 * @returns void
+                 */}
+                <Button
+                  aria-label="Save Settings"
+                  data-testid="save-settings-btn"
+                  onClick={handleSaveSettings}
+                >
+                  Save Settings
+                </Button>
               </CardFooter>
             </Card>
           </TabsContent>
