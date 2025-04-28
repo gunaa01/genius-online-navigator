@@ -1,28 +1,19 @@
 
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import NotFound from './pages/NotFound';
+import Index from './pages/Index';
 
-// Import any other pages here
-// import Home from './pages/Home';
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Genius</h1>
-        <p className="text-lg text-muted-foreground mb-6">Your AI-powered business growth platform</p>
-      </div>
-    </div>,
-  },
-  {
-    path: "*",
-    element: <NotFound />,
-  },
-]);
-
-const RoutesComponent = () => {
-  return <RouterProvider router={router} />;
-};
+const RoutesComponent = () => (
+  <BrowserRouter>
+    <Routes>
+      {/* Main Routes */}
+      <Route path="/" element={<Index />} />
+      
+      {/* 404 route - must be last */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </BrowserRouter>
+);
 
 export default RoutesComponent;
