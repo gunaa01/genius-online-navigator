@@ -7,5 +7,20 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "typescript": "^5.3.3"
+  },
+  "description": "- `/teams/` (CRUD, multi-tenancy, admin actions) - `/organizations/` (CRUD) - `/notifications/` (CRUD) - `/auth/` (register, login, password reset)",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
   }
 }
