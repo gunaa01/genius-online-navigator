@@ -1,24 +1,8 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> parent of 1444075 (Fix: Resolve 'vite not found' error)
-/* Add your global styles below */
-body {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background: #f8fafc;
-  color: #222;
-  margin: 0;
-  padding: 0;
-<<<<<<< HEAD
-}
-
-.card {
-  padding: 2em;
-=======
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -93,15 +77,4 @@ body {
   body {
     @apply bg-background text-foreground;
   }
->>>>>>> f864e55e0fef75f1a5278abc98597e49e39e99f9
-=======
-}
-
-.card {
-  padding: 2em;
->>>>>>> parent of 1444075 (Fix: Resolve 'vite not found' error)
-}
-
-.read-the-docs {
-  color: #888;
 }
