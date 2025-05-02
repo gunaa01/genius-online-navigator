@@ -1,161 +1,143 @@
 
 import React from 'react';
-import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
-  LineChart, 
-  BarChart, 
-  PieChart, 
-  Rocket, 
-  FileText, 
+  BarChart2, 
+  Zap, 
   Share2, 
-  Search, 
-  Mail, 
-  User, 
+  FileText, 
+  Globe, 
+  Users, 
   ArrowRight 
 } from 'lucide-react';
 
 const Home: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Genius Online Navigator | Digital Marketing Platform</title>
-        <meta name="description" content="An all-in-one digital marketing platform for managing SEO, social media, analytics, and content." />
-      </Helmet>
-      
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary/90 to-primary px-4 py-20 text-white">
-        <div className="container mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Elevate Your Digital Marketing
+    <div className="container mx-auto px-4 py-8">
+      <section className="py-12 md:py-24">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            Welcome to <span className="text-primary">Genius</span>
           </h1>
-          <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-10 text-white/90">
-            An all-in-one platform to streamline your SEO, social media, content, 
-            and analytics in one powerful dashboard.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            The all-in-one platform to manage and optimize your online presence effortlessly
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button
-              size="lg"
-              className="bg-white text-primary hover:bg-white/90"
-              asChild
-            >
-              <Link to="/login">Get Started</Link>
+          <div className="flex flex-wrap justify-center gap-4 pt-4">
+            <Button asChild size="lg">
+              <Link to="/dashboard">Go to Dashboard</Link>
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white/10"
-              asChild
-            >
-              <Link to="/pricing">View Plans</Link>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/auth">Sign In</Link>
             </Button>
           </div>
         </div>
       </section>
-      
-      {/* Features Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            All Your Marketing Needs in One Place
-          </h2>
+
+      <section className="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="bg-card rounded-lg p-6 shadow-sm border">
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <BarChart2 className="h-6 w-6 text-primary" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Comprehensive Analytics</h3>
+          <p className="text-muted-foreground">
+            Get detailed insights into your online performance with interactive dashboards and AI-driven suggestions.
+          </p>
+        </div>
+        
+        <div className="bg-card rounded-lg p-6 shadow-sm border">
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Share2 className="h-6 w-6 text-primary" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Social Media Integration</h3>
+          <p className="text-muted-foreground">
+            Schedule and auto-post content to multiple platforms simultaneously with our AI content generator.
+          </p>
+        </div>
+        
+        <div className="bg-card rounded-lg p-6 shadow-sm border">
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Zap className="h-6 w-6 text-primary" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Ad Campaign Management</h3>
+          <p className="text-muted-foreground">
+            Create, run, and monitor ad campaigns on platforms like Google Ads and Facebook Ads all from one place.
+          </p>
+        </div>
+      </section>
+
+      <section className="py-12">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold">Key Features</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex items-start gap-3">
+            <Globe className="h-6 w-6 text-primary shrink-0" />
+            <div>
+              <h3 className="font-semibold">Data Integration</h3>
+              <p className="text-sm text-muted-foreground">
+                Connect your existing admin panels or upload data directly.
+              </p>
+            </div>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-card p-6 rounded-lg shadow-sm border">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Search className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">SEO Optimization</h3>
-              <p className="text-muted-foreground mb-4">
-                Boost your search ranking with automated sitemaps, schema markup, and optimization tools.
+          <div className="flex items-start gap-3">
+            <FileText className="h-6 w-6 text-primary shrink-0" />
+            <div>
+              <h3 className="font-semibold">AI Content Generation</h3>
+              <p className="text-sm text-muted-foreground">
+                Generate blog posts, product descriptions, and ad copy using AI.
               </p>
-              <Link to="/seo" className="text-primary hover:underline inline-flex items-center">
-                Learn more <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
             </div>
-            
-            <div className="bg-card p-6 rounded-lg shadow-sm border">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Share2 className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Social Media</h3>
-              <p className="text-muted-foreground mb-4">
-                Schedule and auto-post content across all your social media platforms from one dashboard.
+          </div>
+          
+          <div className="flex items-start gap-3">
+            <BarChart2 className="h-6 w-6 text-primary shrink-0" />
+            <div>
+              <h3 className="font-semibold">Automated Reports</h3>
+              <p className="text-sm text-muted-foreground">
+                Generate detailed reports on traffic, conversions, and engagement.
               </p>
-              <Link to="/social" className="text-primary hover:underline inline-flex items-center">
-                Learn more <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
             </div>
-            
-            <div className="bg-card p-6 rounded-lg shadow-sm border">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <LineChart className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Analytics</h3>
-              <p className="text-muted-foreground mb-4">
-                Get actionable insights with detailed analytics and performance tracking for all channels.
+          </div>
+          
+          <div className="flex items-start gap-3">
+            <Share2 className="h-6 w-6 text-primary shrink-0" />
+            <div>
+              <h3 className="font-semibold">Social Media Management</h3>
+              <p className="text-sm text-muted-foreground">
+                Schedule and auto-post content across multiple platforms.
               </p>
-              <Link to="/analytics" className="text-primary hover:underline inline-flex items-center">
-                Learn more <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
             </div>
-            
-            <div className="bg-card p-6 rounded-lg shadow-sm border">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <FileText className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Content Creation</h3>
-              <p className="text-muted-foreground mb-4">
-                Create SEO-optimized content with AI assistance and schedule publishing across channels.
+          </div>
+          
+          <div className="flex items-start gap-3">
+            <Users className="h-6 w-6 text-primary shrink-0" />
+            <div>
+              <h3 className="font-semibold">Multi-User Access</h3>
+              <p className="text-sm text-muted-foreground">
+                Assign different roles and permissions to team members.
               </p>
-              <Link to="/content" className="text-primary hover:underline inline-flex items-center">
-                Learn more <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
             </div>
-            
-            <div className="bg-card p-6 rounded-lg shadow-sm border">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <BarChart className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Ad Campaigns</h3>
-              <p className="text-muted-foreground mb-4">
-                Manage Google Ads and Meta Ads with performance tracking and optimization suggestions.
+          </div>
+          
+          <div className="flex items-start gap-3">
+            <Zap className="h-6 w-6 text-primary shrink-0" />
+            <div>
+              <h3 className="font-semibold">A/B Testing</h3>
+              <p className="text-sm text-muted-foreground">
+                Test variations of content and analyze performance.
               </p>
-              <Link to="/ads" className="text-primary hover:underline inline-flex items-center">
-                Learn more <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
-            
-            <div className="bg-card p-6 rounded-lg shadow-sm border">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Mail className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Email Marketing</h3>
-              <p className="text-muted-foreground mb-4">
-                Create, automate, and track email campaigns with customizable templates and analytics.
-              </p>
-              <Link to="/email" className="text-primary hover:underline inline-flex items-center">
-                Learn more <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
             </div>
           </div>
         </div>
-      </section>
-      
-      {/* CTA Section */}
-      <section className="bg-muted py-20 px-4">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Digital Strategy?</h2>
-          <p className="text-xl max-w-2xl mx-auto mb-8 text-muted-foreground">
-            Join thousands of marketers who save time and drive better results with Genius Online Navigator.
-          </p>
-          <Button
-            size="lg"
-            className="bg-primary text-white hover:bg-primary/90"
-            asChild
-          >
-            <Link to="/signup">Start Free Trial</Link>
+        
+        <div className="text-center mt-10">
+          <Button asChild size="lg">
+            <Link to="/dashboard">
+              Get Started <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </section>
