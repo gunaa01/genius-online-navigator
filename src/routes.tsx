@@ -13,55 +13,72 @@ import Integrations from './pages/Integrations';
 import ContentAnalytics from './pages/ContentAnalytics';
 import Auth from './pages/Auth';
 import Blog from './pages/Blog';
+import SeoManagement from './pages/SeoManagement';
+import MetaAdsPage from './pages/MetaAdsPage';
+import Layout from './components/Layout';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Dashboard />,
-  },
-  {
-    path: "/dashboard",
-    element: <Dashboard />,
-  },
-  {
-    path: "/analytics",
-    element: <Analytics />,
-  },
-  {
-    path: "/social",
-    element: <SocialMedia />,
-  },
-  {
-    path: "/ads",
-    element: <AdCampaigns />,
-  },
-  {
-    path: "/content",
-    element: <AiContent />,
-  },
-  {
-    path: "/content-analytics",
-    element: <ContentAnalytics />,
-  },
-  {
-    path: "/settings",
-    element: <Settings />,
-  },
-  {
-    path: "/team",
-    element: <TeamManagement />,
-  },
-  {
-    path: "/reports",
-    element: <Reports />,
-  },
-  {
-    path: "/integrations",
-    element: <Integrations />,
-  },
-  {
-    path: "/blog",
-    element: <Blog />,
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "/analytics",
+        element: <Analytics />,
+      },
+      {
+        path: "/social",
+        element: <SocialMedia />,
+      },
+      {
+        path: "/ads",
+        element: <AdCampaigns />,
+      },
+      {
+        path: "/meta-ads",
+        element: <MetaAdsPage />,
+      },
+      {
+        path: "/content",
+        element: <AiContent />,
+      },
+      {
+        path: "/content-analytics",
+        element: <ContentAnalytics />,
+      },
+      {
+        path: "/seo",
+        element: <SeoManagement />,
+      },
+      {
+        path: "/settings",
+        element: <Settings />,
+      },
+      {
+        path: "/team",
+        element: <TeamManagement />,
+      },
+      {
+        path: "/reports",
+        element: <Reports />,
+      },
+      {
+        path: "/integrations",
+        element: <Integrations />,
+      },
+      {
+        path: "/blog",
+        element: <Blog />,
+      },
+    ]
   },
   {
     path: "/login",

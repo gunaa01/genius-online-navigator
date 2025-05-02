@@ -1,246 +1,345 @@
-// Renamed from Index.tsx
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import MetricsOverview from "@/components/dashboard/MetricsOverview";
-import AnalyticsPanel from "@/components/dashboard/AnalyticsPanel";
-import ReportGenerator from "@/components/dashboard/ReportGenerator";
-import SocialMediaConnect from "@/components/dashboard/SocialMediaConnect";
-import AIInsights from "@/components/dashboard/AIInsights";
-import IntegrationCard from "@/components/common/IntegrationCard";
-import { useDemoData } from "@/hooks/useDemoData";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
+import React from 'react';
+import { Helmet } from 'react-helmet';
 import { 
-  Search, Bell, Plus, HelpCircle, Calendar, Filter, 
-  TrendingUp, RefreshCw, Download, Zap, Settings, 
-  FileText, BarChart2, Mail, Users
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
-import { useState, useEffect } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import {
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Eye,
+  Users,
+  Share2,
+  DollarSign,
+  Calendar,
+  ChevronRight,
+  Bell,
+  FileText,
+  CheckCircle,
+  ArrowRight
+} from 'lucide-react';
 
-const Dashboard = () => {
-  console.log('[Dashboard] Mounted');
-  const { 
-    metrics, 
-    visitors, 
-    revenue, 
-    socialAccounts, 
-    integrations, 
-    reports, 
-    loading 
-  } = useDemoData();
-  
-  const [dateRange, setDateRange] = useState("7days");
-  const [healthScore, setHealthScore] = useState({ score: 0, status: "" });
-  
-  // Calculate Business Health Score based on metrics
-  useEffect(() => {
-    if (!loading && metrics.length > 0) {
-      // Simple algorithm: average of normalized metrics
-      const conversionRate = metrics.find(m => m.name === "Conversion Rate")?.value || 0;
-      const revenueValue = metrics.find(m => m.name === "Total Revenue")?.value || 0;
-      const visitors = metrics.find(m => m.name === "Total Visitors")?.value || 0;
-      
-      // Normalize and weight different factors
-      const normalizedConversion = (conversionRate / 10) * 0.4; // 40% weight, assuming 10% is excellent
-      const normalizedRevenue = (revenueValue / 100000) * 0.35; // 35% weight, assuming $100k is excellent
-      const normalizedVisitors = (visitors / 50000) * 0.25; // 25% weight, assuming 50k is excellent
-      
-      // Calculate score (0-100)
-      const score = Math.min(100, Math.round((normalizedConversion + normalizedRevenue + normalizedVisitors) * 100));
-      
-      // Determine status
-      let status = "Critical";
-      if (score >= 80) status = "Excellent";
-      else if (score >= 60) status = "Good";
-      else if (score >= 40) status = "Fair";
-      else if (score >= 20) status = "Poor";
-      
-      setHealthScore({ score, status });
-    }
-  }, [loading, metrics]);
-
+const Dashboard: React.FC = () => {
   return (
-    <DashboardLayout>
+    <div className="space-y-6">
       <Helmet>
-        <title>Genius Dashboard | Business Analytics & Insights</title>
-        <meta name="description" content="View your key business metrics, analytics, and AI-powered insights all in one place." />
+        <title>Dashboard | Genius Online Navigator</title>
+        <meta name="description" content="Marketing dashboard with key metrics and insights" />
       </Helmet>
-      
-      <div className="flex flex-col space-y-8">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back! Here's an overview of your business.</p>
-          </div>
-          <div className="flex gap-2 w-full md:w-auto">
-            <div className="relative flex-1 md:flex-initial">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input 
-                placeholder="Search..." 
-                className="pl-9 w-full md:w-64"
-              />
-            </div>
-            <Button size="icon" variant="outline" aria-label="Notifications">
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Campaign
-            </Button>
-          </div>
-        </header>
-        
-        {/* Date Range & Quick Actions Bar */}
-        <div className="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <Select defaultValue={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="yesterday">Yesterday</SelectItem>
-                <SelectItem value="7days">Last 7 days</SelectItem>
-                <SelectItem value="30days">Last 30 days</SelectItem>
-                <SelectItem value="90days">Last 90 days</SelectItem>
-                <SelectItem value="custom">Custom range</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
-            <Button variant="outline" size="sm">
-              <RefreshCw className="h-3.5 w-3.5 mr-2" />
-              Refresh
-            </Button>
-            <Button variant="outline" size="sm">
-              <Download className="h-3.5 w-3.5 mr-2" />
-              Export
-            </Button>
-            <Button variant="outline" size="sm">
-              <Settings className="h-3.5 w-3.5 mr-2" />
-              Customize
-            </Button>
-          </div>
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Marketing Dashboard</h1>
+          <p className="text-muted-foreground">Welcome back! Here's an overview of your marketing performance</p>
         </div>
         
-        {/* Business Health Score */}
-        {!loading && (
-          <Card className="border-2 border-primary/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex justify-between items-center">
-                Business Health Score
-                <Badge variant={
-                  healthScore.status === "Excellent" ? "success" : 
-                  healthScore.status === "Good" ? "default" : 
-                  healthScore.status === "Fair" ? "warning" : 
-                  "destructive"
-                }>
-                  {healthScore.status}
-                </Badge>
-              </CardTitle>
+        <div className="flex items-center gap-2 mt-4 md:mt-0">
+          <Button>
+            <FileText className="h-4 w-4 mr-2" />
+            Generate Report
+          </Button>
+          <Button variant="outline">
+            <Calendar className="h-4 w-4 mr-2" />
+            Last 30 Days
+          </Button>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Website Traffic</CardTitle>
+            <div className="flex items-center">
+              <Eye className="h-4 w-4 text-muted-foreground" />
+              <span className="ml-1 text-xs text-muted-foreground">Daily average</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">24,679</div>
+            <div className="flex items-center mt-1">
+              <div className="flex items-center text-green-600 text-xs font-medium">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                <span>12.5%</span>
+              </div>
+              <span className="text-xs text-muted-foreground ml-2">vs. previous period</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Conversions</CardTitle>
+            <div className="flex items-center">
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              <span className="ml-1 text-xs text-muted-foreground">Form submissions</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1,234</div>
+            <div className="flex items-center mt-1">
+              <div className="flex items-center text-green-600 text-xs font-medium">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                <span>8.2%</span>
+              </div>
+              <span className="text-xs text-muted-foreground ml-2">vs. previous period</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Social Engagement</CardTitle>
+            <div className="flex items-center">
+              <Share2 className="h-4 w-4 text-muted-foreground" />
+              <span className="ml-1 text-xs text-muted-foreground">Likes, shares, comments</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">8,742</div>
+            <div className="flex items-center mt-1">
+              <div className="flex items-center text-green-600 text-xs font-medium">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                <span>16.8%</span>
+              </div>
+              <span className="text-xs text-muted-foreground ml-2">vs. previous period</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Ad Revenue</CardTitle>
+            <div className="flex items-center">
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <span className="ml-1 text-xs text-muted-foreground">ROAS: 3.8x</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$12,450</div>
+            <div className="flex items-center mt-1">
+              <div className="flex items-center text-red-600 text-xs font-medium">
+                <TrendingDown className="h-3 w-3 mr-1" />
+                <span>3.2%</span>
+              </div>
+              <span className="text-xs text-muted-foreground ml-2">vs. previous period</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Marketing Performance</CardTitle>
+            <CardDescription>
+              Traffic and conversion trends over time
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="h-[300px] flex items-center justify-center border rounded-md">
+            <div className="text-center">
+              <BarChart3 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">Performance chart will be displayed here</p>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" className="w-full">View Detailed Analytics</Button>
+          </CardFooter>
+        </Card>
+        
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Upcoming Tasks</CardTitle>
+              <CardDescription>
+                Your marketing tasks due soon
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center text-white font-bold text-xl">
-                  {healthScore.score}
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-sm text-muted-foreground">Your business health score is calculated from conversion rates, revenue, and visitor trends.</p>
-                  <Link to="/analytics" className="text-sm text-primary flex items-center mt-1">
-                    <Zap className="h-3 w-3 mr-1" /> Get recommendations to improve
-                  </Link>
-                </div>
-              </div>
+              <ul className="space-y-3">
+                <li className="flex justify-between items-center p-2 bg-secondary/50 rounded-md">
+                  <div>
+                    <p className="font-medium">Social media posts</p>
+                    <p className="text-xs text-muted-foreground">Due in 2 days</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </li>
+                <li className="flex justify-between items-center p-2 bg-secondary/50 rounded-md">
+                  <div>
+                    <p className="font-medium">Email newsletter</p>
+                    <p className="text-xs text-muted-foreground">Due tomorrow</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </li>
+                <li className="flex justify-between items-center p-2 bg-secondary/50 rounded-md">
+                  <div>
+                    <p className="font-medium">Campaign report</p>
+                    <p className="text-xs text-muted-foreground">Due in 5 days</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </li>
+              </ul>
             </CardContent>
+            <CardFooter>
+              <Button variant="link" className="w-full">View All Tasks</Button>
+            </CardFooter>
           </Card>
-        )}
-
-        <section>
-          <MetricsOverview metrics={metrics} loading={loading} />
-        </section>
-
-        <section>
-          <AnalyticsPanel 
-            visitors={visitors} 
-            revenue={revenue} 
-            loading={loading} 
-          />
-        </section>
-        
-        {/* Quick Action Shortcuts */}
-        <section>
-          <h2 className="text-lg font-medium mb-3">Quick Actions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link to="/ads">
-              <Card className="hover:border-primary hover:bg-primary/5 transition-all">
-                <CardContent className="p-4 flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                    <TrendingUp className="h-5 w-5 text-primary" />
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Notifications</CardTitle>
+              <CardDescription>
+                Recent alerts and updates
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3 p-2 rounded-md">
+                  <div className="bg-blue-100 p-1 rounded-full">
+                    <Bell className="h-4 w-4 text-blue-600" />
                   </div>
-                  <h3 className="font-medium">Create Ad</h3>
-                </CardContent>
-              </Card>
-            </Link>
-            <Link to="/social">
-              <Card className="hover:border-primary hover:bg-primary/5 transition-all">
-                <CardContent className="p-4 flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                    <Mail className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium">Ad campaign completed</p>
+                    <p className="text-xs text-muted-foreground">Summer Sale campaign has ended</p>
+                    <p className="text-xs text-muted-foreground">2 hours ago</p>
                   </div>
-                  <h3 className="font-medium">Schedule Post</h3>
-                </CardContent>
-              </Card>
-            </Link>
-            <Link to="/reports">
-              <Card className="hover:border-primary hover:bg-primary/5 transition-all">
-                <CardContent className="p-4 flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                    <FileText className="h-5 w-5 text-primary" />
+                </li>
+                <li className="flex items-start gap-3 p-2 rounded-md">
+                  <div className="bg-green-100 p-1 rounded-full">
+                    <TrendingUp className="h-4 w-4 text-green-600" />
                   </div>
-                  <h3 className="font-medium">Generate Report</h3>
-                </CardContent>
-              </Card>
-            </Link>
-            <Link to="/team">
-              <Card className="hover:border-primary hover:bg-primary/5 transition-all">
-                <CardContent className="p-4 flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                    <Users className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium">Traffic spike detected</p>
+                    <p className="text-xs text-muted-foreground">50% increase in the last hour</p>
+                    <p className="text-xs text-muted-foreground">5 hours ago</p>
                   </div>
-                  <h3 className="font-medium">Invite Team</h3>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
-        </section>
-
-        <section>
-          <ReportGenerator reports={reports} loading={loading} />
-        </section>
-
-        <section>
-          <SocialMediaConnect accounts={socialAccounts} loading={loading} />
-        </section>
-
-        <section>
-          <AIInsights loading={loading} />
-        </section>
-
-        <section>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {integrations.map((integration: Record<string, unknown>) => (
-              <IntegrationCard key={integration.id} integration={integration} />
-            ))}
-          </div>
-        </section>
+                </li>
+                <li className="flex items-start gap-3 p-2 rounded-md">
+                  <div className="bg-yellow-100 p-1 rounded-full">
+                    <Users className="h-4 w-4 text-yellow-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">New leads generated</p>
+                    <p className="text-xs text-muted-foreground">15 new leads from contact form</p>
+                    <p className="text-xs text-muted-foreground">1 day ago</p>
+                  </div>
+                </li>
+              </ul>
+            </CardContent>
+            <CardFooter>
+              <Button variant="link" className="w-full">View All Notifications</Button>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
-    </DashboardLayout>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="col-span-1 md:col-span-2">
+          <CardHeader>
+            <CardTitle>Top Performing Content</CardTitle>
+            <CardDescription>
+              Your best performing blog posts and pages
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-2 bg-secondary/50 rounded-md">
+                <div>
+                  <p className="font-medium">10 Digital Marketing Trends for 2025</p>
+                  <div className="flex items-center mt-1">
+                    <Eye className="h-3 w-3 text-muted-foreground mr-1" />
+                    <span className="text-xs text-muted-foreground">8,542 views</span>
+                    <span className="text-xs text-muted-foreground mx-2">•</span>
+                    <span className="text-xs text-green-600">4.8% conversion rate</span>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm">
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="flex justify-between items-center p-2 bg-secondary/50 rounded-md">
+                <div>
+                  <p className="font-medium">Guide to Social Media Marketing</p>
+                  <div className="flex items-center mt-1">
+                    <Eye className="h-3 w-3 text-muted-foreground mr-1" />
+                    <span className="text-xs text-muted-foreground">6,128 views</span>
+                    <span className="text-xs text-muted-foreground mx-2">•</span>
+                    <span className="text-xs text-green-600">3.9% conversion rate</span>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm">
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="flex justify-between items-center p-2 bg-secondary/50 rounded-md">
+                <div>
+                  <p className="font-medium">SEO Best Practices for 2025</p>
+                  <div className="flex items-center mt-1">
+                    <Eye className="h-3 w-3 text-muted-foreground mr-1" />
+                    <span className="text-xs text-muted-foreground">5,890 views</span>
+                    <span className="text-xs text-muted-foreground mx-2">•</span>
+                    <span className="text-xs text-green-600">5.2% conversion rate</span>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm">
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button variant="link" className="w-full">View Content Analytics</Button>
+          </CardFooter>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>
+              Perform common marketing tasks
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <Button variant="outline" className="w-full justify-start">
+                <FileText className="h-4 w-4 mr-2" />
+                Create Blog Post
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                <Share2 className="h-4 w-4 mr-2" />
+                Schedule Social Post
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                <DollarSign className="h-4 w-4 mr-2" />
+                Create Ad Campaign
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                <Users className="h-4 w-4 mr-2" />
+                View Audience Insights
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Generate Analytics Report
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 

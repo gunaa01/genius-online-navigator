@@ -1,98 +1,118 @@
+
 import axios from 'axios';
 
-// Base API URL from environment variables
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.geniusonlinenavigator.com';
-
-// Create a base axios instance
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+// Base API client with common configuration
+export const apiClient = axios.create({
+  baseURL: '/api',
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
-  },
+  }
 });
 
-// Enhanced API client with interceptors for authentication, error handling, etc.
-export const enhancedApiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Request interceptor for authentication
-enhancedApiClient.interceptors.request.use(
-  (config) => {
-    // Get token from localStorage or secure storage
+// Add request interceptor for authentication
+apiClient.interceptors.request.use(
+  config => {
     const token = localStorage.getItem('auth_token');
-    
-    // If token exists, add to headers
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
-    
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
   }
 );
 
-// Response interceptor for error handling
-enhancedApiClient.interceptors.response.use(
-  (response) => {
-    return response;
+// Add response interceptor for error handling
+apiClient.interceptors.response.use(
+  response => response,
+  error => {
+    // Handle common errors
+    if (error.response) {
+      // Server responded with non-2xx status
+      if (error.response.status === 401) {
+        // Unauthorized - redirect to login
+        localStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      }
+    } else if (error.request) {
+      // Request made but no response received
+      console.error('Network error, no response received:', error.request);
+    } else {
+      // Request setup error
+      console.error('Error setting up request:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Enhanced API client with retry and additional features
+export const enhancedApiClient = axios.create({
+  baseURL: '/api',
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
+// Add request interceptor for authentication
+enhancedApiClient.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
   },
-  async (error) => {
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor with retry mechanism
+let isRetrying = false;
+enhancedApiClient.interceptors.response.use(
+  response => response,
+  async error => {
     const originalRequest = error.config;
     
-    // Handle 401 Unauthorized errors (token expired)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Implement retry logic for network errors and certain status codes
+    if (
+      (error.code === 'ECONNABORTED' || !error.response) && 
+      originalRequest && 
+      !originalRequest._retry && 
+      !isRetrying
+    ) {
       originalRequest._retry = true;
+      isRetrying = true;
       
       try {
-        // Attempt to refresh token
-        const refreshToken = localStorage.getItem('refresh_token');
-        
-        if (refreshToken) {
-          const response = await apiClient.post('/auth/refresh', {
-            refresh_token: refreshToken,
-          });
-          
-          const { token } = response.data;
-          
-          // Update token in storage
-          localStorage.setItem('auth_token', token);
-          
-          // Update Authorization header
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          
-          // Retry the original request
-          return enhancedApiClient(originalRequest);
-        }
-      } catch (refreshError) {
-        // If refresh fails, redirect to login
-        console.error('Token refresh failed:', refreshError);
-        
-        // Clear tokens
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('refresh_token');
-        
-        // Redirect to login (in a real app, this would use a router)
-        window.location.href = '/login';
+        console.log('Retrying request after network error...');
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+        const response = await enhancedApiClient(originalRequest);
+        isRetrying = false;
+        return response;
+      } catch (retryError) {
+        isRetrying = false;
+        return Promise.reject(retryError);
       }
     }
     
+    // Handle authentication errors
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('auth_token');
+      window.location.href = '/login';
+    }
+    
     return Promise.reject(error);
   }
 );
 
-// For mock API responses during development
-export const mockApiResponse = <T>(data: T, delay = 500): Promise<T> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data);
-    }, delay);
-  });
+// Mock API for development
+export const mockApiResponse = <T>(data: T): T => {
+  return data;
 };
 
+// Export default client
 export default apiClient;
