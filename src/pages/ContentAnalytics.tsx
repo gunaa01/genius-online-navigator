@@ -1,150 +1,81 @@
+
 import React from 'react';
-import { 
-  Container, Typography, Paper, Box, 
-  Tabs, Tab, Divider, Breadcrumbs, Link
-} from '@mui/material';
-import { Home, Analytics, Description } from '@mui/icons-material';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Home, Analytics, FileText } from "lucide-react";
 import ContentAnalyzer from '../components/analytics/ContentAnalyzer';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`analytics-tabpanel-${index}`}
-      aria-labelledby={`analytics-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `analytics-tab-${index}`,
-    'aria-controls': `analytics-tabpanel-${index}`,
-  };
-}
-
 const ContentAnalytics: React.FC = () => {
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
+  const [activeTab, setActiveTab] = React.useState("analyzer");
 
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ mb: 3, mt: 2 }}>
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link 
-            underline="hover" 
-            color="inherit" 
-            href="/" 
-            sx={{ display: 'flex', alignItems: 'center' }}
-          >
-            <Home sx={{ mr: 0.5 }} fontSize="inherit" />
-            Home
-          </Link>
-          <Typography 
-            color="text.primary"
-            sx={{ display: 'flex', alignItems: 'center' }}
-          >
-            <Analytics sx={{ mr: 0.5 }} fontSize="inherit" />
-            Content Analytics
-          </Typography>
-        </Breadcrumbs>
-      </Box>
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+        <Home className="h-4 w-4" />
+        <span>/</span>
+        <Analytics className="h-4 w-4" />
+        <span>Content Analytics</span>
+      </div>
       
-      <Typography variant="h4" component="h1" gutterBottom>
-        Content Analytics
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
+      <h1 className="text-3xl font-bold mb-2">Content Analytics</h1>
+      <p className="text-muted-foreground mb-6">
         Analyze and optimize your content with AI-powered insights. Get recommendations for readability, SEO, sentiment, and engagement.
-      </Typography>
+      </p>
       
-      <Paper sx={{ width: '100%', mt: 3 }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs 
-            value={value} 
-            onChange={handleChange} 
-            aria-label="content analytics tabs"
-            variant="scrollable"
-            scrollButtons="auto"
-          >
-            <Tab 
-              label="Content Analyzer" 
-              icon={<Description />} 
-              iconPosition="start"
-              {...a11yProps(0)} 
-            />
-            <Tab 
-              label="Performance Metrics" 
-              {...a11yProps(1)} 
-            />
-            <Tab 
-              label="Audience Insights" 
-              {...a11yProps(2)} 
-            />
-            <Tab 
-              label="Competitive Analysis" 
-              {...a11yProps(3)} 
-            />
-          </Tabs>
-        </Box>
+      <Tabs defaultValue="analyzer" className="space-y-4" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="analyzer" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Content Analyzer
+          </TabsTrigger>
+          <TabsTrigger value="performance">Performance Metrics</TabsTrigger>
+          <TabsTrigger value="audience">Audience Insights</TabsTrigger>
+          <TabsTrigger value="competitive">Competitive Analysis</TabsTrigger>
+        </TabsList>
         
-        <TabPanel value={value} index={0}>
+        <TabsContent value="analyzer" className="space-y-4">
           <ContentAnalyzer />
-        </TabPanel>
+        </TabsContent>
         
-        <TabPanel value={value} index={1}>
-          <Box sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" color="text.secondary">
-              Performance Metrics Dashboard
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+        <TabsContent value="performance">
+          <Card>
+            <CardHeader>
+              <CardTitle>Performance Metrics Dashboard</CardTitle>
+              <CardDescription>Track engagement, time on page, conversion rates, and more.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center min-h-[400px] text-muted-foreground">
               Coming soon: Track engagement, time on page, conversion rates, and more.
-            </Typography>
-          </Box>
-        </TabPanel>
+            </CardContent>
+          </Card>
+        </TabsContent>
         
-        <TabPanel value={value} index={2}>
-          <Box sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" color="text.secondary">
-              Audience Insights
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+        <TabsContent value="audience">
+          <Card>
+            <CardHeader>
+              <CardTitle>Audience Insights</CardTitle>
+              <CardDescription>Understand your audience demographics, behavior, and preferences.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center min-h-[400px] text-muted-foreground">
               Coming soon: Understand your audience demographics, behavior, and preferences.
-            </Typography>
-          </Box>
-        </TabPanel>
+            </CardContent>
+          </Card>
+        </TabsContent>
         
-        <TabPanel value={value} index={3}>
-          <Box sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" color="text.secondary">
-              Competitive Content Analysis
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+        <TabsContent value="competitive">
+          <Card>
+            <CardHeader>
+              <CardTitle>Competitive Content Analysis</CardTitle>
+              <CardDescription>Compare your content performance against competitors.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center min-h-[400px] text-muted-foreground">
               Coming soon: Compare your content performance against competitors.
-            </Typography>
-          </Box>
-        </TabPanel>
-      </Paper>
-    </Container>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
-export default ContentAnalytics; 
+export default ContentAnalytics;

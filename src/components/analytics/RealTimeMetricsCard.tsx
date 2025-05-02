@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
-import { ArrowUpRight, ArrowDownRight, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, TrendingUp, TrendingDown } from "lucide-react";
 
 interface RealTimeMetricsCardProps {
   title: string;
@@ -12,11 +13,11 @@ interface RealTimeMetricsCardProps {
   prefix?: string;
   suffix?: string;
   isLive?: boolean;
-  updateInterval?: number;
+  updateInterval?: number; // in milliseconds
   fetchData?: () => Promise<number>;
 }
 
-export default function RealTimeMetricsCard({
+const RealTimeMetricsCard = ({
   title,
   metric,
   previousMetric,
@@ -25,100 +26,106 @@ export default function RealTimeMetricsCard({
   prefix = '',
   suffix = '',
   isLive = false,
-  updateInterval = 60000,
+  updateInterval = 60000, // default 1 minute
   fetchData
-}: RealTimeMetricsCardProps) {
-  const [currentMetric, setCurrentMetric] = useState<number>(metric);
+}: RealTimeMetricsCardProps) => {
+  const [currentMetric, setCurrentMetric] = useState(metric);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   
-  // Calculate percentage change
-  const percentChange = previousMetric 
-    ? ((currentMetric - previousMetric) / previousMetric) * 100 
-    : 0;
+  useEffect(() => {
+    setCurrentMetric(metric);
+  }, [metric]);
   
-  // Format the metric value based on the format prop
-  const formatValue = (value: number): string => {
+  useEffect(() => {
+    if (!isLive || !fetchData) return;
+    
+    const updateData = async () => {
+      setIsLoading(true);
+      try {
+        const newValue = await fetchData();
+        setCurrentMetric(newValue);
+        setLastUpdated(new Date());
+      } catch (error) {
+        console.error('Error fetching updated metric:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    // Initial update
+    updateData();
+    
+    // Set interval for updates
+    const interval = setInterval(updateData, updateInterval);
+    
+    return () => clearInterval(interval);
+  }, [isLive, fetchData, updateInterval]);
+  
+  // Format the metric based on type
+  const formatMetric = (value: number) => {
+    let formattedValue;
+    
     switch (format) {
       case 'percentage':
-        return `${prefix}${value.toFixed(precision)}${suffix}`;
+        formattedValue = value.toFixed(precision);
+        break;
       case 'currency':
-        return `${prefix}${value.toLocaleString(undefined, {
+        formattedValue = value.toLocaleString('en-US', {
           minimumFractionDigits: precision,
           maximumFractionDigits: precision
-        })}${suffix}`;
+        });
+        break;
       default:
-        return `${prefix}${value.toLocaleString(undefined, {
-          minimumFractionDigits: precision,
-          maximumFractionDigits: precision
-        })}${suffix}`;
+        formattedValue = value >= 1000000
+          ? (value / 1000000).toFixed(1) + 'M'
+          : value >= 1000
+            ? (value / 1000).toFixed(1) + 'K'
+            : value.toFixed(precision);
     }
+    
+    return `${prefix}${formattedValue}${suffix}`;
   };
   
-  // Update metrics in real-time if enabled
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (isLive && fetchData) {
-      interval = setInterval(async () => {
-        setIsLoading(true);
-        try {
-          const newValue = await fetchData();
-          setCurrentMetric(newValue);
-          setLastUpdated(new Date());
-        } catch (error) {
-          console.error("Failed to fetch updated metric:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      }, updateInterval);
-    }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isLive, updateInterval, fetchData]);
+  // Calculate percent change
+  const percentChange = previousMetric 
+    ? ((currentMetric - previousMetric) / previousMetric) * 100
+    : 0;
   
   return (
-    <Card className="p-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground mb-1">
-            {title}
-          </p>
-          <div className="flex items-center">
-            <h3 className="text-2xl font-bold">
-              {formatValue(currentMetric)}
-            </h3>
-            {isLoading && (
-              <Loader2 className="h-4 w-4 ml-2 animate-spin text-muted-foreground" />
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-baseline justify-between">
+          <div className="flex items-baseline">
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2 text-muted-foreground" />
+            ) : (
+              <h2 className="text-3xl font-bold">{formatMetric(currentMetric)}</h2>
             )}
           </div>
+          
+          {previousMetric !== undefined && (
+            <Badge 
+              variant={percentChange >= 0 ? "outline" : "destructive"} 
+              className={percentChange >= 0 ? "bg-green-50 text-green-700 border-green-200" : ""}
+            >
+              {percentChange >= 0 ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
+              {percentChange >= 0 ? '+' : ''}{percentChange.toFixed(1)}%
+            </Badge>
+          )}
         </div>
         
-        {previousMetric && (
-          <div className={`flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            percentChange > 0 
-              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
-              : percentChange < 0 
-                ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' 
-                : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-          }`}>
-            {percentChange > 0 ? (
-              <ArrowUpRight className="h-3 w-3 mr-1" />
-            ) : percentChange < 0 ? (
-              <ArrowDownRight className="h-3 w-3 mr-1" />
-            ) : null}
-            {Math.abs(percentChange).toFixed(1)}%
-          </div>
+        {isLive && lastUpdated && (
+          <p className="text-xs text-muted-foreground mt-2">
+            Last updated: {lastUpdated.toLocaleTimeString()}
+          </p>
         )}
-      </div>
-      
-      {isLive && (
-        <p className="text-xs text-muted-foreground mt-1">
-          Last updated: {lastUpdated.toLocaleTimeString()}
-        </p>
-      )}
+      </CardContent>
     </Card>
   );
-}
+};
+
+export default RealTimeMetricsCard;

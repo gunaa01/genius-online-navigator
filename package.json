@@ -13,7 +13,9 @@
     "build:dev": "vite build --mode development"
   },
   "dependencies": {
+    "@emotion/styled": "^11.14.0",
     "@hookform/resolvers": "^3.3.2",
+    "@mui/material": "^7.0.2",
     "@radix-ui/react-aspect-ratio": "^1.1.4",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",

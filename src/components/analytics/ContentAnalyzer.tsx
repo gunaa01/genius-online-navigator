@@ -3,236 +3,322 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, LineChart, PieChart, ResponsiveContainer, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, Pie, Cell } from 'recharts';
-import { FileText, BarChart2, TrendingUp, PieChart as PieChartIcon, Download, Filter, RefreshCw } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { Textarea } from "@/components/ui/textarea";
+import { 
+  BarChart, LineChart, PieChart, ResponsiveContainer, 
+  Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
+  Line, Pie, Cell 
+} from 'recharts';
+import { 
+  FileText, BarChart2, TrendingUp, 
+  PieChart as PieChartIcon, Download, Filter, RefreshCw,
+  CheckCircle, AlertCircle, HelpCircle
+} from 'lucide-react';
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
+} from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Sample data for demonstration
 const sampleContentData = {
-  engagement: [
-    { name: 'Blog Posts', views: 1240, shares: 350, comments: 210, likes: 840 },
-    { name: 'Social Media', views: 2180, shares: 890, comments: 560, likes: 1250 },
-    { name: 'Email Campaigns', views: 980, shares: 120, comments: 90, likes: 320 },
-    { name: 'Landing Pages', views: 1560, shares: 210, comments: 110, likes: 430 },
+  readabilityScore: 72,
+  seoScore: 85,
+  sentimentScore: 64,
+  keywords: [
+    { word: 'marketing', count: 12, relevance: 0.85 },
+    { word: 'strategy', count: 8, relevance: 0.72 },
+    { word: 'business', count: 7, relevance: 0.68 },
+    { word: 'digital', count: 6, relevance: 0.65 },
+    { word: 'content', count: 5, relevance: 0.62 },
   ],
-  performance: [
-    { date: '2023-01', blog: 42, social: 63, email: 28 },
-    { date: '2023-02', blog: 51, social: 70, email: 34 },
-    { date: '2023-03', blog: 48, social: 68, email: 42 },
-    { date: '2023-04', blog: 61, social: 75, email: 45 },
-    { date: '2023-05', blog: 65, social: 80, email: 56 },
-    { date: '2023-06', blog: 72, social: 85, email: 61 },
+  recommendations: [
+    { id: 1, type: 'readability', text: 'Consider breaking up longer paragraphs for better readability.' },
+    { id: 2, type: 'seo', text: 'Add more internal links to improve SEO performance.' },
+    { id: 3, type: 'seo', text: 'Increase keyword density for "digital marketing" to 2-3%.' },
+    { id: 4, type: 'sentiment', text: 'The tone is slightly negative in the third paragraph, consider rephrasing.' },
   ],
-  distribution: [
-    { name: 'Blog Posts', value: 35 },
-    { name: 'Social Media', value: 45 },
-    { name: 'Email Campaigns', value: 20 },
-  ]
+  metrics: {
+    wordCount: 1240,
+    readTime: 5.2, // minutes
+    sentenceCount: 62,
+    flesch: 58,
+    complexity: 'moderate'
+  }
 };
 
-// Colors for charts
+// COLORS
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-interface ContentAnalyzerProps {
-  data?: typeof sampleContentData;
-}
-
-const ContentAnalyzer: React.FC<ContentAnalyzerProps> = ({ data = sampleContentData }) => {
-  const [timeRange, setTimeRange] = useState<string>('6months');
-  const [activeTab, setActiveTab] = useState<string>('engagement');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const handleRefresh = () => {
-    setIsLoading(true);
-    toast({
-      title: "Refreshing data",
-      description: "Your content analytics are being updated.",
-    });
+const ContentAnalyzer: React.FC = () => {
+  const [content, setContent] = useState<string>('');
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [hasResults, setHasResults] = useState<boolean>(false);
+  const [analysisResults, setAnalysisResults] = useState(sampleContentData);
+  
+  const handleAnalyzeContent = async () => {
+    if (!content.trim()) {
+      toast.error('Please enter some content to analyze');
+      return;
+    }
     
-    // Simulate refresh delay
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Data refreshed",
-        description: "Your content analytics have been updated.",
-      });
-    }, 1500);
+    setIsAnalyzing(true);
+    
+    // Simulate API call
+    try {
+      // In a real app, this would be an API call to analyze the content
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Use sample data for demonstration
+      setAnalysisResults(sampleContentData);
+      setHasResults(true);
+      toast.success('Content analysis complete!');
+    } catch (error) {
+      toast.error('Failed to analyze content. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
-
-  const handleDownload = () => {
-    toast({
-      title: "Report downloaded",
-      description: "Your content analytics report has been downloaded.",
-    });
+  
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-500';
+    if (score >= 60) return 'text-amber-500';
+    return 'text-red-500';
   };
-
+  
+  const getScoreIcon = (score: number) => {
+    if (score >= 80) return <CheckCircle className="h-5 w-5 text-green-500" />;
+    if (score >= 60) return <HelpCircle className="h-5 w-5 text-amber-500" />;
+    return <AlertCircle className="h-5 w-5 text-red-500" />;
+  };
+  
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <CardTitle className="text-xl flex items-center">
-              <FileText className="mr-2 h-5 w-5" />
-              Content Analytics
-            </CardTitle>
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Content Analyzer</CardTitle>
+          <CardDescription>
+            Paste your content below to get AI-powered insights on readability, SEO optimization, and sentiment analysis.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            placeholder="Paste your content here (article, blog post, product description, etc.)"
+            className="min-h-[200px] mb-4"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
+          <Button 
+            onClick={handleAnalyzeContent}
+            disabled={isAnalyzing || !content.trim()}
+            className="w-full"
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Analyzing Content...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Analyze Content
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+      
+      {hasResults && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Analysis Results</CardTitle>
             <CardDescription>
-              Analyze engagement and performance across your content
+              AI-powered insights for your content
             </CardDescription>
-          </div>
-          <div className="flex gap-2">
-            <Select
-              value={timeRange}
-              onValueChange={(value) => setTimeRange(value)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select time range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7days">Last 7 days</SelectItem>
-                <SelectItem value="30days">Last 30 days</SelectItem>
-                <SelectItem value="3months">Last 3 months</SelectItem>
-                <SelectItem value="6months">Last 6 months</SelectItem>
-                <SelectItem value="1year">Last year</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" size="icon" onClick={handleRefresh} disabled={isLoading}>
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="overview" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="seo">SEO Analysis</TabsTrigger>
+                <TabsTrigger value="readability">Readability</TabsTrigger>
+                <TabsTrigger value="sentiment">Sentiment</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="overview" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center justify-between">
+                        SEO Score
+                        {getScoreIcon(analysisResults.seoScore)}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold mb-2 flex items-baseline gap-2">
+                        <span className={getScoreColor(analysisResults.seoScore)}>
+                          {analysisResults.seoScore}
+                        </span>
+                        <span className="text-sm text-muted-foreground">/100</span>
+                      </div>
+                      <Progress value={analysisResults.seoScore} className="h-2" />
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center justify-between">
+                        Readability Score
+                        {getScoreIcon(analysisResults.readabilityScore)}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold mb-2 flex items-baseline gap-2">
+                        <span className={getScoreColor(analysisResults.readabilityScore)}>
+                          {analysisResults.readabilityScore}
+                        </span>
+                        <span className="text-sm text-muted-foreground">/100</span>
+                      </div>
+                      <Progress value={analysisResults.readabilityScore} className="h-2" />
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center justify-between">
+                        Sentiment Score
+                        {getScoreIcon(analysisResults.sentimentScore)}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold mb-2 flex items-baseline gap-2">
+                        <span className={getScoreColor(analysisResults.sentimentScore)}>
+                          {analysisResults.sentimentScore}
+                        </span>
+                        <span className="text-sm text-muted-foreground">/100</span>
+                      </div>
+                      <Progress value={analysisResults.sentimentScore} className="h-2" />
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recommendations</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {analysisResults.recommendations.map(rec => (
+                        <Alert key={rec.id}>
+                          <AlertDescription className="flex items-start">
+                            <Badge variant="outline" className="mr-2 capitalize">
+                              {rec.type}
+                            </Badge>
+                            {rec.text}
+                          </AlertDescription>
+                        </Alert>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="seo" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Keyword Analysis</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex flex-wrap gap-2">
+                        {analysisResults.keywords.map((keyword, idx) => (
+                          <Badge 
+                            key={idx} 
+                            variant="secondary"
+                            style={{ opacity: 0.5 + keyword.relevance / 2 }}
+                          >
+                            {keyword.word} <span className="ml-1 opacity-70">{keyword.count}</span>
+                          </Badge>
+                        ))}
+                      </div>
+                      
+                      <div className="h-[250px] mt-8">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            width={500}
+                            height={300}
+                            data={analysisResults.keywords}
+                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="word" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="count" name="Occurrences" fill="#8884d8" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="readability" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Content Metrics</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <Label className="text-muted-foreground">Word Count</Label>
+                        <p className="text-2xl font-bold">{analysisResults.metrics.wordCount}</p>
+                      </div>
+                      <div>
+                        <Label className="text-muted-foreground">Reading Time</Label>
+                        <p className="text-2xl font-bold">{analysisResults.metrics.readTime} min</p>
+                      </div>
+                      <div>
+                        <Label className="text-muted-foreground">Sentences</Label>
+                        <p className="text-2xl font-bold">{analysisResults.metrics.sentenceCount}</p>
+                      </div>
+                      <div>
+                        <Label className="text-muted-foreground">Complexity</Label>
+                        <p className="text-2xl font-bold capitalize">{analysisResults.metrics.complexity}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="sentiment" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Sentiment Analysis</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex items-center justify-center min-h-[200px]">
+                    <div className="text-center">
+                      <PieChartIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">Detailed sentiment analysis coming soon</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" className="w-full">
+              <Download className="h-4 w-4 mr-2" />
+              Export Analysis Report
             </Button>
-          </div>
-        </div>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3">
-            <TabsTrigger value="engagement">
-              <BarChart2 className="h-4 w-4 mr-2" />
-              Engagement
-            </TabsTrigger>
-            <TabsTrigger value="performance">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Performance
-            </TabsTrigger>
-            <TabsTrigger value="distribution">
-              <PieChartIcon className="h-4 w-4 mr-2" />
-              Distribution
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </CardHeader>
-      <CardContent>
-        <TabsContent value="engagement" className="mt-0">
-          <div className="h-80 mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={data?.engagement || []} // Handle case when data is undefined
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="views" fill="#0088FE" name="Views" />
-                <Bar dataKey="shares" fill="#00C49F" name="Shares" />
-                <Bar dataKey="comments" fill="#FFBB28" name="Comments" />
-                <Bar dataKey="likes" fill="#FF8042" name="Likes" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {data?.engagement?.[0] && Object.keys(data.engagement[0])
-              .filter(key => key !== 'name')
-              .map((key, index) => {
-                const total = data.engagement.reduce((sum, item) => sum + item[key as keyof typeof item], 0);
-                return (
-                  <div key={key} className="bg-muted rounded-lg p-3">
-                    <div className="text-sm text-muted-foreground mb-1">{key.charAt(0).toUpperCase() + key.slice(1)}</div>
-                    <div className="text-2xl font-bold">{total.toLocaleString()}</div>
-                  </div>
-                );
-              })}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="performance" className="mt-0">
-          <div className="h-80 mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={data?.performance || []} // Handle case when data is undefined
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="blog" stroke="#0088FE" name="Blog Posts" activeDot={{ r: 8 }} />
-                <Line type="monotone" dataKey="social" stroke="#00C49F" name="Social Media" activeDot={{ r: 8 }} />
-                <Line type="monotone" dataKey="email" stroke="#FFBB28" name="Email Campaigns" activeDot={{ r: 8 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-4">
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-                Blog Posts
-              </Badge>
-              <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-                Social Media
-              </Badge>
-              <Badge variant="outline" className="bg-yellow-50 text-yellow-600 border-yellow-200">
-                Email Campaigns
-              </Badge>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="distribution" className="mt-0">
-          <div className="h-80 mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data?.distribution || []} // Handle case when data is undefined
-                  cx="50%"
-                  cy="50%"
-                  labelLine={true}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {data?.distribution?.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => `${value}%`} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </TabsContent>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={handleDownload}>
-          <Download className="mr-2 h-4 w-4" />
-          Download Report
-        </Button>
-        <Button variant="outline">
-          <Filter className="mr-2 h-4 w-4" />
-          Advanced Filters
-        </Button>
-      </CardFooter>
-    </Card>
+          </CardFooter>
+        </Card>
+      )}
+    </div>
   );
 };
 

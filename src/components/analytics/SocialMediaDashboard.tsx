@@ -36,7 +36,10 @@ import {
   ThumbsUp,
   Users,
   Eye,
-  ArrowUpRight
+  ArrowUpRight,
+  MoreHorizontal,
+  Download,
+  X
 } from "lucide-react";
 import RealTimeMetricsCard from './RealTimeMetricsCard';
 

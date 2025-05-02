@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { 
   Send, 
@@ -13,7 +14,9 @@ import {
   Loader2,
   AlertTriangle,
   Info,
-  Filter
+  Filter,
+  X,
+  Download
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
