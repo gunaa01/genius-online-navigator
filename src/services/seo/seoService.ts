@@ -3,7 +3,7 @@
  * SEO Service
  * Provides SEO optimization features for the digital marketing platform
  */
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { enhancedApiClient } from '../apiClient';
 
 // SEO Data Interface
