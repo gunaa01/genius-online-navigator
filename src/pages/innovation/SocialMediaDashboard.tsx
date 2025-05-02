@@ -366,7 +366,7 @@ const SocialMediaDashboard = () => {
             </CardFooter>
           </Card>
         </TabsContent>
-        
+
         {/* Schedule Tab */}
         <TabsContent value="schedule" className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
