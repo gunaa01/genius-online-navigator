@@ -1,10 +1,10 @@
-
 /**
  * SEO Service
  * Provides SEO optimization features for the digital marketing platform
  */
 import { Helmet } from 'react-helmet-async';
 import { enhancedApiClient } from '../apiClient';
+import React from 'react';
 
 // SEO Data Interface
 export interface SeoData {
@@ -66,37 +66,37 @@ export class SeoService {
   /**
    * Generate SEO head tags using React Helmet
    */
-  public generateSeoHead(seoData: SeoData): JSX.Element {
-    return (
-      <Helmet>
-        {/* Basic Metadata */}
-        <title>{seoData.title}</title>
-        <meta name="description" content={seoData.description} />
-        {seoData.keywords && <meta name="keywords" content={seoData.keywords.join(', ')} />}
-        {seoData.canonicalUrl && <link rel="canonical" href={seoData.canonicalUrl} />}
-        {seoData.robots && <meta name="robots" content={seoData.robots} />}
-        
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={seoData.ogTitle || seoData.title} />
-        <meta property="og:description" content={seoData.ogDescription || seoData.description} />
-        {seoData.ogImage && <meta property="og:image" content={seoData.ogImage} />}
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={seoData.twitterTitle || seoData.title} />
-        <meta name="twitter:description" content={seoData.twitterDescription || seoData.description} />
-        {seoData.twitterImage && <meta name="twitter:image" content={seoData.twitterImage} />}
-        
-        {/* Structured Data / Schema.org */}
-        {seoData.structuredData && seoData.structuredData.map((schema, index) => (
-          <script 
-            key={index} 
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-          />
-        ))}
-      </Helmet>
+  public generateSeoHead(seoData: SeoData): React.ReactElement {
+    return React.createElement(
+      Helmet,
+      null,
+      /* Basic Metadata */
+      React.createElement('title', null, seoData.title),
+      React.createElement('meta', { name: "description", content: seoData.description }),
+      seoData.keywords && React.createElement('meta', { name: "keywords", content: seoData.keywords.join(', ') }),
+      seoData.canonicalUrl && React.createElement('link', { rel: "canonical", href: seoData.canonicalUrl }),
+      seoData.robots && React.createElement('meta', { name: "robots", content: seoData.robots }),
+      
+      /* Open Graph / Facebook */
+      React.createElement('meta', { property: "og:type", content: "website" }),
+      React.createElement('meta', { property: "og:title", content: seoData.ogTitle || seoData.title }),
+      React.createElement('meta', { property: "og:description", content: seoData.ogDescription || seoData.description }),
+      seoData.ogImage && React.createElement('meta', { property: "og:image", content: seoData.ogImage }),
+      
+      /* Twitter */
+      React.createElement('meta', { name: "twitter:card", content: "summary_large_image" }),
+      React.createElement('meta', { name: "twitter:title", content: seoData.twitterTitle || seoData.title }),
+      React.createElement('meta', { name: "twitter:description", content: seoData.twitterDescription || seoData.description }),
+      seoData.twitterImage && React.createElement('meta', { name: "twitter:image", content: seoData.twitterImage }),
+      
+      /* Structured Data / Schema.org */
+      seoData.structuredData && seoData.structuredData.map((schema, index) => 
+        React.createElement('script', { 
+          key: index, 
+          type: "application/ld+json",
+          dangerouslySetInnerHTML: { __html: JSON.stringify(schema) }
+        })
+      )
     );
   }
 

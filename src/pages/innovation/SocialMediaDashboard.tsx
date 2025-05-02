@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { 
   Calendar, 
@@ -106,7 +105,7 @@ const scheduledPosts = [
   {
     id: 'post-3',
     title: 'Weekly Tips & Tricks',
-    content: 'Pro tip: Use our new template feature to save time on repetitive projects. Here's how to set it up in 3 easy steps...',
+    content: 'Pro tip: Use our new template feature to save time on repetitive projects. Here\'s how to set it up in 3 easy steps...',
     platforms: ['facebook', 'twitter'],
     scheduledFor: '2025-04-25T09:15:00Z',
     status: 'draft'

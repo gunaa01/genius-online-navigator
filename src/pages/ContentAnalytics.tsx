@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, Analytics, FileText } from "lucide-react";
+import { Home, BarChart3, FileText } from "lucide-react";
 import ContentAnalyzer from '../components/analytics/ContentAnalyzer';
 
 const ContentAnalytics: React.FC = () => {
@@ -14,7 +13,7 @@ const ContentAnalytics: React.FC = () => {
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Home className="h-4 w-4" />
         <span>/</span>
-        <Analytics className="h-4 w-4" />
+        <BarChart3 className="h-4 w-4" />
         <span>Content Analytics</span>
       </div>
       
