@@ -16,6 +16,7 @@ import Blog from './pages/Blog';
 import SeoManagement from './pages/SeoManagement';
 import MetaAdsPage from './pages/MetaAdsPage';
 import Layout from './components/Layout';
+import Home from './pages/Home';
 
 const router = createBrowserRouter([
   {
@@ -24,7 +25,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Dashboard />,
+        element: <Home />,
       },
       {
         path: "/dashboard",

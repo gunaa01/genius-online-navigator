@@ -1,30 +1,32 @@
-// Global type declarations for the project
 
-// Add Vite environment variable types
-interface ImportMeta {
-  env: {
-    MODE: string;
-    BASE_URL: string;
-    PROD: boolean;
-    DEV: boolean;
-    // Add any other environment variables you use
-  };
+// Global type definitions
+
+// Define any global type extensions or declarations here
+declare module '*.svg' {
+  import React = require('react');
+  export const ReactComponent: React.FC<React.SVGProps<SVGSVGElement>>;
+  const src: string;
+  export default src;
 }
 
-// Extend Window interface for analytics integrations
-interface Window {
-  dataLayer: any[];
-  gtag: (...args: any[]) => void;
-  trackGAEvent?: (name: string, params?: Record<string, any>) => void;
-  [key: string]: any; // Allow indexing with string
+declare module '*.png' {
+  const content: string;
+  export default content;
 }
 
-// Declare global utility types
-type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
-};
+declare module '*.jpg' {
+  const content: string;
+  export default content;
+}
 
-// Utility type for React components with children
-type ReactChildren = {
-  children?: React.ReactNode;
-};
+declare module '*.jpeg' {
+  const content: string;
+  export default content;
+}
+
+declare module '*.gif' {
+  const content: string;
+  export default content;
+}
+
+// Add any other global type declarations here
