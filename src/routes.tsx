@@ -1,19 +1,71 @@
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import NotFound from './pages/NotFound';
-
-// Import any other pages here
-// import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
+import Analytics from './pages/Analytics';
+import SocialMedia from './pages/SocialMedia';
+import AdCampaigns from './pages/AdCampaigns';
+import AiContent from './pages/AiContent';
+import Settings from './pages/Settings';
+import TeamManagement from './pages/TeamManagement';
+import Reports from './pages/Reports';
+import Integrations from './pages/Integrations';
+import ContentAnalytics from './pages/ContentAnalytics';
+import Auth from './pages/Auth';
+import Blog from './pages/Blog';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Genius</h1>
-        <p className="text-lg text-muted-foreground mb-6">Your AI-powered business growth platform</p>
-      </div>
-    </div>,
+    element: <Dashboard />,
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
+  },
+  {
+    path: "/analytics",
+    element: <Analytics />,
+  },
+  {
+    path: "/social",
+    element: <SocialMedia />,
+  },
+  {
+    path: "/ads",
+    element: <AdCampaigns />,
+  },
+  {
+    path: "/content",
+    element: <AiContent />,
+  },
+  {
+    path: "/content-analytics",
+    element: <ContentAnalytics />,
+  },
+  {
+    path: "/settings",
+    element: <Settings />,
+  },
+  {
+    path: "/team",
+    element: <TeamManagement />,
+  },
+  {
+    path: "/reports",
+    element: <Reports />,
+  },
+  {
+    path: "/integrations",
+    element: <Integrations />,
+  },
+  {
+    path: "/blog",
+    element: <Blog />,
+  },
+  {
+    path: "/login",
+    element: <Auth />,
   },
   {
     path: "*",
