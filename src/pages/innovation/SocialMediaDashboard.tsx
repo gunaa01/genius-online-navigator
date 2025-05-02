@@ -88,7 +88,7 @@ const scheduledPosts = [
   {
     id: 'post-1',
     title: 'New Feature Announcement',
-    content: 'We're excited to announce our new AI-powered project management features! Check out how it can save you hours of work every week.',
+    content: "We're excited to announce our new AI-powered project management features! Check out how it can save you hours of work every week.",
     platforms: ['instagram', 'facebook', 'twitter', 'linkedin'],
     scheduledFor: '2025-04-23T10:00:00Z',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop',
