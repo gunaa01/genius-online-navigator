@@ -1,19 +1,27 @@
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import NotFound from './pages/NotFound';
-
-// Import any other pages here
-// import Home from './pages/Home';
+import HomePage from './pages/HomePage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import Dashboard from './pages/Dashboard';
+import SEOPage from './pages/SEOPage';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Genius</h1>
-        <p className="text-lg text-muted-foreground mb-6">Your AI-powered business growth platform</p>
-      </div>
-    </div>,
+    element: <HomePage />,
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
+  },
+  {
+    path: "/analytics",
+    element: <AnalyticsPage />,
+  },
+  {
+    path: "/seo",
+    element: <SEOPage />,
   },
   {
     path: "*",
