@@ -1,567 +1,199 @@
-import { enhancedApiClient, mockApiResponse } from '@/services/apiClient';
 
-/**
- * Content Template
- */
-export interface ContentTemplate {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  structure: string;
-  placeholders: string[];
-  platforms: string[];
-  tags: string[];
-}
+import axios from 'axios';
 
-/**
- * Content Generation Request
- */
-export interface ContentGenerationRequest {
+interface ContentGenerationOptions {
+  contentType: string;
   topic: string;
-  keywords?: string[];
-  tone?: 'professional' | 'casual' | 'enthusiastic' | 'informative' | 'persuasive';
-  length?: 'short' | 'medium' | 'long';
-  platform?: string;
-  templateId?: string;
-  industry?: string;
-  audience?: string;
-  brandVoice?: {
-    style?: string;
-    values?: string[];
-    prohibitedWords?: string[];
-  };
-  includeCta?: boolean;
-  includeHashtags?: boolean;
-  seoOptimize?: boolean;
+  keywords: string[];
+  tone: string;
+  length: 'short' | 'medium' | 'long';
+  targetAudience?: string;
+  format?: string;
 }
 
-/**
- * Generated Content
- */
-export interface GeneratedContent {
+interface ContentGenerationResult {
   id: string;
   content: string;
-  title?: string;
-  hashtags?: string[];
-  keywords?: string[];
-  seoScore?: number;
-  readabilityScore?: number;
-  engagementScore?: number;
-  brandVoiceScore?: number;
   metadata: {
-    generatedAt: string;
-    model: string;
-    requestId: string;
+    contentType: string;
     topic: string;
-    platform?: string;
-    tone?: string;
+    keywords: string[];
+    generatedAt: Date;
+    wordCount: number;
+    readingTime: number;
   };
-  variations?: string[];
+  status: 'complete' | 'failed' | 'processing';
 }
 
-/**
- * Brand Voice Profile
- */
-export interface BrandVoiceProfile {
-  id: string;
-  name: string;
-  description: string;
-  style: string;
-  toneAttributes: string[];
-  values: string[];
-  prohibitedWords: string[];
-  exampleContent: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * Get content templates
- * @param category Filter by category
- * @param platform Filter by platform
- * @returns List of content templates
- */
-export const getContentTemplates = async (
-  category?: string,
-  platform?: string
-): Promise<ContentTemplate[]> => {
+export async function generateContent(options: ContentGenerationOptions): Promise<ContentGenerationResult> {
   try {
-    const response = await enhancedApiClient.get('/ai-content/templates', {
-      params: { category, platform },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching content templates:', error);
+    // In a real implementation, this would call an API endpoint
+    // For demo purposes, we'll simulate an API call with a delay
     
-    // Return mock data for development
-    return mockApiResponse([
-      {
-        id: 'product-announcement',
-        name: 'Product Announcement',
-        description: 'Announce a new product or feature',
-        category: 'marketing',
-        structure: 'Introduction\nProduct Details\nBenefits\nAvailability\nCall to Action',
-        placeholders: ['[PRODUCT_NAME]', '[KEY_FEATURES]', '[BENEFITS]', '[AVAILABILITY_DATE]', '[CTA]'],
-        platforms: ['all'],
-        tags: ['product', 'announcement', 'marketing'],
-      },
-      {
-        id: 'how-to-guide',
-        name: 'How-To Guide',
-        description: 'Step-by-step instructions for completing a task',
-        category: 'educational',
-        structure: 'Introduction\nProblem Statement\nSolution Overview\nStep-by-Step Guide\nConclusion\nCall to Action',
-        placeholders: ['[TOPIC]', '[PROBLEM]', '[SOLUTION]', '[STEPS]', '[CONCLUSION]', '[CTA]'],
-        platforms: ['blog', 'linkedin'],
-        tags: ['guide', 'tutorial', 'educational'],
-      },
-      {
-        id: 'customer-testimonial',
-        name: 'Customer Testimonial',
-        description: 'Showcase a customer success story',
-        category: 'social',
-        structure: 'Introduction\nCustomer Background\nChallenge\nSolution\nResults\nQuote\nCall to Action',
-        placeholders: ['[CUSTOMER_NAME]', '[CUSTOMER_BACKGROUND]', '[CHALLENGE]', '[SOLUTION]', '[RESULTS]', '[QUOTE]', '[CTA]'],
-        platforms: ['all'],
-        tags: ['testimonial', 'success', 'customer'],
-      },
-      {
-        id: 'industry-insights',
-        name: 'Industry Insights',
-        description: 'Share insights and trends about your industry',
-        category: 'thought-leadership',
-        structure: 'Introduction\nTrend Overview\nData Points\nAnalysis\nImplications\nConclusion\nCall to Action',
-        placeholders: ['[INDUSTRY]', '[TREND]', '[DATA_POINTS]', '[ANALYSIS]', '[IMPLICATIONS]', '[CONCLUSION]', '[CTA]'],
-        platforms: ['linkedin', 'twitter', 'blog'],
-        tags: ['insights', 'trends', 'thought-leadership'],
-      },
-      {
-        id: 'event-promotion',
-        name: 'Event Promotion',
-        description: 'Promote an upcoming event',
-        category: 'marketing',
-        structure: 'Introduction\nEvent Details\nBenefits of Attending\nSpeakers/Highlights\nRegistration Information\nCall to Action',
-        placeholders: ['[EVENT_NAME]', '[EVENT_DATE]', '[EVENT_LOCATION]', '[BENEFITS]', '[SPEAKERS]', '[REGISTRATION_LINK]', '[CTA]'],
-        platforms: ['all'],
-        tags: ['event', 'promotion', 'marketing'],
-      },
-    ]);
-  }
-};
-
-/**
- * Get content template by ID
- * @param id Template ID
- * @returns Content template
- */
-export const getContentTemplateById = async (id: string): Promise<ContentTemplate> => {
-  try {
-    const response = await enhancedApiClient.get(`/ai-content/templates/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching content template ${id}:`, error);
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Return mock data for development
-    const templates = await getContentTemplates();
-    const template = templates.find(t => t.id === id);
+    // Create a simulated response
+    const mockContent = createMockContent(options);
     
-    if (!template) {
-      throw new Error(`Template with ID ${id} not found`);
-    }
-    
-    return template;
-  }
-};
-
-/**
- * Generate content based on request parameters
- * @param request Content generation request
- * @returns Generated content
- */
-export const generateContent = async (
-  request: ContentGenerationRequest
-): Promise<GeneratedContent> => {
-  try {
-    const response = await enhancedApiClient.post('/ai-content/generate', request);
-    return response.data;
-  } catch (error) {
-    console.error('Error generating content:', error);
-    
-    // Return mock data for development
-    const shortContent = `Check out our latest ${request.topic} that helps you save time! #ProductivityTips`;
-    
-    const mediumContent = `We're excited to announce our newest ${request.topic} that helps you save time and boost productivity! Try it today and let us know what you think. #ProductivityTips #Innovation`;
-    
-    const longContent = `We're thrilled to unveil our latest innovation: a game-changing ${request.topic} designed to streamline your workflow and boost productivity!
-
-After months of development and customer feedback, this new capability helps you accomplish more in less time by automating repetitive tasks and providing intelligent suggestions.
-
-Have you tried it yet? We'd love to hear your thoughts in the comments below!
-
-#ProductivityTips #Innovation #WorkSmarter #DigitalTransformation`;
-
-    // Determine content based on requested length
-    let content = '';
-    switch (request.length) {
-      case 'short':
-        content = shortContent;
-        break;
-      case 'long':
-        content = longContent;
-        break;
-      case 'medium':
-      default:
-        content = mediumContent;
-        break;
-    }
-    
-    // Generate mock hashtags if requested
-    const hashtags = request.includeHashtags ? [
-      'ProductivityTips',
-      'Innovation',
-      'WorkSmarter',
-      request.topic.replace(/\s+/g, ''),
-    ] : undefined;
-    
-    return mockApiResponse({
-      id: `gen-${Date.now()}`,
-      content,
-      title: request.topic.charAt(0).toUpperCase() + request.topic.slice(1),
-      hashtags,
-      keywords: request.keywords || [request.topic],
-      seoScore: 85,
-      readabilityScore: 92,
-      engagementScore: 78,
-      brandVoiceScore: 90,
+    return {
+      id: `content-${Date.now()}`,
+      content: mockContent,
       metadata: {
-        generatedAt: new Date().toISOString(),
-        model: 'gpt-4',
-        requestId: `req-${Date.now()}`,
-        topic: request.topic,
-        platform: request.platform,
-        tone: request.tone,
+        contentType: options.contentType,
+        topic: options.topic,
+        keywords: options.keywords,
+        generatedAt: new Date(),
+        wordCount: mockContent.split(' ').length,
+        readingTime: Math.ceil(mockContent.split(' ').length / 200),
       },
-      variations: [
-        `Introducing our innovative ${request.topic} that will revolutionize how you work!`,
-        `New ${request.topic} alert! Discover how this can transform your productivity.`,
-        `Just launched: Our ${request.topic} that our customers have been asking for.`,
-      ],
-    });
-  }
-};
-
-/**
- * Generate content variations
- * @param contentId Original content ID
- * @param count Number of variations to generate
- * @returns List of content variations
- */
-export const generateContentVariations = async (
-  contentId: string,
-  count: number = 3
-): Promise<string[]> => {
-  try {
-    const response = await enhancedApiClient.post(`/ai-content/variations/${contentId}`, {
-      count,
-    });
-    return response.data.variations;
+      status: 'complete'
+    };
   } catch (error) {
-    console.error(`Error generating variations for content ${contentId}:`, error);
+    console.error("Error generating content:", error);
+    throw new Error("Failed to generate content. Please try again later.");
+  }
+}
+
+function createMockContent(options: ContentGenerationOptions): string {
+  const { contentType, topic, keywords, tone, length, targetAudience } = options;
+  
+  // Generate different length of content based on the length option
+  const wordCountMap = {
+    short: { min: 100, max: 250 },
+    medium: { min: 350, max: 600 },
+    long: { min: 800, max: 1200 }
+  };
+  
+  const { min, max } = wordCountMap[length];
+  const targetWordCount = Math.floor(Math.random() * (max - min + 1)) + min;
+  
+  // Base templates for different content types
+  const templates = {
+    blogPost: `# ${topic}\n\nAre you looking to improve your ${keywords[0]}? In this comprehensive guide, we'll explore everything you need to know about ${topic}.\n\n## Understanding ${keywords[1]}\n\n${keywords[1]} is essential for success in today's competitive landscape. Let's dive into why it matters and how you can leverage it effectively.\n\n## Top Strategies for ${keywords[0]}\n\n1. **Strategy One**: Implementing effective ${keywords[2]} techniques\n2. **Strategy Two**: Optimizing your approach to ${keywords[0]}\n3. **Strategy Three**: Leveraging new technologies for better ${keywords[1]}\n\n## Conclusion\n\nBy focusing on these key areas, you'll be well on your way to mastering ${topic} and achieving your goals.`,
     
-    // Return mock data for development
-    return mockApiResponse([
-      'Introducing our innovative solution that will revolutionize how you work!',
-      'New feature alert! Discover how this can transform your productivity.',
-      'Just launched: The solution that our customers have been asking for.',
-      'Excited to share our latest innovation that helps you work smarter, not harder.',
-    ]);
-  }
-};
-
-/**
- * Get brand voice profiles
- * @returns List of brand voice profiles
- */
-export const getBrandVoiceProfiles = async (): Promise<BrandVoiceProfile[]> => {
-  try {
-    const response = await enhancedApiClient.get('/ai-content/brand-voices');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching brand voice profiles:', error);
+    productDescription: `**Introducing Our Revolutionary ${topic}**\n\nDiscover the ultimate solution for all your ${keywords[0]} needs. Our ${topic} is designed with you in mind, featuring cutting-edge ${keywords[1]} technology that sets it apart from competitors.\n\n**Key Features:**\n\n- Advanced ${keywords[2]} functionality\n- Intuitive design for seamless user experience\n- Premium materials for lasting durability\n- Smart integration with your existing tools\n\n**Why Choose Our ${topic}?**\n\nUnlike other products, our solution addresses the common problems associated with ${keywords[0]} while providing exceptional value for your investment.`,
     
-    // Return mock data for development
-    return mockApiResponse([
-      {
-        id: 'professional',
-        name: 'Professional',
-        description: 'Formal and authoritative tone for business communications',
-        style: 'formal',
-        toneAttributes: ['authoritative', 'credible', 'clear', 'concise'],
-        values: ['expertise', 'reliability', 'professionalism'],
-        prohibitedWords: ['slang', 'jargon', 'buzzwords'],
-        exampleContent: [
-          'We are pleased to announce the launch of our new enterprise solution.',
-          'Our research indicates significant improvements in productivity when implementing these strategies.',
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: 'friendly',
-        name: 'Friendly',
-        description: 'Warm and approachable tone for customer communications',
-        style: 'casual',
-        toneAttributes: ['warm', 'approachable', 'helpful', 'conversational'],
-        values: ['customer-focus', 'helpfulness', 'accessibility'],
-        prohibitedWords: ['technical jargon', 'complex terminology'],
-        exampleContent: [
-          'Hey there! We're excited to share our latest update with you.',
-          'We'd love to hear your thoughts on our new feature. Drop us a comment below!',
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: 'innovative',
-        name: 'Innovative',
-        description: 'Forward-thinking and dynamic tone for thought leadership',
-        style: 'enthusiastic',
-        toneAttributes: ['dynamic', 'forward-thinking', 'bold', 'visionary'],
-        values: ['innovation', 'creativity', 'leadership'],
-        prohibitedWords: ['outdated', 'traditional', 'conventional'],
-        exampleContent: [
-          'We're revolutionizing the industry with our groundbreaking approach.',
-          'Our cutting-edge technology is transforming how businesses operate in the digital age.',
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ]);
-  }
-};
-
-/**
- * Create brand voice profile
- * @param profile Brand voice profile
- * @returns Created profile
- */
-export const createBrandVoiceProfile = async (
-  profile: Omit<BrandVoiceProfile, 'id' | 'createdAt' | 'updatedAt'>
-): Promise<BrandVoiceProfile> => {
-  try {
-    const response = await enhancedApiClient.post('/ai-content/brand-voices', profile);
-    return response.data;
-  } catch (error) {
-    console.error('Error creating brand voice profile:', error);
-    throw error;
-  }
-};
-
-/**
- * Update brand voice profile
- * @param id Profile ID
- * @param profile Updated profile data
- * @returns Updated profile
- */
-export const updateBrandVoiceProfile = async (
-  id: string,
-  profile: Partial<Omit<BrandVoiceProfile, 'id' | 'createdAt' | 'updatedAt'>>
-): Promise<BrandVoiceProfile> => {
-  try {
-    const response = await enhancedApiClient.put(`/ai-content/brand-voices/${id}`, profile);
-    return response.data;
-  } catch (error) {
-    console.error(`Error updating brand voice profile ${id}:`, error);
-    throw error;
-  }
-};
-
-/**
- * Delete brand voice profile
- * @param id Profile ID
- * @returns Success status
- */
-export const deleteBrandVoiceProfile = async (
-  id: string
-): Promise<{ success: boolean }> => {
-  try {
-    const response = await enhancedApiClient.delete(`/ai-content/brand-voices/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error deleting brand voice profile ${id}:`, error);
-    throw error;
-  }
-};
-
-/**
- * Analyze content for brand voice consistency
- * @param content Content to analyze
- * @param brandVoiceId Brand voice profile ID
- * @returns Analysis results
- */
-export const analyzeBrandVoiceConsistency = async (
-  content: string,
-  brandVoiceId: string
-): Promise<{
-  score: number;
-  matchedAttributes: string[];
-  unmatchedAttributes: string[];
-  prohibitedWords: { word: string; index: number }[];
-  suggestions: string[];
-}> => {
-  try {
-    const response = await enhancedApiClient.post('/ai-content/analyze-brand-voice', {
-      content,
-      brandVoiceId,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error analyzing brand voice consistency:', error);
+    socialMediaPost: `✨ Excited to share our latest insights on ${topic}! \n\nDid you know that improving your ${keywords[0]} can lead to significant growth? Here's how:\n\n- Focus on ${keywords[1]} for immediate results\n- Implement our tried-and-tested ${keywords[2]} strategy\n- Measure and optimize regularly\n\n👉 What's your biggest challenge with ${topic}? Share in the comments below!\n\n#${keywords[0].replace(/\s+/g, '')} #${keywords[1].replace(/\s+/g, '')} #${topic.replace(/\s+/g, '')}`,
     
-    // Return mock data for development
-    return mockApiResponse({
-      score: 85,
-      matchedAttributes: ['clear', 'concise', 'authoritative'],
-      unmatchedAttributes: ['credible'],
-      prohibitedWords: [
-        { word: 'jargon', index: content.indexOf('jargon') },
-      ],
-      suggestions: [
-        'Add more data points to increase credibility',
-        'Replace "jargon" with more specific terminology',
-        'Consider adding industry examples to strengthen authority',
-      ],
-    });
+    emailNewsletter: `Subject: Transform Your Approach to ${topic} - Exclusive Tips Inside\n\nDear Valued Subscriber,\n\nWe hope this email finds you well. Today, we're excited to share some exclusive insights on ${topic} that can revolutionize your approach.\n\n**Latest Developments in ${keywords[0]}**\n\nOur team has been researching the most effective strategies for ${keywords[1]}, and we've discovered some game-changing techniques that can help you stay ahead of the curve.\n\n**3 Action Steps You Can Take Today:**\n\n1. Reassess your current ${keywords[0]} strategy\n2. Implement our recommended ${keywords[2]} framework\n3. Schedule a review session to measure results\n\nStay tuned for our upcoming webinar where we'll dive deeper into these strategies.\n\nBest regards,\nThe Team`
+  };
+  
+  let baseContent = templates[contentType as keyof typeof templates] || templates.blogPost;
+  
+  // Adjust tone based on the specified parameter
+  if (tone === 'professional') {
+    baseContent = baseContent.replace(/excited|revolutionary|game-changing/gi, 'significant');
+  } else if (tone === 'casual') {
+    baseContent = baseContent.replace(/comprehensive|implementing|strategies/gi, 'awesome');
+  } else if (tone === 'persuasive') {
+    baseContent = baseContent.replace(/discover|introducing|find/gi, 'experience');
   }
-};
-
-/**
- * Generate SEO-optimized content
- * @param topic Content topic
- * @param keywords Target keywords
- * @param length Content length
- * @returns SEO-optimized content
- */
-export const generateSeoContent = async (
-  topic: string,
-  keywords: string[],
-  length: 'short' | 'medium' | 'long' = 'medium'
-): Promise<{
-  content: string;
-  title: string;
-  metaDescription: string;
-  keywordDensity: { keyword: string; count: number; density: number }[];
-  readabilityScore: number;
-  seoScore: number;
-  suggestions: string[];
-}> => {
-  try {
-    const response = await enhancedApiClient.post('/ai-content/seo-optimize', {
-      topic,
-      keywords,
-      length,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error generating SEO-optimized content:', error);
+  
+  // Add target audience specific content if provided
+  if (targetAudience) {
+    baseContent += `\n\n**Specially Crafted for ${targetAudience}**\n\nAs a ${targetAudience}, you'll particularly appreciate how our solution addresses your unique challenges and goals.`;
+  }
+  
+  // Ensure content meets the target word count
+  const currentWordCount = baseContent.split(' ').length;
+  if (currentWordCount < targetWordCount) {
+    const additionalParagraphs = Math.ceil((targetWordCount - currentWordCount) / 50);
     
-    // Return mock data for development
-    const shortContent = `Learn how ${topic} can improve your business efficiency. Our ${keywords[0]} solutions are designed to help you achieve more with less effort.`;
-    
-    const mediumContent = `Discover how ${topic} is transforming businesses today. Our innovative ${keywords[0]} solutions are designed to streamline your operations and boost productivity. With advanced ${keywords[1]} capabilities, you can focus on what matters most to your business.`;
-    
-    const longContent = `Are you looking to improve your business efficiency with ${topic}? Look no further.
-
-Our cutting-edge ${keywords[0]} solutions are specifically designed to help businesses like yours overcome common challenges and achieve better results. By implementing our ${keywords[1]} technology, you can streamline operations, reduce costs, and improve customer satisfaction.
-
-Many businesses struggle with ${keywords[2]} issues, but our approach provides a comprehensive solution that addresses these pain points directly. Our clients have reported up to 30% improvement in efficiency after implementing our solutions.
-
-Ready to transform your business with ${topic}? Contact us today for a free consultation.`;
-
-    // Determine content based on requested length
-    let content = '';
-    switch (length) {
-      case 'short':
-        content = shortContent;
-        break;
-      case 'long':
-        content = longContent;
-        break;
-      case 'medium':
-      default:
-        content = mediumContent;
-        break;
+    for (let i = 0; i < additionalParagraphs; i++) {
+      baseContent += `\n\n${generateFillerParagraph(topic, keywords, i % 3)}`;
     }
-    
-    return mockApiResponse({
-      content,
-      title: `${topic.charAt(0).toUpperCase() + topic.slice(1)}: Boost Your Business with ${keywords[0]}`,
-      metaDescription: `Learn how our ${keywords[0]} solutions can help your business leverage ${topic} to improve efficiency and productivity.`,
-      keywordDensity: keywords.map((keyword, index) => ({
-        keyword,
-        count: 3 - index,
-        density: (3 - index) / (content.length / 100),
-      })),
-      readabilityScore: 85,
-      seoScore: 92,
-      suggestions: [
-        'Add more instances of the primary keyword',
-        'Include the keyword in H2 headings',
-        'Add internal links to related content',
-        'Include a call-to-action',
-      ],
-    });
   }
-};
+  
+  return baseContent;
+}
 
-/**
- * Personalize content for target audience
- * @param content Original content
- * @param audience Target audience
- * @param industry Target industry
- * @returns Personalized content
- */
-export const personalizeContent = async (
-  content: string,
-  audience: string,
-  industry?: string
-): Promise<{
-  content: string;
-  audienceRelevanceScore: number;
-  industryRelevanceScore: number;
-  personalizationChanges: { original: string; personalized: string }[];
-}> => {
-  try {
-    const response = await enhancedApiClient.post('/ai-content/personalize', {
-      content,
-      audience,
-      industry,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error personalizing content:', error);
+function generateFillerParagraph(topic: string, keywords: string[], style: number): string {
+  const paragraphTemplates = [
+    `It's important to consider how ${topic} affects your overall strategy. Many experts agree that focusing on ${keywords[0]} can yield substantial benefits in the long run. By consistently applying best practices in ${keywords[1]}, you'll position yourself for sustainable success.`,
     
-    // Return mock data for development
-    // Create a personalized version based on audience
-    let personalizedContent = content;
+    `Let's examine the data behind ${topic}. Recent studies show that organizations implementing effective ${keywords[0]} strategies see an average improvement of 27% in key performance indicators. This is particularly evident when combined with strong ${keywords[1]} frameworks.`,
     
-    if (audience === 'executives') {
-      personalizedContent = content.replace(/improve/g, 'optimize ROI').replace(/solution/g, 'strategic solution');
-    } else if (audience === 'technical') {
-      personalizedContent = content.replace(/improve/g, 'technically enhance').replace(/solution/g, 'technical implementation');
-    } else if (audience === 'marketing') {
-      personalizedContent = content.replace(/improve/g, 'drive engagement').replace(/solution/g, 'marketing solution');
+    `Consider this practical example of ${topic} in action: A client recently transformed their approach to ${keywords[0]} and saw immediate improvements in their metrics. By focusing on ${keywords[1]} and optimizing their ${keywords[2]} processes, they achieved remarkable results in just three months.`
+  ];
+  
+  return paragraphTemplates[style];
+}
+
+export async function getContentHistory(): Promise<ContentGenerationResult[]> {
+  // In a real implementation, this would fetch from an API or database
+  // For demo purposes, we return mock data
+  
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  const mockHistory: ContentGenerationResult[] = [
+    {
+      id: 'content-1',
+      content: "# How to Improve Your Content Marketing Strategy\n\nContent marketing continues to be a powerful way to attract and engage your target audience...",
+      metadata: {
+        contentType: 'blogPost',
+        topic: 'Content Marketing Strategy',
+        keywords: ['content marketing', 'SEO', 'engagement'],
+        generatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+        wordCount: 850,
+        readingTime: 4
+      },
+      status: 'complete'
+    },
+    {
+      id: 'content-2',
+      content: "**Introducing Our Revolutionary Smart Home Hub**\n\nDiscover the ultimate solution for all your home automation needs...",
+      metadata: {
+        contentType: 'productDescription',
+        topic: 'Smart Home Hub',
+        keywords: ['home automation', 'IoT', 'smart living'],
+        generatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+        wordCount: 320,
+        readingTime: 2
+      },
+      status: 'complete'
+    },
+    {
+      id: 'content-3',
+      content: "✨ Excited to share our latest insights on Social Media Trends for 2023! \n\nDid you know that improving your...",
+      metadata: {
+        contentType: 'socialMediaPost',
+        topic: 'Social Media Trends 2023',
+        keywords: ['social media', 'digital marketing', 'trends'],
+        generatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+        wordCount: 120,
+        readingTime: 1
+      },
+      status: 'complete'
     }
-    
-    return mockApiResponse({
-      content: personalizedContent,
-      audienceRelevanceScore: 88,
-      industryRelevanceScore: industry ? 85 : 70,
-      personalizationChanges: [
-        { original: 'improve', personalized: personalizedContent.includes('optimize ROI') ? 'optimize ROI' : personalizedContent.includes('technically enhance') ? 'technically enhance' : 'drive engagement' },
-        { original: 'solution', personalized: personalizedContent.includes('strategic solution') ? 'strategic solution' : personalizedContent.includes('technical implementation') ? 'technical implementation' : 'marketing solution' },
-      ],
-    });
-  }
-};
+  ];
+  
+  return mockHistory;
+}
+
+// Analysis functions
+export async function analyzeBrandVoice(content: string): Promise<{
+  tone: string;
+  formality: number;
+  clarity: number;
+  consistency: number;
+  keyPhrases: string[];
+  suggestions: string[];
+}> {
+  // In a real implementation, this would use NLP and ML models
+  // For demo purposes, we'll return mock analysis
+  
+  await new Promise(resolve => setTimeout(resolve, 1200));
+  
+  return {
+    tone: content.includes('excited') || content.includes('revolutionary') ? 'enthusiastic' : 'professional',
+    formality: Math.floor(Math.random() * 30) + 70, // 70-100 score
+    clarity: Math.floor(Math.random() * 20) + 75, // 75-95 score
+    consistency: Math.floor(Math.random() * 25) + 70, // 70-95 score
+    keyPhrases: ['innovative solution', 'customer-focused approach', 'industry-leading technology'],
+    suggestions: [
+      'Consider using more active voice for stronger impact',
+      'Your messaging is consistent but could benefit from more concise sentences',
+      'The technical terminology aligns well with your expertise positioning'
+    ]
+  };
+}

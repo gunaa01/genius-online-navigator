@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { 
   Calendar, 
@@ -19,7 +20,7 @@ import {
   Info,
   MoreHorizontal
 } from 'lucide-react';
-
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -183,6 +184,7 @@ const SocialMediaDashboard = () => {
         <meta name="description" content="Manage all your social media accounts, schedule posts, and analyze performance." />
       </Helmet>
       
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold">Social Media Dashboard</h1>
@@ -201,6 +203,7 @@ const SocialMediaDashboard = () => {
         </div>
       </div>
       
+      {/* Alert */}
       <Alert className="mb-6">
         <Info className="h-4 w-4" />
         <AlertTitle>AI-Powered Insights Available</AlertTitle>
@@ -210,6 +213,7 @@ const SocialMediaDashboard = () => {
         </AlertDescription>
       </Alert>
       
+      {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid grid-cols-4 md:w-[600px]">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
