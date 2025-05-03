@@ -1,0 +1,38 @@
+// This is your test database configuration
+// It uses an in-memory SQLite database for testing
+// This file should be used with the --schema flag when running Prisma commands
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/test-client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./test.db"
+}
+
+// Include your schema models here (or import them from another file)
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  password     String
+  firstName    String?
+  lastName     String?
+  role         String    @default("USER")
+  isActive     Boolean   @default(true)
+  isSuperuser  Boolean   @default(false)
+  lastLogin    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  refreshToken RefreshToken[]
+}
+
+model RefreshToken {
+  id           String   @id @default(uuid())
+  token        String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

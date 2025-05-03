@@ -17,6 +17,7 @@ import SeoManagement from './pages/SeoManagement';
 import MetaAdsPage from './pages/MetaAdsPage';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import DeveloperDashboard from './pages/developer/DeveloperDashboard';
 
 const router = createBrowserRouter([
   {
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
       {
         path: "/blog",
         element: <Blog />,
+      },
+      {
+        path: "/developer",
+        element: <DeveloperDashboard />,
       },
     ]
   },

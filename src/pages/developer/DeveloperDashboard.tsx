@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/table';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import ErrorReportingDashboard from '@/components/common/ErrorReportingDashboard';
+import PerformanceDashboard from '@/components/common/PerformanceDashboard';
 import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
 import { FeatureFlag, FeatureFlagType } from '@/lib/featureFlags';
 
@@ -354,25 +355,9 @@ const DeveloperDashboard = () => {
           
           {/* Performance Tab */}
           <TabsContent value="performance" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
-                <CardDescription>
-                  Monitor application performance and resource usage
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <BarChart className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Performance Monitoring Coming Soon</h3>
-                  <p className="text-muted-foreground max-w-md">
-                    We're working on comprehensive performance monitoring tools. Check back soon for detailed metrics and insights.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <ErrorBoundary>
+              <PerformanceDashboard />
+            </ErrorBoundary>
           </TabsContent>
         </Tabs>
       </div>

@@ -60,135 +60,15 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 
-// Types
-interface ErrorEvent {
-  id: string;
-  message: string;
-  stack: string;
-  component: string;
-  module: string;
-  browser: string;
-  os: string;
-  userId?: string;
-  userName?: string;
-  userRole?: string;
-  path: string;
-  timestamp: string;
-  status: 'new' | 'investigating' | 'resolved' | 'ignored';
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  occurrences: number;
-  lastOccurrence: string;
-  assignedTo?: string;
-}
-
-interface ErrorSummary {
-  total: number;
-  new: number;
-  investigating: number;
-  resolved: number;
-  ignored: number;
-  byModule: Record<string, number>;
-  byBrowser: Record<string, number>;
-  byComponent: Record<string, number>;
-  critical: number;
-  high: number;
-  medium: number;
-  low: number;
-}
-
-// Mock data
-const mockErrors: ErrorEvent[] = [
-  {
-    id: 'err-001',
-    message: 'Cannot read properties of undefined (reading \'length\')',
-    stack: 'TypeError: Cannot read properties of undefined (reading \'length\')\n    at ClientProjectList (ClientProjectList.tsx:45)\n    at renderWithHooks (react-dom.development.js:16305)',
-    component: 'ClientProjectList',
-    module: 'Client Portal',
-    browser: 'Chrome 112',
-    os: 'Windows 11',
-    userId: 'user-123',
-    userName: 'John Smith',
-    userRole: 'Client',
-    path: '/client-portal',
-    timestamp: '2025-04-22T10:15:23Z',
-    status: 'new',
-    priority: 'high',
-    occurrences: 5,
-    lastOccurrence: '2025-04-22T14:30:45Z'
-  },
-  {
-    id: 'err-002',
-    message: 'Network error: Failed to fetch',
-    stack: 'Error: Network error: Failed to fetch\n    at fetchData (api.ts:78)\n    at ResourceManagement (ResourceManagement.tsx:112)',
-    component: 'ResourceManagement',
-    module: 'Resource Management',
-    browser: 'Firefox 98',
-    os: 'macOS 12.4',
-    userId: 'user-456',
-    userName: 'Sarah Williams',
-    userRole: 'Admin',
-    path: '/resource-management',
-    timestamp: '2025-04-21T16:42:10Z',
-    status: 'investigating',
-    priority: 'medium',
-    occurrences: 3,
-    lastOccurrence: '2025-04-22T09:12:33Z',
-    assignedTo: 'Michael Chen'
-  },
-  {
-    id: 'err-003',
-    message: 'Maximum update depth exceeded',
-    stack: 'Error: Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate.\n    at AutomationHub (AutomationHub.tsx:231)',
-    component: 'AutomationHub',
-    module: 'Automation Hub',
-    browser: 'Safari 15',
-    os: 'iOS 15.4',
-    userId: 'user-789',
-    userName: 'Emily Rodriguez',
-    userRole: 'Project Manager',
-    path: '/automation-hub',
-    timestamp: '2025-04-20T11:05:17Z',
-    status: 'resolved',
-    priority: 'critical',
-    occurrences: 12,
-    lastOccurrence: '2025-04-21T15:30:22Z',
-    assignedTo: 'Error Handling Expert'
-  },
-  {
-    id: 'err-004',
-    message: 'ChunkLoadError: Loading chunk failed',
-    stack: 'ChunkLoadError: Loading chunk failed\n    at HTMLScriptElement.onError (webpack.js:345)',
-    component: 'App',
-    module: 'Core',
-    browser: 'Edge 100',
-    os: 'Windows 10',
-    path: '/dashboard',
-    timestamp: '2025-04-22T08:30:45Z',
-    status: 'new',
-    priority: 'low',
-    occurrences: 2,
-    lastOccurrence: '2025-04-22T12:15:10Z'
-  },
-  {
-    id: 'err-005',
-    message: 'Uncaught SyntaxError: Unexpected token',
-    stack: 'SyntaxError: Unexpected token\n    at JSON.parse (<anonymous>)\n    at parseResponse (api.ts:45)\n    at IntegrationHub (IntegrationHub.tsx:178)',
-    component: 'IntegrationHub',
-    module: 'Integration Hub',
-    browser: 'Chrome 112',
-    os: 'Ubuntu 22.04',
-    userId: 'user-321',
-    userName: 'Michael Chen',
-    userRole: 'Developer',
-    path: '/integration-hub',
-    timestamp: '2025-04-21T14:22:33Z',
-    status: 'investigating',
-    priority: 'high',
-    occurrences: 7,
-    lastOccurrence: '2025-04-22T11:45:20Z',
-    assignedTo: 'Error Handling Expert'
-  }
-];
+// Import types and services from our error reporting service
+import {
+  ErrorEvent,
+  ErrorSummary,
+  getAllErrors,
+  updateErrorStatus,
+  assignError,
+  calculateErrorSummary
+} from '@/services/errorReporting';
 
 // Helper functions
 const formatDate = (dateString: string): string => {
@@ -253,55 +133,7 @@ const getPriorityBadge = (priority: string) => {
   }
 };
 
-// Calculate error summary
-const calculateErrorSummary = (errors: ErrorEvent[]): ErrorSummary => {
-  const summary: ErrorSummary = {
-    total: errors.length,
-    new: 0,
-    investigating: 0,
-    resolved: 0,
-    ignored: 0,
-    byModule: {},
-    byBrowser: {},
-    byComponent: {},
-    critical: 0,
-    high: 0,
-    medium: 0,
-    low: 0
-  };
-
-  errors.forEach(error => {
-    // Count by status
-    summary[error.status as keyof Pick<ErrorSummary, 'new' | 'investigating' | 'resolved' | 'ignored'>]++;
-    
-    // Count by priority
-    summary[error.priority as keyof Pick<ErrorSummary, 'critical' | 'high' | 'medium' | 'low'>]++;
-    
-    // Count by module
-    if (summary.byModule[error.module]) {
-      summary.byModule[error.module]++;
-    } else {
-      summary.byModule[error.module] = 1;
-    }
-    
-    // Count by browser
-    if (summary.byBrowser[error.browser]) {
-      summary.byBrowser[error.browser]++;
-    } else {
-      summary.byBrowser[error.browser] = 1;
-    }
-    
-    // Count by component
-    if (summary.byComponent[error.component]) {
-      summary.byComponent[error.component]++;
-    } else {
-      summary.byComponent[error.component] = 1;
-    }
-  });
-
-  return summary;
-};
-
+// We now use the calculateErrorSummary function from our service
 interface ErrorReportingDashboardProps {
   isDevMode?: boolean;
   onAssignError?: (errorId: string, assignee: string) => void;
@@ -334,22 +166,16 @@ const ErrorReportingDashboard: React.FC<ErrorReportingDashboardProps> = ({
   const [errors, setErrors] = useState<ErrorEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load errors (in a real app, this would fetch from an API)
-  useEffect(() => {
-    const loadErrors = async () => {
-      setIsLoading(true);
-      try {
-        // In a real app, this would be an API call
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-        setErrors(mockErrors);
-        setErrorSummary(calculateErrorSummary(mockErrors));
-      } catch (error) {
-        console.error('Error loading error reports:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Load errors from our error reporting service
+  const loadErrors = () => {
+    // Get errors from our service
+    const allErrors = getAllErrors();
+    setErrors(allErrors);
+    setErrorSummary(calculateErrorSummary(allErrors));
+    setIsLoading(false);
+  };
 
+  useEffect(() => {
     loadErrors();
   }, []);
 
@@ -364,9 +190,7 @@ const ErrorReportingDashboard: React.FC<ErrorReportingDashboardProps> = ({
         onRefresh();
       }
       
-      // For demo, just re-use the mock data
-      setErrors(mockErrors);
-      setErrorSummary(calculateErrorSummary(mockErrors));
+      loadErrors();
     } catch (error) {
       console.error('Error refreshing error reports:', error);
     } finally {
@@ -421,18 +245,16 @@ const ErrorReportingDashboard: React.FC<ErrorReportingDashboardProps> = ({
 
   // Handle status update
   const handleStatusUpdate = (errorId: string, status: string) => {
-    if (onUpdateStatus) {
-      onUpdateStatus(errorId, status);
-    } else {
-      // For demo purposes, update the local state
-      const updatedErrors = errors.map(error => {
-        if (error.id === errorId) {
-          return { ...error, status: status as any };
-        }
-        return error;
-      });
-      setErrors(updatedErrors);
-      setErrorSummary(calculateErrorSummary(updatedErrors));
+    // Call our service to update the error status
+    const updatedError = updateErrorStatus(errorId, status as ErrorEvent['status']);
+    
+    if (updatedError) {
+      // Refresh the errors list
+      loadErrors();
+      
+      if (onUpdateStatus) {
+        onUpdateStatus(errorId, status);
+      }
     }
   };
 
