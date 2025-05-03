@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import GigCard from '../../components/GigCard';
 import { useApiError } from '../../hooks/useApiError';
@@ -17,11 +18,29 @@ const GigList: React.FC = () => {
   const [error, handleError] = useApiError();
 
   useEffect(() => {
-    fetch('/api/for-hire/gigs')
-      .then(async res => {
-        if (await handleError(res)) return;
-        setGigs(await res.json());
-      });
+    // Add error handling for the fetch operation
+    const fetchGigs = async () => {
+      try {
+        const response = await fetch('/api/for-hire/gigs');
+        if (!response.ok) {
+          if (handleError) await handleError(response);
+          return;
+        }
+        
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setGigs(data);
+        } else {
+          console.error("Expected array but got:", typeof data);
+          setGigs([]);
+        }
+      } catch (err) {
+        console.error("Error fetching gigs:", err);
+        setGigs([]);
+      }
+    };
+    
+    fetchGigs();
   }, [handleError]);
 
   return (
@@ -29,7 +48,10 @@ const GigList: React.FC = () => {
       <h2>Browse Gigs</h2>
       {error && <div className="error">{error}</div>}
       <div className="gig-list">
-        {gigs.map(gig => <GigCard key={gig.id} gig={gig} />)}
+        {Array.isArray(gigs) && gigs.length > 0 ? 
+          gigs.map(gig => <GigCard key={gig.id} gig={gig} />) : 
+          <p>No gigs available</p>
+        }
       </div>
     </div>
   );

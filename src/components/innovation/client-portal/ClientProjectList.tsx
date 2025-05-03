@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Search, Filter, CheckSquare, MessageSquare } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -48,7 +49,7 @@ const ClientProjectList: React.FC<ClientProjectListProps> = ({
   const [statusFilter, setStatusFilter] = useState('all');
   
   // Filter projects
-  const filteredProjects = projects.filter(project => {
+  const filteredProjects = Array.isArray(projects) ? projects.filter(project => {
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -64,7 +65,7 @@ const ClientProjectList: React.FC<ClientProjectListProps> = ({
     }
     
     return true;
-  });
+  }) : [];
   
   return (
     <ErrorBoundary>

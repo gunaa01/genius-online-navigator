@@ -85,14 +85,20 @@ const CommunityDirectory = ({ searchQuery = "" }: CommunityDirectoryProps) => {
     
     const lowerCaseQuery = searchQuery.toLowerCase();
     
-    const filtered = businesses.filter(business => 
-      business.name.toLowerCase().includes(lowerCaseQuery) || 
-      business.description.toLowerCase().includes(lowerCaseQuery) || 
-      business.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery)) ||
-      business.category.toLowerCase().includes(lowerCaseQuery)
-    );
-    
-    setFilteredBusinesses(filtered);
+    // Ensure businesses is an array before calling filter
+    if (Array.isArray(businesses)) {
+      const filtered = businesses.filter(business => 
+        business.name.toLowerCase().includes(lowerCaseQuery) || 
+        business.description.toLowerCase().includes(lowerCaseQuery) || 
+        (Array.isArray(business.tags) && business.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery))) ||
+        business.category.toLowerCase().includes(lowerCaseQuery)
+      );
+      
+      setFilteredBusinesses(filtered);
+    } else {
+      console.error("Expected businesses to be an array but got:", typeof businesses);
+      setFilteredBusinesses([]);
+    }
   }, [searchQuery, businesses]);
 
   return (
@@ -135,7 +141,7 @@ const CommunityDirectory = ({ searchQuery = "" }: CommunityDirectoryProps) => {
                   {business.location}
                 </div>
                 <div className="flex flex-wrap gap-1 mt-3">
-                  {business.tags.map((tag) => (
+                  {Array.isArray(business.tags) && business.tags.map((tag) => (
                     <Badge key={tag} variant="secondary" className="text-xs">
                       {tag}
                     </Badge>

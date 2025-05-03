@@ -177,6 +177,21 @@ const SocialMediaDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [platformFilter, setPlatformFilter] = useState('all');
   
+  // Safe filter function
+  const safeFilter = <T extends unknown>(
+    array: T[] | undefined | null, 
+    predicate: (value: T) => boolean
+  ): T[] => {
+    if (!Array.isArray(array)) return [];
+    return array.filter(predicate);
+  };
+  
+  // Safely filter scheduled posts
+  const filteredPosts = safeFilter(scheduledPosts, post => {
+    if (platformFilter === 'all') return true;
+    return Array.isArray(post.platforms) && post.platforms.includes(platformFilter);
+  });
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <Helmet>

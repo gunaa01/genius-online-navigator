@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,10 @@ import { Textarea } from "@/components/ui/textarea";
 import axios from 'axios';
 
 const SocialMedia = () => {
-  const { socialAccounts, loading } = useDemoData();
+  const { socialAccounts = [], loading } = useDemoData() || {};
+
+  // Ensure socialAccounts is always an array
+  const ensuredAccounts = Array.isArray(socialAccounts) ? socialAccounts : [];
 
   const scheduledPosts = [
     {
@@ -116,16 +120,23 @@ const SocialMedia = () => {
     });
   };
 
-  const [accounts, setAccounts] = React.useState(socialAccounts);
+  const [accounts, setAccounts] = React.useState(ensuredAccounts);
   const [showCalendar, setShowCalendar] = React.useState(false);
   const [showCreatePost, setShowCreatePost] = React.useState(false);
   const [showConnect, setShowConnect] = React.useState(false);
   const [postContent, setPostContent] = React.useState('');
   const [postImage, setPostImage] = React.useState(null);
-  const [postPlatforms, setPostPlatforms] = React.useState([]);
+  const [postPlatforms, setPostPlatforms] = React.useState<string[]>([]);
   const [message, setMessage] = React.useState('');
 
-  function handleViewAnalytics(account) {
+  // Update accounts if socialAccounts changes
+  useEffect(() => {
+    if (Array.isArray(socialAccounts)) {
+      setAccounts(socialAccounts);
+    }
+  }, [socialAccounts]);
+
+  function handleViewAnalytics(account: any) {
     // Replace with navigation or modal as needed
     alert(`Viewing analytics for @${account.username}`);
   }
@@ -150,9 +161,11 @@ const SocialMedia = () => {
     }, 1000);
   }
 
-  function handleToggleAccount(id) {
+  function handleToggleAccount(id: string) {
     // Find the account to toggle
     const updated = accounts.find(acc => acc.id === id);
+    if (!updated) return;
+
     // Optimistically update UI
     setAccounts(prev =>
       prev.map(acc =>
@@ -160,20 +173,27 @@ const SocialMedia = () => {
       )
     );
     setMessage('Account connection toggled!');
-    // Send request to backend
-    axios.post(`http://localhost:8000/api/social-accounts/${id}/toggle`, {
-      connected: !updated.connected
-    })
-      .then(() => setMessage('Account connection updated on server!'))
-      .catch(() => {
-        setMessage('Failed to update account on server.');
-        // Optionally revert UI
-        setAccounts(prev =>
-          prev.map(acc =>
-            acc.id === id ? { ...acc, connected: updated.connected } : acc
-          )
-        );
-      });
+
+    // Safe error handling for API call
+    try {
+      // Send request to backend
+      axios.post(`http://localhost:8000/api/social-accounts/${id}/toggle`, {
+        connected: !updated.connected
+      })
+        .then(() => setMessage('Account connection updated on server!'))
+        .catch(() => {
+          setMessage('Failed to update account on server.');
+          // Optionally revert UI
+          setAccounts(prev =>
+            prev.map(acc =>
+              acc.id === id ? { ...acc, connected: updated.connected } : acc
+            )
+          );
+        });
+    } catch (error) {
+      console.error('Error toggling account:', error);
+      setMessage('Error connecting to server.');
+    }
   }
 
   return (
