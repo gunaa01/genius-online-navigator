@@ -1,146 +1,98 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { 
-  BarChart2, 
-  Zap, 
-  Share2, 
-  FileText, 
-  Globe, 
-  Users, 
-  ArrowRight 
-} from 'lucide-react';
+import { ArrowRight, BarChart2, Layout, Globe, MessageSquare, Share2 } from 'lucide-react';
 
 const Home: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
-      <section className="py-12 md:py-24">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            Welcome to <span className="text-primary">Genius</span>
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            The all-in-one platform to manage and optimize your online presence effortlessly
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 pt-4">
-            <Button asChild size="lg">
-              <Link to="/dashboard">Go to Dashboard</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/auth">Sign In</Link>
-            </Button>
-          </div>
+      <div className="text-center mb-16">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to Genius</h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+          Your all-in-one platform for marketing automation, analytics, and content management
+        </p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Link 
+            to="/dashboard" 
+            className="inline-flex items-center px-6 py-3 rounded-md font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Get Started <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
+          <Link 
+            to="/analytics" 
+            className="inline-flex items-center px-6 py-3 rounded-md font-medium bg-muted hover:bg-muted/80 transition-colors"
+          >
+            Explore Analytics
+          </Link>
         </div>
-      </section>
-
-      <section className="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-card rounded-lg p-6 shadow-sm border">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <BarChart2 className="h-6 w-6 text-primary" />
-          </div>
-          <h3 className="text-xl font-semibold mb-2">Comprehensive Analytics</h3>
-          <p className="text-muted-foreground">
-            Get detailed insights into your online performance with interactive dashboards and AI-driven suggestions.
-          </p>
-        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <Link
+          to="/dashboard"
+          className="flex flex-col items-center p-6 border rounded-lg bg-card hover:shadow-md transition-shadow"
+        >
+          <Layout className="h-12 w-12 text-primary mb-4" />
+          <h3 className="text-xl font-medium mb-2">Dashboard</h3>
+          <p className="text-center text-muted-foreground">Get a complete overview of your marketing efforts</p>
+        </Link>
         
-        <div className="bg-card rounded-lg p-6 shadow-sm border">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <Share2 className="h-6 w-6 text-primary" />
-          </div>
-          <h3 className="text-xl font-semibold mb-2">Social Media Integration</h3>
-          <p className="text-muted-foreground">
-            Schedule and auto-post content to multiple platforms simultaneously with our AI content generator.
-          </p>
-        </div>
+        <Link
+          to="/analytics"
+          className="flex flex-col items-center p-6 border rounded-lg bg-card hover:shadow-md transition-shadow"
+        >
+          <BarChart2 className="h-12 w-12 text-primary mb-4" />
+          <h3 className="text-xl font-medium mb-2">Analytics</h3>
+          <p className="text-center text-muted-foreground">Detailed insights and performance metrics</p>
+        </Link>
         
-        <div className="bg-card rounded-lg p-6 shadow-sm border">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <Zap className="h-6 w-6 text-primary" />
-          </div>
-          <h3 className="text-xl font-semibold mb-2">Ad Campaign Management</h3>
-          <p className="text-muted-foreground">
-            Create, run, and monitor ad campaigns on platforms like Google Ads and Facebook Ads all from one place.
-          </p>
-        </div>
-      </section>
-
-      <section className="py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold">Key Features</h2>
-        </div>
+        <Link
+          to="/social"
+          className="flex flex-col items-center p-6 border rounded-lg bg-card hover:shadow-md transition-shadow"
+        >
+          <Share2 className="h-12 w-12 text-primary mb-4" />
+          <h3 className="text-xl font-medium mb-2">Social Media</h3>
+          <p className="text-center text-muted-foreground">Manage all your social platforms from one place</p>
+        </Link>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="flex items-start gap-3">
-            <Globe className="h-6 w-6 text-primary shrink-0" />
-            <div>
-              <h3 className="font-semibold">Data Integration</h3>
-              <p className="text-sm text-muted-foreground">
-                Connect your existing admin panels or upload data directly.
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <FileText className="h-6 w-6 text-primary shrink-0" />
-            <div>
-              <h3 className="font-semibold">AI Content Generation</h3>
-              <p className="text-sm text-muted-foreground">
-                Generate blog posts, product descriptions, and ad copy using AI.
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <BarChart2 className="h-6 w-6 text-primary shrink-0" />
-            <div>
-              <h3 className="font-semibold">Automated Reports</h3>
-              <p className="text-sm text-muted-foreground">
-                Generate detailed reports on traffic, conversions, and engagement.
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <Share2 className="h-6 w-6 text-primary shrink-0" />
-            <div>
-              <h3 className="font-semibold">Social Media Management</h3>
-              <p className="text-sm text-muted-foreground">
-                Schedule and auto-post content across multiple platforms.
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <Users className="h-6 w-6 text-primary shrink-0" />
-            <div>
-              <h3 className="font-semibold">Multi-User Access</h3>
-              <p className="text-sm text-muted-foreground">
-                Assign different roles and permissions to team members.
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <Zap className="h-6 w-6 text-primary shrink-0" />
-            <div>
-              <h3 className="font-semibold">A/B Testing</h3>
-              <p className="text-sm text-muted-foreground">
-                Test variations of content and analyze performance.
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="text-center mt-10">
-          <Button asChild size="lg">
-            <Link to="/dashboard">
-              Get Started <ArrowRight className="ml-2 h-4 w-4" />
+        <Link
+          to="/content"
+          className="flex flex-col items-center p-6 border rounded-lg bg-card hover:shadow-md transition-shadow"
+        >
+          <MessageSquare className="h-12 w-12 text-primary mb-4" />
+          <h3 className="text-xl font-medium mb-2">AI Content</h3>
+          <p className="text-center text-muted-foreground">Generate engaging content with AI assistance</p>
+        </Link>
+      </div>
+      
+      <div className="mb-16">
+        <h2 className="text-3xl font-bold mb-6 text-center">Explore More Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            { name: 'Reports', path: '/reports', description: 'Comprehensive reporting tools' },
+            { name: 'Ad Campaigns', path: '/ads', description: 'Manage and optimize your ads' },
+            { name: 'Social Dashboard', path: '/social-dashboard', description: 'Monitor social performance' },
+            { name: 'Content Analytics', path: '/content-analytics', description: 'Content performance metrics' },
+            { name: 'SEO Management', path: '/seo', description: 'Optimize your search rankings' },
+            { name: 'Meta Ads', path: '/meta-ads', description: 'Facebook and Instagram ad management' },
+            { name: 'Team Management', path: '/team', description: 'Collaborate with your team' },
+            { name: 'Integrations', path: '/integrations', description: 'Connect with other tools' },
+            { name: 'Developer', path: '/developer', description: 'Access developer tools' }
+          ].map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className="flex items-center justify-between p-4 border rounded-md hover:bg-muted/50 transition-colors"
+            >
+              <div>
+                <h3 className="font-medium">{item.name}</h3>
+                <p className="text-sm text-muted-foreground">{item.description}</p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-muted-foreground" />
             </Link>
-          </Button>
+          ))}
         </div>
-      </section>
+      </div>
     </div>
   );
 };

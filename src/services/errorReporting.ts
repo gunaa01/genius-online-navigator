@@ -142,7 +142,7 @@ export const createErrorBoundary = () => {
   // This is a simplified version
   return {
     ErrorBoundary: ({ children }: { children: React.ReactNode }) => {
-      return <>{children}</>;
+      return children;
     },
     error: null
   };
