@@ -232,15 +232,19 @@ export const createFocusTrap = (containerRef: React.RefObject<HTMLElement>) => {
 /**
  * Skip to content link for keyboard navigation
  * @param contentId ID of main content
- * @returns JSX element
+ * @returns JSX Element type definition
  */
-export const SkipToContent: React.FC<{ contentId: string }> = ({ contentId }) => {
-  return (
-    <a 
-      href={`#${contentId}`}
-      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground focus:rounded"
-    >
-      Skip to content
-    </a>
-  );
+export interface SkipToContentProps {
+  contentId: string;
+}
+
+export const SkipToContent: React.FC<SkipToContentProps> = function SkipToContent(props: SkipToContentProps) {
+  return {
+    type: 'a',
+    props: {
+      href: `#${props.contentId}`,
+      className: "sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground focus:rounded",
+      children: "Skip to content"
+    }
+  };
 };
