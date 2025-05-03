@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { withPerformanceTracking, useInteractionTracker } from '../withPerformanceTracking';
@@ -7,6 +8,10 @@ import { clientPerformance } from '../performance';
 jest.mock('../performance', () => ({
   clientPerformance: {
     trackComponentRender: jest.fn(),
+    trackInteraction: jest.fn()
+  }
+}));
+
 describe('withPerformanceTracking', () => {
   const TestComponent: React.FC<{ name: string }> = ({ name }) => (
     <div data-testid="test-component">Hello {name}</div>
