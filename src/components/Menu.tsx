@@ -12,6 +12,7 @@ const menuItems = [
     { to: '/reports', label: 'Reports' },
     { to: '/ads', label: 'Ad Campaigns' },
     { to: '/social', label: 'Social Media' },
+    { to: '/social-dashboard', label: 'Social Dashboard' },
     { to: '/content', label: 'AI Content' },
     { to: '/community', label: 'Community' },
     { to: '/integrations', label: 'Integrations' },

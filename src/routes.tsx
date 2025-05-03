@@ -18,6 +18,7 @@ import MetaAdsPage from './pages/MetaAdsPage';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import DeveloperDashboard from './pages/developer/DeveloperDashboard';
+import SocialMediaDashboard from './pages/innovation/SocialMediaDashboard';
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "/social",
         element: <SocialMedia />,
+      },
+      {
+        path: "/social-dashboard",
+        element: <SocialMediaDashboard />,
       },
       {
         path: "/ads",
