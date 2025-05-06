@@ -1,21 +1,22 @@
-
 import JobCard from "./JobCard";
 import JobListHeader from "./JobListHeader";
 
+interface Job {
+  id: number;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  duration: string;
+  budget: string;
+  posted: string;
+  description: string;
+  skills: string[];
+  applicants: number;
+}
+
 interface JobListingProps {
-  jobs: Array<{
-    id: number;
-    title: string;
-    company: string;
-    location: string;
-    type: string;
-    duration: string;
-    budget: string;
-    posted: string;
-    description: string;
-    skills: string[];
-    applicants: number;
-  }>;
+  jobs: Job[];
 }
 
 const JobsListing = ({ jobs }: JobListingProps) => {

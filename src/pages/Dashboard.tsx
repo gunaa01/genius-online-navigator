@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { 
   Card, 
@@ -10,6 +10,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart3,
   TrendingUp,
@@ -23,21 +24,25 @@ import {
   Bell,
   FileText,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Code,
+  Database
 } from 'lucide-react';
+import BSTVisualization from '@/components/BSTVisualization';
 
 const Dashboard: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>('marketing');
   return (
     <div className="space-y-6">
       <Helmet>
         <title>Dashboard | Genius Online Navigator</title>
-        <meta name="description" content="Marketing dashboard with key metrics and insights" />
+        <meta name="description" content="Dashboard with key metrics, insights, and developer tools" />
       </Helmet>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Marketing Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back! Here's an overview of your marketing performance</p>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">Welcome back! Here's an overview of your performance and tools</p>
         </div>
         
         <div className="flex items-center gap-2 mt-4 md:mt-0">
@@ -51,6 +56,20 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
       </div>
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="marketing">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Marketing
+          </TabsTrigger>
+          <TabsTrigger value="developer">
+            <Code className="h-4 w-4 mr-2" />
+            Developer Tools
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="marketing">
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
@@ -339,6 +358,52 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+      </TabsContent>
+      
+      <TabsContent value="developer">
+        <div className="grid grid-cols-1 gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div>
+              <h2 className="text-2xl font-bold">Developer Tools</h2>
+              <p className="text-muted-foreground">Visualize and understand data structures and algorithms</p>
+            </div>
+          </div>
+          
+          <BSTVisualization 
+            title="Binary Search Tree Visualization"
+            description="Visualize and interact with a Binary Search Tree data structure"
+            initialData={[50, 30, 70, 20, 40, 60, 80]}
+          />
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Database className="h-5 w-5 mr-2 text-primary" />
+                Data Structure Library
+              </CardTitle>
+              <CardDescription>
+                Additional data structure visualizations and tools
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
+                  <span className="text-lg font-medium mb-1">Hash Table</span>
+                  <span className="text-xs text-muted-foreground">Coming soon</span>
+                </Button>
+                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
+                  <span className="text-lg font-medium mb-1">Graph</span>
+                  <span className="text-xs text-muted-foreground">Coming soon</span>
+                </Button>
+                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
+                  <span className="text-lg font-medium mb-1">Heap</span>
+                  <span className="text-xs text-muted-foreground">Coming soon</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </TabsContent>
     </div>
   );
 };

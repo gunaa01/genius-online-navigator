@@ -1,8 +1,14 @@
 import { FastifyInstance } from 'fastify';
 import { PrismaClient } from '@prisma/client';
 import { UserRole } from '../utils/auth';
+import { buildApp } from '../app';
 
 const prisma = new PrismaClient();
+
+// Helper to get a test app instance
+export async function getTestApp(): Promise<FastifyInstance> {
+  return await buildApp();
+}
 
 export interface TestUser {
   id: string;
@@ -32,15 +38,15 @@ export async function createTestUser(
   const user = await prisma.user.create({
     data: {
       email: defaultUser.email,
-      password: await app.bcrypt.hash(defaultUser.password, 10),
+      password: 'hashed_password', // Simplified for tests
       role: defaultUser.role,
       isActive: defaultUser.isActive,
       isSuperuser: defaultUser.isSuperuser
     }
   });
 
-  // Generate tokens
-  const tokens = await app.jwt.sign({
+  // Generate a mock token
+  const accessToken = app.jwt.sign({
     id: user.id,
     email: user.email,
     role: user.role
@@ -49,8 +55,8 @@ export async function createTestUser(
   return {
     ...defaultUser,
     id: user.id,
-    accessToken: tokens.accessToken,
-    refreshToken: tokens.refreshToken
+    accessToken,
+    refreshToken: 'mock-refresh-token'
   };
 }
 

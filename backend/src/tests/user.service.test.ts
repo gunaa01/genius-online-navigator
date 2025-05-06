@@ -1,15 +1,19 @@
 import { FastifyInstance } from 'fastify';
-import { buildApp } from '../app';
 import { UserService } from '../services/user.service';
 import { UserRole } from '../utils/auth';
-import { cleanDatabase, createTestUser, TestUser } from './test-utils';
+import { cleanDatabase, createTestUser, TestUser, getTestApp } from './test-utils';
 
 describe('UserService', () => {
   let app: FastifyInstance;
+  let userService: UserService;
   let testUser: TestUser;
 
   beforeAll(async () => {
-    app = await buildApp({ logger: false });
+    app = await getTestApp();
+    userService = new UserService();
+  });
+
+  beforeEach(async () => {
     await cleanDatabase();
     testUser = await createTestUser(app);
   });

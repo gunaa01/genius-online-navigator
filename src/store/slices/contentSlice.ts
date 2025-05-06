@@ -182,6 +182,9 @@ const contentSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    addContent: (state, action: PayloadAction<ContentItem>) => {
+      state.items.push(action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -301,5 +304,5 @@ const contentSlice = createSlice({
   },
 });
 
-export const { setSelectedItem, clearError } = contentSlice.actions;
+export const { setSelectedItem, clearError, addContent } = contentSlice.actions;
 export default contentSlice.reducer;

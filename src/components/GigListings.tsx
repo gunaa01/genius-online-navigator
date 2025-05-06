@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -78,16 +79,12 @@ const GigListings: React.FC<GigListingsProps> = ({
   freelancerId,
   categoryId,
 }) => {
+  const { filters, setFilters } = useMarketplace();
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [totalGigs, setTotalGigs] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>(categoryId?.toString() || "");
   const [categories, setCategories] = useState<Category[]>([]);
-  const [minPrice, setMinPrice] = useState<string>("");
-  const [maxPrice, setMaxPrice] = useState<string>("");
-  const [maxDeliveryTime, setMaxDeliveryTime] = useState<string>("");
   
   const navigate = useNavigate();
 
@@ -99,11 +96,11 @@ const GigListings: React.FC<GigListingsProps> = ({
         limit,
         is_featured: featuredOnly || undefined,
         freelancer_id: freelancerId || undefined,
-        category_id: selectedCategory || categoryId || undefined,
-        search: searchQuery || undefined,
-        min_price: minPrice || undefined,
-        max_price: maxPrice || undefined,
-        max_delivery_time: maxDeliveryTime || undefined,
+        category_id: filters.category || categoryId || undefined,
+        search: filters.search || undefined,
+        min_price: filters.minPrice || undefined,
+        max_price: filters.maxPrice || undefined,
+        max_delivery_time: filters.maxDeliveryTime || undefined,
         is_active: true,
       };
 
@@ -144,11 +141,7 @@ const GigListings: React.FC<GigListingsProps> = ({
   };
 
   const handleResetFilters = () => {
-    setSearchQuery("");
-    setSelectedCategory("");
-    setMinPrice("");
-    setMaxPrice("");
-    setMaxDeliveryTime("");
+    setFilters({ search: "", category: "", minPrice: "", maxPrice: "", maxDeliveryTime: "" });
     setCurrentPage(1);
     fetchGigs();
   };
@@ -173,13 +166,13 @@ const GigListings: React.FC<GigListingsProps> = ({
               <label className="text-sm font-medium mb-1 block">Search</label>
               <Input
                 placeholder="Gig title, description, keyword..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={filters.search}
+                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               />
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">Category</label>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select value={filters.category} onValueChange={(val) => setFilters({ ...filters, category: val })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -195,7 +188,7 @@ const GigListings: React.FC<GigListingsProps> = ({
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">Delivery Time</label>
-              <Select value={maxDeliveryTime} onValueChange={setMaxDeliveryTime}>
+              <Select value={filters.maxDeliveryTime || ""} onValueChange={(val) => setFilters({ ...filters, maxDeliveryTime: val })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select delivery time" />
                 </SelectTrigger>
@@ -214,8 +207,8 @@ const GigListings: React.FC<GigListingsProps> = ({
               <Input
                 type="number"
                 placeholder="Minimum price"
-                value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
+                value={filters.minPrice || ""}
+                onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
               />
             </div>
             <div>
@@ -223,8 +216,8 @@ const GigListings: React.FC<GigListingsProps> = ({
               <Input
                 type="number"
                 placeholder="Maximum price"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
+                value={filters.maxPrice || ""}
+                onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
               />
             </div>
           </div>

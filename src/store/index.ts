@@ -10,6 +10,7 @@ import socialMediaReducer from './slices/socialMediaSlice';
 import aiContentReducer from './slices/aiContentSlice';
 import analyticsReducer from './slices/analyticsSlice';
 import uiReducer from './slices/uiSlice';
+import messageReducer from './slices/messageSlice';
 
 // Import middleware
 import { loggerMiddleware } from './middleware/logger';
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   aiContent: aiContentReducer,
   analytics: analyticsReducer,
   ui: uiReducer,
+  messages: messageReducer,
 });
 
 // Create persisted reducer

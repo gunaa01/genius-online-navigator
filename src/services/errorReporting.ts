@@ -1,4 +1,3 @@
-
 // Error reporting service for tracking and managing application errors
 import { useEffect, useState } from 'react';
 
@@ -142,7 +141,7 @@ export const createErrorBoundary = () => {
   // This is a simplified version
   return {
     ErrorBoundary: ({ children }: { children: React.ReactNode }) => {
-      return <>{children}</>;
+      return <React.Fragment>{children}</React.Fragment>;
     },
     error: null
   };

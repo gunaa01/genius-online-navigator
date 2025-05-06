@@ -17,12 +17,14 @@ import {
   ThumbsUp,
   Share2,
   Plus,
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import axios from 'axios';
+import SocialMediaAutomation from '@/components/SocialMediaAutomation';
 
 const SocialMedia = () => {
   const { socialAccounts = [], loading } = useDemoData() || {};
@@ -214,157 +216,126 @@ const SocialMedia = () => {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {accounts.map((account) => (
-            <Card key={account.id} className="card-shadow">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center mr-3">
-                      {getPlatformIcon(account.platform)}
-                    </div>
-                    <div>
-                      <p className="font-medium">{getPlatformName(account.platform)}</p>
-                      <p className="text-xs text-muted-foreground">{account.username}</p>
-                    </div>
-                  </div>
-                  <Switch checked={account.connected} onCheckedChange={() => handleToggleAccount(account.id)} />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Followers</span>
-                    <span className="text-sm font-medium">{account.followers.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Posts This Month</span>
-                    <span className="text-sm font-medium">{Math.floor(Math.random() * 20) + 5}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Engagement Rate</span>
-                    <span className="text-sm font-medium">{(Math.random() * 5 + 1).toFixed(1)}%</span>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="border-t px-6 py-4">
-                <Button variant="ghost" size="sm" className="w-full" onClick={() => handleViewAnalytics(account)}>
-                  View Analytics
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-          <Card className="card-shadow border-dashed">
-            <CardContent className="p-6 flex flex-col items-center justify-center h-full text-center">
-              <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center mb-3">
-                <Plus className="h-5 w-5 text-primary" />
-              </div>
-              <p className="font-medium mb-1">Connect New Account</p>
-              <p className="text-xs text-muted-foreground mb-4">Add more social platforms to your Genius dashboard</p>
-              <Button variant="outline" size="sm" onClick={() => setShowConnect(true)}>
-                Connect Platform
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Tabs defaultValue="compose" className="w-full">
+        <Tabs defaultValue="automation" className="w-full">
           <TabsList className="mb-8">
-            <TabsTrigger value="compose">Compose</TabsTrigger>
-            <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-            <TabsTrigger value="published">Published</TabsTrigger>
-            <TabsTrigger value="analytics">Post Analytics</TabsTrigger>
+            <TabsTrigger value="automation">Automation</TabsTrigger>
+            <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="compose">
-            <Card className="card-shadow">
-              <CardHeader>
-                <CardTitle>Create New Post</CardTitle>
-                <CardDescription>Write content to share across your social platforms</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <Textarea 
-                    placeholder="What would you like to share?" 
-                    className="resize-none min-h-28"
-                  />
-                  
-                  <div className="flex flex-wrap gap-3 justify-start">
-                    <Button variant="outline" className="flex gap-2">
-                      <Image className="h-4 w-4" />
-                      Add Image
-                    </Button>
-                    <Button variant="outline" className="flex gap-2">
-                      <Calendar className="h-4 w-4" />
-                      Schedule
-                    </Button>
-                    <Button variant="outline" className="flex gap-2">
-                      <Sparkles className="h-4 w-4" />
-                      AI Suggestions
-                    </Button>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium mb-3">Post to:</h4>
-                    <div className="flex flex-wrap gap-3">
-                      {accounts
-                        .filter(account => account.connected)
-                        .map((account) => (
-                          <div key={account.id} className="flex items-center gap-2 p-2 border rounded-md">
-                            {getPlatformIcon(account.platform)}
-                            <span className="text-sm">{getPlatformName(account.platform)}</span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-end gap-2">
-                <Button variant="outline">Save Draft</Button>
-                <Button>Publish Now</Button>
-              </CardFooter>
-            </Card>
+          <TabsContent value="automation">
+            <SocialMediaAutomation />
           </TabsContent>
 
-          <TabsContent value="scheduled">
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium">Upcoming Posts</h3>
-              
-              {scheduledPosts.map((post) => (
-                <Card key={post.id} className="card-shadow">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
+          <TabsContent value="accounts">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {accounts.map((account) => (
+                <Card key={account.id} className="card-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center">
-                        <Calendar className="h-4 w-4 text-primary mr-2" />
-                        <span className="text-sm font-medium">
-                          Scheduled for {formatDate(post.scheduledDate)}
-                        </span>
+                        <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center mr-3">
+                          {getPlatformIcon(account.platform)}
+                        </div>
+                        <div>
+                          <p className="font-medium">{getPlatformName(account.platform)}</p>
+                          <p className="text-xs text-muted-foreground">{account.username}</p>
+                        </div>
                       </div>
-                      <div className="flex gap-1">
-                        {post.platforms.map((platform) => (
-                          <div key={platform} className="h-6 w-6">
-                            {getPlatformIcon(platform)}
-                          </div>
-                        ))}
+                      <Switch checked={account.connected} onCheckedChange={() => handleToggleAccount(account.id)} />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Followers</span>
+                        <span className="text-sm font-medium">{account.followers.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Posts This Month</span>
+                        <span className="text-sm font-medium">{Math.floor(Math.random() * 20) + 5}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Engagement Rate</span>
+                        <span className="text-sm font-medium">{(Math.random() * 5 + 1).toFixed(1)}%</span>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm mb-3">{post.content}</p>
-                    {post.image && (
-                      <div className="w-full h-48 bg-secondary/50 rounded-md flex items-center justify-center overflow-hidden">
-                        <img src={post.image} alt="Post preview" className="w-full h-full object-cover" />
-                      </div>
-                    )}
                   </CardContent>
-                  <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm">Edit</Button>
-                    <Button variant="ghost" size="sm">Cancel</Button>
+                  <CardFooter className="border-t px-6 py-4">
+                    <Button variant="ghost" size="sm" className="w-full" onClick={() => handleViewAnalytics(account)}>
+                      View Analytics
+                    </Button>
                   </CardFooter>
                 </Card>
               ))}
+              <Card className="card-shadow border-dashed">
+                <CardContent className="p-6 flex flex-col items-center justify-center h-full text-center">
+                  <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center mb-3">
+                    <Plus className="h-5 w-5 text-primary" />
+                  </div>
+                  <p className="font-medium mb-1">Connect New Account</p>
+                  <p className="text-xs text-muted-foreground mb-4">Add more social platforms to your Genius dashboard</p>
+                  <Button variant="outline" size="sm" onClick={() => setShowConnect(true)}>
+                    Connect Platform
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
-          <TabsContent value="published">
+          <TabsContent value="analytics">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+              <Card className="card-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Total Followers</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">24.5K</div>
+                  <div className="flex items-center mt-1 text-xs text-green-600">
+                    <ArrowRight className="h-3 w-3 mr-1 rotate-45" />
+                    <span>12% from last month</span>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="card-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Engagement Rate</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">3.2%</div>
+                  <div className="flex items-center mt-1 text-xs text-green-600">
+                    <ArrowRight className="h-3 w-3 mr-1 rotate-45" />
+                    <span>0.5% from last month</span>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="card-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Link Clicks</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">1,245</div>
+                  <div className="flex items-center mt-1 text-xs text-green-600">
+                    <ArrowRight className="h-3 w-3 mr-1 rotate-45" />
+                    <span>18% from last month</span>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="card-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Posts Published</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">28</div>
+                  <div className="flex items-center mt-1 text-xs text-green-600">
+                    <ArrowRight className="h-3 w-3 mr-1 rotate-45" />
+                    <span>4 more than last month</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
             <div className="space-y-6">
               <h3 className="text-lg font-medium">Recent Posts</h3>
               
@@ -406,17 +377,6 @@ const SocialMedia = () => {
                 </Card>
               ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <Card className="card-shadow">
-              <CardHeader>
-                <CardTitle>Post Performance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Detailed post analytics will be displayed here.</p>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>

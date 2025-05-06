@@ -565,13 +565,7 @@ export const authenticate = async (request: FastifyRequest, reply: FastifyReply)
   }
 };
 
-// Validate and convert string role to UserRole enum
-const toUserRole = (role: string): UserRole => {
-  if (Object.values(UserRole).includes(role as UserRole)) {
-    return role as UserRole;
-  }
-  throw new Error(`Invalid role: ${role}`);
-};
+
 
 // Role hierarchy definition - each role includes all permissions of roles below it
 const roleHierarchy: Record<UserRole, number> = {

@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
@@ -7,7 +6,7 @@ import SocialMedia from './pages/SocialMedia';
 import AdCampaigns from './pages/AdCampaigns';
 import AiContent from './pages/AiContent';
 import Settings from './pages/Settings';
-import TeamManagement from './pages/TeamManagement';
+import TeamManagementWithProvider from './pages/TeamManagement';
 import Reports from './pages/Reports';
 import Integrations from './pages/Integrations';
 import ContentAnalytics from './pages/ContentAnalytics';
@@ -19,6 +18,8 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import DeveloperDashboard from './pages/developer/DeveloperDashboard';
 import SocialMediaDashboard from './pages/innovation/SocialMediaDashboard';
+import JobsExplorer from './pages/JobsExplorer';
+import Hiring from './pages/Hiring';
 
 const router = createBrowserRouter([
   {
@@ -71,7 +72,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/team",
-        element: <TeamManagement />,
+        element: <TeamManagementWithProvider />,
       },
       {
         path: "/reports",
@@ -88,6 +89,14 @@ const router = createBrowserRouter([
       {
         path: "/developer",
         element: <DeveloperDashboard />,
+      },
+      {
+        path: "/jobs",
+        element: <JobsExplorer />,
+      },
+      {
+        path: "/hiring",
+        element: <Hiring />,
       },
     ]
   },

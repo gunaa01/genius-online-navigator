@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   BarChart3,
@@ -16,6 +16,7 @@ import {
   Users2,
   Sparkle,
   Brain,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,9 @@ const Sidebar = ({ onCollapse }: { onCollapse?: (collapsed: boolean) => void }) 
   const [isOpen, setIsOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false); // desktop collapsed state
   const { pathname } = useLocation();
+  const hoverTimerRef = useRef<number | null>(null);
+  const navigationTimerRef = useRef<number | null>(null);
+  const preventHoverExpandRef = useRef(false);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -37,23 +41,52 @@ const Sidebar = ({ onCollapse }: { onCollapse?: (collapsed: boolean) => void }) 
     if (!isMobile) {
       setCollapsed(true);
       if (onCollapse) onCollapse(true);
+      
+      // Prevent immediate expansion after navigation for a short period
+      preventHoverExpandRef.current = true;
+      if (navigationTimerRef.current) {
+        window.clearTimeout(navigationTimerRef.current);
+      }
+      navigationTimerRef.current = window.setTimeout(() => {
+        preventHoverExpandRef.current = false;
+      }, 500); // 500ms delay before allowing hover expansion again
     }
     if (isMobile) setIsOpen(false);
   };
 
-  // Expand sidebar on hover (desktop only)
+  // Expand sidebar on hover (desktop only) with a slight delay
   const handleMouseEnter = () => {
+    if (preventHoverExpandRef.current) return;
+    
     if (!isMobile && collapsed) {
-      setCollapsed(false);
-      if (onCollapse) onCollapse(false);
+      // Add a small delay to prevent unwanted expansions
+      hoverTimerRef.current = window.setTimeout(() => {
+        setCollapsed(false);
+        if (onCollapse) onCollapse(false);
+      }, 200); // 200ms delay before expanding
     }
   };
+  
   const handleMouseLeave = () => {
+    // Clear any pending hover timer
+    if (hoverTimerRef.current) {
+      window.clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    
     if (!isMobile && !collapsed) {
       setCollapsed(true);
       if (onCollapse) onCollapse(true);
     }
   };
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current);
+      if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isMobile || !isOpen) return;
@@ -76,6 +109,7 @@ const Sidebar = ({ onCollapse }: { onCollapse?: (collapsed: boolean) => void }) 
     { name: "Ad Campaigns", href: "/ads", icon: Target },
     { name: "Social Media", href: "/social", icon: Share2 },
     { name: "AI Content", href: "/content", icon: MessageSquare },
+    { name: "Jobs", href: "/jobs", icon: Briefcase },
     { name: "Community", href: "/community", icon: Users2 },
     { name: "Integrations", href: "/integrations", icon: Plug },
     { name: "Team", href: "/team", icon: Users },

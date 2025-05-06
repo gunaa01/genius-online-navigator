@@ -1,11 +1,14 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Briefcase, Users, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchBar from "@/components/hire/SearchBar";
 import FreelancersList from "@/components/hire/FreelancersList";
 import FreelancerFeature from "@/components/hire/FreelancerFeature";
+import JobListings from "@/components/JobListings";
+import { MarketplaceProvider } from "@/contexts/MarketplaceContext";
 
 // Mock data for freelancers
 const freelancers = [
@@ -91,11 +94,15 @@ const categories = [
 ];
 
 const Hire = () => {
+  // Removed local filter/search state; now handled by MarketplaceContext
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Development");
+  const [activeTab, setActiveTab] = useState("freelancers");
 
   return (
-    <div className="min-h-screen bg-background">
+    <MarketplaceProvider>
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" asChild>
@@ -114,26 +121,66 @@ const Hire = () => {
 
         {/* Hero section */}
         <div className="text-center mb-8 max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-4">Find the perfect freelancer for your business</h1>
+          <h1 className="text-3xl font-bold mb-4">Talent Marketplace</h1>
           <p className="text-muted-foreground mb-8">
-            Browse our talented pool of freelancers to help you take your business online and grow your digital presence.
+            Find the perfect talent for your business or browse available job opportunities.
           </p>
-          
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </div>
-
-        {/* Categories and Freelancers listing */}
-        <FreelancersList 
-          categories={categories}
-          freelancers={freelancers}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-        />
         
-        {/* Features section */}
-        <FreelancerFeature />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8">
+            <TabsTrigger value="freelancers">
+              <Users className="h-4 w-4 mr-2" />
+              Find Freelancers
+            </TabsTrigger>
+            <TabsTrigger value="jobs">
+              <Briefcase className="h-4 w-4 mr-2" />
+              Browse Jobs
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="freelancers">
+            <div className="mb-8 max-w-3xl mx-auto">
+              <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+            </div>
+            
+            {/* Categories and Freelancers listing */}
+            <FreelancersList 
+              categories={categories}
+              freelancers={freelancers}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+            />
+            
+            {/* Features section */}
+            <FreelancerFeature />
+          </TabsContent>
+          
+          <TabsContent value="jobs">
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold">Available Job Opportunities</h2>
+                  <p className="text-muted-foreground">Browse through job listings from businesses looking for talent</p>
+                </div>
+                <Link to="/hiring/post-job">
+                  <Button>
+                    <Briefcase className="h-4 w-4 mr-2" />
+                    Post a Job
+                  </Button>
+                </Link>
+              </div>
+              
+              <JobListings />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
+  );
+};
+
+      </MarketplaceProvider>
   );
 };
 

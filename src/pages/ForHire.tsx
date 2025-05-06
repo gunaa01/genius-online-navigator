@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,12 +22,20 @@ import {
   Database,
   ArrowRightLeft,
   Users,
-  Truck
+  Truck,
+  Briefcase,
+  ListFilter
 } from "lucide-react";
+import GigListings from "@/components/GigListings";
+import { MarketplaceProvider } from "@/contexts/MarketplaceContext";
 
 const ForHire = () => {
+  // Removed local filter/search state; now handled by MarketplaceContext
+
+  const [activeTab, setActiveTab] = useState("roles");
   return (
-    <div className="min-h-screen bg-background">
+    <MarketplaceProvider>
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <Button variant="ghost" className="mb-6" asChild>
           <Link to="/offline-to-online">
@@ -35,13 +44,26 @@ const ForHire = () => {
           </Link>
         </Button>
         
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <header className="mb-8 text-center">
-            <h1 className="text-3xl font-bold mb-4">Key Roles to Hire</h1>
-            <p className="text-lg text-muted-foreground">Essential roles to consider when taking your business online</p>
+            <h1 className="text-3xl font-bold mb-4">For Hire Marketplace</h1>
+            <p className="text-lg text-muted-foreground">Find the right talent or browse available gigs for your online business</p>
           </header>
 
-          <Tabs defaultValue="tech" className="mb-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="roles">
+                <Briefcase className="h-4 w-4 mr-2" />
+                Key Roles to Hire
+              </TabsTrigger>
+              <TabsTrigger value="gigs">
+                <ListFilter className="h-4 w-4 mr-2" />
+                Browse Available Gigs
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="roles" className="mt-6">
+              <Tabs defaultValue="tech" className="mb-8">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="tech">Website & Tech</TabsTrigger>
               <TabsTrigger value="marketing">Marketing & Visibility</TabsTrigger>
@@ -256,9 +278,9 @@ const ForHire = () => {
                 </Card>
               </div>
             </TabsContent>
-          </Tabs>
+              </Tabs>
 
-          <div className="bg-muted p-6 rounded-lg">
+              <div className="bg-muted p-6 rounded-lg">
             <h3 className="text-xl font-bold mb-4">Budget-Based Hiring Guide</h3>
             <div className="grid md:grid-cols-3 gap-6">
               <Card>
@@ -303,10 +325,28 @@ const ForHire = () => {
                 </CardContent>
               </Card>
             </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="gigs" className="mt-6">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold mb-4">Available Gigs</h2>
+                <p className="text-muted-foreground mb-6">Browse through available gigs from talented freelancers ready to help with your online business needs.</p>
+                
+                <GigListings 
+                  showFilters={true}
+                  limit={6}
+                />
+              </div>
+            </TabsContent>
           </div>
         </div>
       </div>
     </div>
+  );
+};
+
+      </MarketplaceProvider>
   );
 };
 

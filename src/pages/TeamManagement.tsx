@@ -1,682 +1,718 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { MessageProvider, useMessages } from "@/contexts/MessageContext";
+import EnhancedMessageThread from "@/components/EnhancedMessageThread";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Users, 
-  UserPlus, 
-  Mail, 
-  Shield, 
-  UserMinus, 
-  Edit,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Save,
-  Key
-} from "lucide-react";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { Users, UserPlus, Search, Mail, Trash2, Settings, Plus } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "@/components/ui/use-toast";
+import StyledUserProfileCard from "@/components/StyledUserProfileCard";
+import { DeleteTeamDialog } from "@/components/DeleteTeamDialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useHotkeys } from 'react-hotkeys-hook';
 
-// Type definitions for team members and invites
+type TeamRole = 'owner' | 'admin' | 'member' | 'viewer';
+type TeamStatus = 'active' | 'inactive' | 'pending';
+
 interface TeamMember {
-  id: number;
+  id: number | string;
   name: string;
   email: string;
-  role: string;
-  avatar: string | null;
-  status: string;
-  lastActive: string | null;
+  role: TeamRole;
+  status: TeamStatus;
+  lastActive: string;
+  avatar?: string;
 }
-interface PendingInvite {
-  id: number;
+
+interface Invite {
+  id: string;
   email: string;
-  role: string;
-  sentAt: string;
-  expires: string;
+  role: TeamRole;
+  status: 'pending' | 'accepted' | 'expired';
+  invitedAt: string;
+  expiresAt: string;
 }
 
-const TeamManagement = () => {
-  const [showInviteForm, setShowInviteForm] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('marketing');
-  const [inviteMessage, setInviteMessage] = useState('');
+const roleHierarchy: Record<TeamRole, number> = {
+  owner: 4,
+  admin: 3,
+  member: 2,
+  viewer: 1
+};
+
+const rolePermissions: Record<TeamRole, string[]> = {
+  owner: ['manage_team', 'manage_members', 'manage_roles', 'view_analytics'],
+  admin: ['manage_members', 'view_analytics'],
+  member: ['create_content', 'edit_own_content'],
+  viewer: ['view_content']
+};
+
+const TeamChatTab = () => {
+  const { messages, sendMessage, markAsRead, loading } = useMessages();
   const { user } = useAuth();
-  
-  // Demo team members data - would be replaced with actual data from Supabase
-  const teamMembersDemo: TeamMember[] = [
-    {
-      id: 1,
-      name: "John Smith",
-      email: "john@example.com",
-      role: "admin",
-      avatar: null,
-      status: "active",
-      lastActive: "2025-04-16T10:30:00",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      email: "sarah@example.com",
-      role: "marketing",
-      avatar: null,
-      status: "active",
-      lastActive: "2025-04-15T16:45:00",
-    },
-    {
-      id: 3,
-      name: "Michael Wong",
-      email: "michael@example.com",
-      role: "analyst",
-      avatar: null,
-      status: "active",
-      lastActive: "2025-04-16T09:15:00",
-    },
-    {
-      id: 4,
-      name: "Emily Davis",
-      email: "emily@example.com",
-      role: "marketing",
-      avatar: null,
-      status: "pending",
-      lastActive: null,
-    },
-  ];
-  
-  const pendingInvitesDemo: PendingInvite[] = [
-    {
-      id: 1,
-      email: "alex@example.com",
-      role: "marketing",
-      sentAt: "2025-04-14T11:20:00",
-      expires: "2025-04-21T11:20:00"
-    },
-    {
-      id: 2,
-      email: "jessica@example.com",
-      role: "analyst",
-      sentAt: "2025-04-15T09:45:00",
-      expires: "2025-04-22T09:45:00"
-    }
-  ];
 
-  useEffect(() => {
-    // In a real implementation, this would fetch data from Supabase
-    setTeamMembers(teamMembersDemo);
-    setPendingInvites(pendingInvitesDemo);
-  }, []);
-
-  const rolePermissions = {
-    admin: {
-      name: "Administrator",
-      description: "Full access to all features and settings",
-      permissions: [
-        "View and manage all data",
-        "Invite and manage team members",
-        "Configure integrations",
-        "Generate reports",
-        "Manage subscription",
-        "Access billing information"
-      ]
-    },
-    marketing: {
-      name: "Marketing Manager",
-      description: "Manage marketing campaigns and content",
-      permissions: [
-        "View analytics dashboard",
-        "Create and schedule social posts",
-        "Generate AI content",
-        "Manage ad campaigns",
-        "View reports",
-        "Limited integrations access"
-      ]
-    },
-    analyst: {
-      name: "Data Analyst",
-      description: "Access to data and analytics",
-      permissions: [
-        "View analytics dashboard",
-        "Generate and download reports",
-        "Access data integrations",
-        "Limited ad campaigns access",
-        "View social media performance",
-        "No billing access"
-      ]
-    }
+  const handleSendMessage = async (content: string) => {
+    await sendMessage(content);
   };
 
-  const getRoleBadge = (role: string) => {
-    switch(role) {
-      case "admin":
-        return <Badge className="bg-primary/20 text-primary hover:bg-primary/30">Administrator</Badge>;
-      case "marketing":
-        return <Badge className="bg-accent/20 text-accent hover:bg-accent/30">Marketing Manager</Badge>;
-      case "analyst":
-        return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Data Analyst</Badge>;
-      default:
-        return <Badge variant="outline">Unknown Role</Badge>;
-    }
-  };
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Never";
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-  };
-
-  const toggleInviteForm = () => {
-    setShowInviteForm(!showInviteForm);
-  };
-
-  const handleSendInvitation = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inviteEmail) {
-      toast({
-        title: "Error",
-        description: "Please enter an email address",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    
-    try {
-      // In a real implementation, this would send an invitation through Supabase
-      // For demo purposes, we're just adding the invite to the list
-      const newInvite = {
-        id: pendingInvites.length + 1,
-        email: inviteEmail,
-        role: inviteRole,
-        sentAt: new Date().toISOString(),
-        expires: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)).toISOString() // 7 days from now
-      };
-      
-      setPendingInvites([...pendingInvites, newInvite]);
-      
-      toast({
-        title: "Invitation sent",
-        description: `An invitation has been sent to ${inviteEmail}`,
-      });
-      
-      // Reset form
-      setInviteEmail('');
-      setInviteMessage('');
-      setShowInviteForm(false);
-      
-    } catch (error) {
-      console.error("Error sending invitation:", error);
-      toast({
-        title: "Error",
-        description: "Failed to send invitation. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendInvitation = (inviteId: number) => {
-    const invite = pendingInvites.find(invite => invite.id === inviteId);
-    if (invite) {
-      toast({
-        title: "Invitation resent",
-        description: `The invitation has been resent to ${invite.email}`,
-      });
-    }
-  };
-
-  const handleCancelInvitation = (inviteId: number) => {
-    setPendingInvites(pendingInvites.filter(invite => invite.id !== inviteId));
-    toast({
-      title: "Invitation cancelled",
-      description: "The invitation has been cancelled",
-    });
-  };
-
-  const handleEditMember = (memberId: number) => {
-    // In a real implementation, this would open a modal to edit the member
-    toast({
-      title: "Edit member",
-      description: "This feature is not yet implemented",
-    });
-  };
-
-  const handleRemoveMember = (memberId: number) => {
-    setTeamMembers(teamMembers.filter(member => member.id !== memberId));
-    toast({
-      title: "Member removed",
-      description: "The team member has been removed",
-    });
-  };
-
-  const handleCreateCustomRole = () => {
-    toast({
-      title: "Create custom role",
-      description: "This feature is not yet implemented",
-    });
-  };
-
-  const handleEditRole = (role: string) => {
-    toast({
-      title: "Edit role",
-      description: `Editing the ${rolePermissions[role].name} role`,
-    });
-  };
-
-  const handleToggleSecurity = (setting: string) => {
-    toast({
-      title: "Security setting updated",
-      description: `The ${setting} setting has been updated`,
-    });
+  const handleMessageRead = (messageId: string) => {
+    markAsRead(messageId);
   };
 
   return (
-    <DashboardLayout>
-      <div className="flex flex-col space-y-8">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">Team Management</h1>
-            <p className="text-muted-foreground">Manage your team members and their permissions</p>
-          </div>
-          <Button onClick={() => window.location.href = '/team/invite'}>
-            <UserPlus className="mr-2 h-4 w-4" /> Invite Team Member
-          </Button>
-        </header>
+    <div className="h-[calc(100vh-200px)]">
+      <EnhancedMessageThread
+        messages={messages}
+        onSend={handleSendMessage}
+        loading={loading}
+        currentUserId={user?.id || ''}
+        channelId="team"
+        onMessageRead={handleMessageRead}
+      />
+    </div>
+  );
+};
 
-        {showInviteForm && (
-          <Card className="card-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg">Invite New Team Member</CardTitle>
-              <CardDescription>
-                Send an invitation email to add someone to your team
-              </CardDescription>
-            </CardHeader>
-            <form onSubmit={handleSendInvitation}>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Email Address</label>
-                    <div className="flex">
-                      <div className="relative flex-grow">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input 
-                          placeholder="colleague@example.com" 
-                          className="pl-9" 
-                          value={inviteEmail}
-                          onChange={(e) => setInviteEmail(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Role</label>
-                    <Select 
-                      value={inviteRole} 
-                      onValueChange={setInviteRole}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Administrator</SelectItem>
-                        <SelectItem value="marketing">Marketing Manager</SelectItem>
-                        <SelectItem value="analyst">Data Analyst</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <label className="text-sm font-medium">Personal Message (Optional)</label>
-                  <Input 
-                    placeholder="Add a personal note to the invitation email..."
-                    className="mt-2"
-                    value={inviteMessage}
-                    onChange={(e) => setInviteMessage(e.target.value)}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-end gap-2">
+const TeamManagement = () => {
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSavingRole, setIsSavingRole] = useState<number | string | null>(null);
+  const [teamName, setTeamName] = useState('My Team');
+  
+  // Add keyboard shortcut for inviting members (Ctrl+Shift+I or Cmd+Shift+I)
+  useHotkeys('ctrl+shift+i, command+shift+i', (e) => {
+    e.preventDefault();
+    if (canPerformAction('invite', user?.role as TeamRole)) {
+      setActiveTab('invites');
+      setShowInviteForm(true);
+    }
+  }, [user?.role]);
+
+  // Add keyboard shortcut for searching (Ctrl+K or Cmd+K)
+  useHotkeys('ctrl+k, command+k', (e) => {
+    e.preventDefault();
+    const searchInput = document.getElementById('member-search');
+    searchInput?.focus();
+  }, []);
+  const [teamDescription, setTeamDescription] = useState('Our awesome team working together');
+  const [activeTab, setActiveTab] = useState('members');
+  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const PendingInvites: React.FC<{
+    invites: Invite[];
+    onInvitesChange: (invites: Invite[]) => void;
+    showForm: boolean;
+    onShowFormChange: (show: boolean) => void;
+  }> = ({ invites, onInvitesChange, showForm, onShowFormChange }) => {
+    const [localEmail, setLocalEmail] = useState('');
+    const [localRole, setLocalRole] = useState<TeamRole>('member');
+    
+    const handleAddInvite = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!localEmail || !localRole) return;
+      
+      const newInvite: Invite = {
+        id: Date.now().toString(),
+        email: localEmail,
+        role: localRole,
+        status: 'pending',
+        invitedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      };
+      
+      onInvitesChange([...invites, newInvite]);
+      setLocalEmail('');
+      setLocalRole('member');
+      onShowFormChange(false);
+      
+      toast({
+        title: "Invite sent",
+        description: `An invitation has been sent to ${localEmail}.`,
+      });
+    };
+    
+    return (
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle>Pending Invites</CardTitle>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onShowFormChange(!showForm)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {showForm ? 'Cancel' : 'Invite Member'}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {showForm && (
+          <form onSubmit={handleAddInvite} className="mb-6 p-4 border rounded-lg">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter email address"
+                  value={localEmail}
+                  onChange={(e) => setLocalEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="role">Role</Label>
+                <Select 
+                  value={localRole} 
+                  onValueChange={(value) => setLocalRole(value as TeamRole)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="member">Member</SelectItem>
+                    <SelectItem value="viewer">Viewer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end space-x-2">
                 <Button 
-                  variant="outline" 
                   type="button" 
-                  onClick={toggleInviteForm}
+                  variant="outline" 
+                  onClick={() => onShowFormChange(false)}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Sending...' : 'Send Invitation'}
-                </Button>
-              </CardFooter>
-            </form>
-          </Card>
+                <Button type="submit">Send Invite</Button>
+              </div>
+            </div>
+          </form>
         )}
-
-        <Tabs defaultValue="members" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="members">Team Members</TabsTrigger>
-            <TabsTrigger value="invites">Pending Invites</TabsTrigger>
-            <TabsTrigger value="roles">Roles & Permissions</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="members">
-            <Card className="card-shadow">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <Users className="h-5 w-5 mr-2 text-primary" />
-                  Team Members
-                </CardTitle>
-                <CardDescription>
-                  Manage your team members and their roles
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
-                  <div className="grid grid-cols-12 bg-secondary/50 p-3 text-sm">
-                    <div className="col-span-3 font-medium">User</div>
-                    <div className="col-span-3 font-medium">Email</div>
-                    <div className="col-span-2 font-medium">Role</div>
-                    <div className="col-span-2 font-medium">Status</div>
-                    <div className="col-span-2 font-medium text-right">Actions</div>
-                  </div>
-                  {teamMembers.map((member) => (
-                    <div key={member.id} className="grid grid-cols-12 py-4 px-3 border-t items-center">
-                      <div className="col-span-3">
-                        <div className="flex items-center">
-                          <Avatar className="h-8 w-8 mr-3">
-                            <AvatarImage src={member.avatar || ""} />
-                            <AvatarFallback className="bg-primary/10 text-primary">
-                              {member.name.split(' ').map(n => n[0]).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{member.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              Last active: {formatDate(member.lastActive)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-span-3 text-sm">
-                        {member.email}
-                      </div>
-                      <div className="col-span-2">
-                        {getRoleBadge(member.role)}
-                      </div>
-                      <div className="col-span-2">
-                        {member.status === "active" ? (
-                          <div className="flex items-center">
-                            <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-                            <span className="text-sm">Active</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center">
-                            <div className="h-2 w-2 rounded-full bg-amber-500 mr-2"></div>
-                            <span className="text-sm">Pending</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="col-span-2 flex justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleEditMember(member.id)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        {member.id !== 1 && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleRemoveMember(member.id)}
-                          >
-                            <UserMinus className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+        {invites.length > 0 ? (
+          <div className="space-y-4">
+            {invites.map((invite) => (
+              <div key={invite.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <p className="font-medium">{invite.email}</p>
+                  <p className="text-sm text-muted-foreground">Invited as {invite.role}</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    onInvitesChange(invites.filter((i) => i.id !== invite.id));
+                    toast({
+                      title: "Invite revoked",
+                      description: `Invitation to ${invite.email} has been revoked.`,
+                    });
+                  }}
+                >
+                  Revoke
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-8">No pending invites</p>
+        )}
+      </CardContent>
+    </Card>
+  );
 
-          <TabsContent value="invites">
-            <Card className="card-shadow">
+  const [pendingInvites, setPendingInvites] = useState<Invite[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [allowInvites, setAllowInvites] = useState(true);
+  const [allowProjectCreation, setAllowProjectCreation] = useState(true);
+
+  const canPerformAction = (action: string, userRole?: TeamRole, targetRole?: TeamRole, targetUserId?: string | number): boolean => {
+    if (!userRole) return false;
+    
+    // Owner can do everything
+    if (userRole === 'owner') return true;
+    
+    // Check action-specific permissions
+    switch (action) {
+      case 'invite':
+        return ['admin', 'member'].includes(userRole);
+      case 'edit_role':
+        return (
+          ['admin'].includes(userRole) && 
+          targetRole && 
+          roleHierarchy[userRole] > roleHierarchy[targetRole] &&
+          targetUserId !== user?.id
+        );
+      case 'remove':
+        return (
+          ['admin'].includes(userRole) && 
+          targetRole && 
+          roleHierarchy[userRole] > roleHierarchy[targetRole] &&
+          targetUserId !== user?.id
+        );
+      case 'update_settings':
+      case 'delete_team':
+        return userRole === 'admin';
+      default:
+        return false;
+    }
+  };
+  
+  // Backward compatibility
+  const canEditRole = (currentUserRole: TeamRole, targetRole: TeamRole, targetUserId: string | number): boolean => {
+    return canPerformAction('edit_role', currentUserRole, targetRole, targetUserId);
+  };
+
+  const handleEditMember = (id: string | number) => {
+    const member = teamMembers.find(m => m.id === id);
+    if (member) {
+      toast({
+        title: "Edit Member",
+        description: `Editing ${member.name}'s profile`
+      });
+    }
+  };
+
+  const handleRemoveMember = async (memberId: number | string) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const filteredMembers = React.useMemo(() => {
+        if (isLoading) return [];
+        if (!searchQuery) return teamMembers;
+        const query = searchQuery.toLowerCase();
+        return teamMembers.filter(member => 
+          member.name.toLowerCase().includes(query) || 
+          member.email.toLowerCase().includes(query) ||
+          member.role.toLowerCase().includes(query)
+        );
+      }, [teamMembers, searchQuery, isLoading]);
+
+      useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+          // Add any additional keyboard shortcuts here
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, []);
+
+      const member = filteredMembers.find(m => m.id === memberId);
+      if (member) {
+        setTeamMembers(filteredMembers.filter(m => m.id !== memberId));
+        toast({
+          title: "Member removed",
+          description: `${member.name} has been removed from the team.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to remove team member. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleMessageMember = (id: string | number) => {
+    const member = teamMembers.find(m => m.id === id);
+    if (member) {
+      toast({
+        title: "Message Member",
+        description: `Messaging ${member.name}...`
+      });
+    }
+  };
+
+  useEffect(() => {
+    const demoTeamMembers: TeamMember[] = [
+      {
+        id: 1,
+        name: "John Doe",
+        email: "john@example.com",
+        role: "owner",
+        status: "active",
+        lastActive: new Date().toISOString(),
+      },
+      {
+        id: 2,
+        name: "Jane Smith",
+        email: "jane@example.com",
+        role: "admin",
+        status: "active",
+        lastActive: new Date(Date.now() - 3600000).toISOString(),
+      },
+      {
+        id: 3,
+        name: "Bob Johnson",
+        email: "bob@example.com",
+        role: "member",
+        status: "pending",
+        lastActive: new Date(Date.now() - 86400000).toISOString(),
+      }
+    ];
+
+    const demoInvites: Invite[] = [
+      {
+        id: "1",
+        email: "alice@example.com",
+        role: "member",
+        status: "pending",
+        invitedAt: new Date(Date.now() - 3600000).toISOString(),
+        expiresAt: new Date(Date.now() + 6 * 24 * 3600000).toISOString()
+      },
+      {
+        id: "2",
+        email: "charlie@example.com",
+        role: "developer",
+        status: "pending",
+      'owner': ['Manage team', 'Invite members', 'Remove members', 'Edit projects', 'View billing', 'Delete team'],
+      'admin': ['Manage team', 'Invite members', 'Remove members', 'Edit projects', 'View billing'],
+      'member': ['View projects', 'Create content', 'Edit own content'],
+      'viewer': ['View projects']
+    };
+    return permissions[role] || [];
+  };
+
+  const handleRoleChange = async (memberId: number | string, newRole: string) => {
+    try {
+      setIsSavingRole(memberId);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      setTeamMembers(teamMembers.map(member => 
+        member.id === memberId ? { ...member, role: newRole as TeamRole } : member
+      ));
+      
+      const member = teamMembers.find(m => m.id === memberId);
+      if (member) {
+        toast({
+          title: "Role updated",
+          description: `${member.name}'s role has been updated to ${newRole}.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update role. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSavingRole(null);
+    }
+  };
+
+  const handleStatusChange = async (memberId: number | string, newStatus: string) => {
+    try {
+      setIsSavingRole(memberId);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setTeamMembers(teamMembers.map(member => 
+        member.id === memberId ? { ...member, status: newStatus as 'active' | 'inactive' | 'pending' } : member
+      ));
+      
+      const member = teamMembers.find(m => m.id === memberId);
+      if (member) {
+        toast({
+          title: "Status updated",
+          description: `${member.name}'s status has been updated to ${newStatus}.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update status. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSavingRole(null);
+    }
+  };
+
+  const handleInvitesChange = (newInvites: Invite[]) => {
+    setPendingInvites(newInvites);
+  };
+
+  const handleDeleteTeam = () => {
+    // In a real app, this would call an API to delete the team
+    toast({
+      title: "Team deleted",
+      description: `The team "${teamName}" has been deleted.`,
+      variant: "destructive"
+    });
+    // Reset form
+    setTeamName('');
+    setTeamDescription('');
+    setShowDeleteDialog(false);
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="container mx-auto p-6">
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-64" />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <div className="flex items-center space-x-4">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-48" />
+                        <Skeleton className="h-3 w-32" />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  return (
+    <DashboardLayout>
+      <div className="container mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Team Management</h1>
+          <Button 
+            onClick={() => {
+              setActiveTab('invites');
+              setShowInviteForm(true);
+            }}
+            disabled={!canPerformAction('invite', user?.role as TeamRole)}
+            title={!canPerformAction('invite', user?.role as TeamRole) ? 'You do not have permission to invite members' : ''}
+          >
+            <UserPlus className="mr-2 h-4 w-4" />
+            Invite Team Member <span className="ml-2 text-xs opacity-60">(⌘⇧I)</span>
+          </Button>
+        </div>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="members">
+              <Users className="w-4 h-4 mr-2" />
+              Members
+            </TabsTrigger>
+            <TabsTrigger value="chat">
+              <Chat className="w-4 h-4 mr-2" />
+              Team Chat
+            </TabsTrigger>
+            <TabsTrigger value="invites">
+              <Mail className="w-4 h-4 mr-2" />
+              Invites
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="members">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <Mail className="h-5 w-5 mr-2 text-primary" />
-                  Pending Invitations
-                </CardTitle>
-                <CardDescription>
-                  Manage outstanding team invitations
-                </CardDescription>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Team Members</CardTitle>
+                  <div className="relative w-64">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="member-search"
+                      type="search"
+                      placeholder="Search team members..."
+                      className="pl-8"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      aria-label="Search team members"
+                    />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                {pendingInvites.length > 0 ? (
-                  <div className="rounded-md border">
-                    <div className="grid grid-cols-10 bg-secondary/50 p-3 text-sm">
-                      <div className="col-span-4 font-medium">Email</div>
-                      <div className="col-span-2 font-medium">Role</div>
-                      <div className="col-span-2 font-medium">Sent</div>
-                      <div className="col-span-2 font-medium text-right">Actions</div>
-                    </div>
-                    {pendingInvites.map((invite) => (
-                      <div key={invite.id} className="grid grid-cols-10 py-4 px-3 border-t items-center">
-                        <div className="col-span-4">
-                          {invite.email}
-                        </div>
-                        <div className="col-span-2">
-                          {getRoleBadge(invite.role)}
-                        </div>
-                        <div className="col-span-2 text-sm">
-                          <div className="flex flex-col">
-                            <span>{formatDate(invite.sentAt)}</span>
-                            <span className="text-xs text-muted-foreground">
-                              Expires: {formatDate(invite.expires)}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="col-span-2 flex justify-end gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleResendInvitation(invite.id)}
-                          >
-                            <Mail className="mr-2 h-4 w-4" />
-                            Resend
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleCancelInvitation(invite.id)}
-                          >
-                            <UserMinus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
+                {filteredMembers.length > 0 ? (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredMembers.map((member) => (
+                      <StyledUserProfileCard
+                        key={member.id}
+                        id={member.id}
+                        name={member.name}
+                        email={member.email}
+                        role={member.role}
+                        status={member.status}
+                        lastActive={member.lastActive}
+                        onEdit={handleEditMember}
+                        onRemove={handleRemoveMember}
+                        onMessage={handleMessageMember}
+                        onRoleChange={handleRoleChange}
+                        onStatusChange={handleStatusChange}
+                        canEditRole={member.role !== 'owner' && user?.role === 'admin'}
+                        isSavingRole={isSavingRole === member.id}
+                        className="h-full"
+                      />
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center p-8">
-                    <CheckCircle2 className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-4" />
-                    <h3 className="text-lg font-medium mb-1">No Pending Invites</h3>
-                    <p className="text-muted-foreground mb-4">
-                      All invitations have been accepted or have expired.
+                  <div className="text-center py-8">
+                    <Users className="mx-auto h-12 w-12 text-muted-foreground mb-2" />
+                    <p className="text-muted-foreground">
+                      {searchQuery ? 'No matching team members found' : 'No team members found'}
                     </p>
-                    <Button onClick={() => window.location.href = '/team/invite'}>
-                      <UserPlus className="mr-2 h-4 w-4" /> Invite Team Member
-                    </Button>
                   </div>
                 )}
               </CardContent>
             </Card>
           </TabsContent>
-
-          <TabsContent value="roles">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {Object.entries(rolePermissions).map(([key, role]) => (
-                <Card key={key} className="card-shadow">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{role.name}</CardTitle>
-                      {getRoleBadge(key)}
-                    </div>
-                    <CardDescription>{role.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <h4 className="text-sm font-medium mb-3">Permissions:</h4>
-                    <ul className="space-y-2">
-                      {role.permissions.map((permission, index) => (
-                        <li key={index} className="flex items-start">
-                          <CheckCircle2 className="h-4 w-4 text-primary mr-2 mt-0.5" />
-                          <span className="text-sm">{permission}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                  <CardFooter className="border-t pt-4 flex justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Users: {teamMembers.filter(m => m.role === key).length}
-                    </span>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleEditRole(key)}
-                    >
-                      <Edit className="mr-2 h-4 w-4" /> Edit Role
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-
-              <Card className="border-dashed flex flex-col justify-center items-center p-6">
-                <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center mb-3">
-                  <Shield className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="text-lg font-medium mb-1">Custom Role</h3>
-                <p className="text-sm text-muted-foreground text-center mb-4">
-                  Create a custom role with specific permissions
-                </p>
-                <Button variant="outline" onClick={handleCreateCustomRole}>
-                  Create Custom Role
-                </Button>
-              </Card>
-            </div>
-
-            <Card className="card-shadow mt-8">
+          
+          <TabsContent value="invites">
+            <PendingInvites 
+              invites={pendingInvites}
+              onInvitesChange={handleInvitesChange}
+              showForm={showInviteForm}
+              onShowFormChange={setShowInviteForm}
+            />
+          </TabsContent>
+          
+          <TabsContent value="chat" className="h-[calc(100vh-300px)]">
+        <TeamChatTab />
+      </TabsContent>
+      <TabsContent value="settings">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Security Settings</CardTitle>
+                <CardTitle>Team Settings</CardTitle>
                 <CardDescription>
-                  Configure team access and security preferences
+                  Manage your team's settings and permissions
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="text-sm font-medium">Two-Factor Authentication</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Require 2FA for all team members
-                    </p>
-                  </div>
-                  <Switch onChange={() => handleToggleSecurity('2FA')} />
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="text-sm font-medium">Session Timeout</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Automatically log out inactive users
-                    </p>
-                  </div>
-                  <Select defaultValue="60">
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Select timeout" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="30">30 minutes</SelectItem>
-                      <SelectItem value="60">1 hour</SelectItem>
-                      <SelectItem value="120">2 hours</SelectItem>
-                      <SelectItem value="240">4 hours</SelectItem>
-                      <SelectItem value="480">8 hours</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="text-sm font-medium">Login Notifications</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Notify administrators of new logins
-                    </p>
-                  </div>
-                  <Switch defaultChecked onChange={() => handleToggleSecurity('login notifications')} />
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="text-sm font-medium">IP Restrictions</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Limit access to specific IP addresses
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => handleToggleSecurity('IP restrictions')}>
-                    Configure
-                  </Button>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="text-sm font-medium">API Access</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Manage API keys and permissions
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm" className="flex items-center">
-                    <Key className="mr-2 h-4 w-4" /> Manage Keys
-                  </Button>
-                </div>
-
-                <div className="border-t pt-6 mt-6">
-                  <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-md">
-                    <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Team Information</h3>
+                  <div className="space-y-4">
                     <div>
-                      <h4 className="text-sm font-medium text-amber-700">Security Recommendation</h4>
-                      <p className="text-xs text-amber-600">
-                        We recommend enabling two-factor authentication for all administrative accounts
-                        to enhance your account security.
-                      </p>
+                      <label className="block text-sm font-medium mb-1">
+                        Team Name
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Team Name"
+                          value={teamName}
+                          onChange={(e) => setTeamName(e.target.value)}
+                          className="max-w-md"
+                        />
+                        <Button 
+                          onClick={() => {
+                            toast({
+                              title: "Team updated",
+                              description: `Team name has been updated to "${teamName}".`,
+                            });
+                          }}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Team Description
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="A brief description of your team"
+                          value={teamDescription}
+                          onChange={(e) => setTeamDescription(e.target.value)}
+                          className="max-w-md"
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            toast({
+                              title: "Description updated",
+                              description: "Team description has been updated.",
+                            });
+                          }}
+                        >
+                          Save
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="text-lg font-medium">Permissions</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Allow Member Invites</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Let team members invite new users
+                        </p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Allow Project Creation</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Let team members create new projects
+                        </p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                  <div className="mt-6 border-t pt-6">
+                    <h3 className="text-lg font-medium text-destructive mb-4">Danger Zone</h3>
+                    <div className="flex items-center justify-between p-4 border border-destructive rounded-lg">
+                      <div>
+                        <h4 className="font-medium">Delete Team</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Once you delete a team, there is no going back. Please be certain.
+                        </p>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowDeleteDialog(true)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Team
+                      </Button>
+                    </div>
+                    <DeleteTeamDialog
+                      open={showDeleteDialog}
+                      onOpenChange={setShowDeleteDialog}
+                      onConfirm={handleDeleteTeam}
+                      teamName={teamName}
+                    />
+                  </div>
+                </div>
               </CardContent>
-              <CardFooter className="flex justify-end">
-                <Button>
-                  <Save className="mr-2 h-4 w-4" /> Save Security Settings
-                </Button>
-              </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
@@ -685,4 +721,10 @@ const TeamManagement = () => {
   );
 };
 
-export default TeamManagement;
+const TeamManagementWithProvider = () => (
+  <MessageProvider>
+    <TeamManagement />
+  </MessageProvider>
+);
+
+export default TeamManagementWithProvider;

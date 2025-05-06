@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Briefcase, 
@@ -329,18 +330,9 @@ const MOCK_JOBS = [
 type JobListingsProps = {
   searchTerm?: string;
   jobTypes?: string[];
-  locations?: string[];
-  experienceLevels?: string[];
-  salaryRange?: [number, number];
-};
 
-const JobListings: React.FC<JobListingsProps> = ({
-  searchTerm = "",
-  jobTypes = [],
-  locations = [],
-  experienceLevels = [],
-  salaryRange = [0, 200000]
-}) => {
+const JobListings: React.FC = () => {
+  const { filters, setFilters } = useMarketplace();
   const [jobs, setJobs] = useState<typeof MOCK_JOBS>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);

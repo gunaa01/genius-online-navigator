@@ -1,22 +1,30 @@
-import React from 'react';
+import * as ReactDefault from 'react';
 import { clientPerformance } from './performance';
+
+interface ReactWithHooks {
+  useRef: typeof ReactDefault.useRef;
+  useEffect: typeof ReactDefault.useEffect;
+  useCallback: typeof ReactDefault.useCallback;
+}
 
 /**
  * Higher-Order Component for tracking React component render performance
  * @param Component - The React component to wrap
  * @param componentName - Optional custom name for the component
+ * @param react - Optional React instance (for testing)
  * @returns A wrapped component with performance tracking
  */
 export function withPerformanceTracking<P extends object>(
   Component: React.ComponentType<P>,
-  componentName?: string
+  componentName?: string,
+  react: ReactWithHooks = ReactDefault
 ): React.FC<P> {
   const displayName = componentName || Component.displayName || Component.name || 'UnknownComponent';
 
   const WrappedComponent: React.FC<P> = (props) => {
-    const startTime = React.useRef(performance.now());
+    const startTime = react.useRef(performance.now());
 
-    React.useEffect(() => {
+    react.useEffect(() => {
       const endTime = performance.now();
       clientPerformance.trackComponentRender(displayName, endTime - startTime.current);
     }, []);
@@ -31,22 +39,42 @@ export function withPerformanceTracking<P extends object>(
 /**
  * Hook for tracking custom interactions
  * @param interactionName - Name of the interaction to track
+ * @param react - Optional React instance (for testing)
  * @returns A function to call when the interaction ends
  */
-export function useInteractionTracker(interactionName: string): () => void {
-  const startTime = React.useRef<number | null>(null);
+// Export for testing
+export const trackInteractionTime = (
+  interactionName: string,
+  startTime: number | null,
+  endTime: number
+) => {
+  if (startTime !== null) {
+    clientPerformance.trackInteraction(interactionName, endTime - startTime);
+  }
+};
 
-  const startTracking = React.useCallback(() => {
-    startTime.current = performance.now();
+interface InteractionTracker {
+  startTracking: () => void;
+  endTracking: () => void;
+}
+
+export function useInteractionTracker(
+  interactionName: string,
+  react: ReactWithHooks = ReactDefault
+): InteractionTracker {
+  const startTime = react.useRef<number | null>(null);
+  const now = () => performance.now();
+
+  const startTracking = react.useCallback(() => {
+    startTime.current = now();
   }, []);
 
-  const endTracking = React.useCallback(() => {
+  const endTracking = react.useCallback(() => {
     if (startTime.current !== null) {
-      const endTime = performance.now();
-      clientPerformance.trackInteraction(interactionName, endTime - startTime.current);
+      trackInteractionTime(interactionName, startTime.current, now());
       startTime.current = null;
     }
   }, [interactionName]);
 
-  return endTracking;
+  return { startTracking, endTracking };
 }

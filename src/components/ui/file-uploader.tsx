@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { ButtonWithVariant } from './ButtonWithVariant';
+import ButtonWithVariant from './ButtonWithVariant';
 
 type FileUploaderProps = {
   onFileSelected: (file: File) => void;

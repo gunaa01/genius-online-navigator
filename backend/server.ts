@@ -1,27 +1,22 @@
-import Fastify from 'fastify';
-import { contentGenRoutes } from './routes/content_generation';
-import { seoRoutes } from './routes/seo';
-import { notificationRoutes } from './routes/notifications';
-import fastifyJwt from '@fastify/jwt';
+import { buildApp } from './src/app';
 
-const server = Fastify();
+async function startServer() {
+  const server = await buildApp();
+  
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
+  
+  server.listen({ port }, (err, address) => {
+    if (err) throw err;
+    console.log(`Server running at ${address}`);
+  });
+  
+  return server;
+}
 
-server.register(fastifyJwt, { secret: process.env.JWT_SECRET! });
-server.decorate('authenticate', async (req, reply) => {
-  try {
-    await req.jwtVerify();
-  } catch {
-    reply.status(401).send({ message: 'Unauthorized' });
-  }
-});
+// Start the server if this file is run directly
+if (require.main === module) {
+  startServer();
+}
 
-await server.register(contentGenRoutes);
-await server.register(seoRoutes);
-await server.register(notificationRoutes);
-
-server.listen({ port: 3001 }, (err, address) => {
-  if (err) throw err;
-  console.log(`Server running at ${address}`);
-});
-
-export default server;
+// For testing purposes
+export default startServer();

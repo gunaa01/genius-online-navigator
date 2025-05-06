@@ -1,16 +1,33 @@
 import * as React from "react";
+import { useState } from "react";
 import Layout from "@/components/Layout";
 import JobListings from "@/components/JobListings";
+import JobFilterSidebar from "@/components/hiring/JobFilterSidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Plus, Briefcase, LineChart, Filter } from "lucide-react";
+import { Plus, Briefcase, LineChart, Filter, ChevronRight, ChevronLeft } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 
 const Hiring: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+
+  // Mock job categories - in a real app, these would come from an API
+  const jobCategories = [
+    "All Categories",
+    "Web Development",
+    "Mobile Development",
+    "UI/UX Design",
+    "Digital Marketing",
+    "Content Writing",
+    "Data Science",
+    "DevOps",
+    "Customer Support"
+  ];
 
   const handlePostJob = () => {
     if (user) {
@@ -18,6 +35,10 @@ const Hiring: React.FC = () => {
     } else {
       navigate("/auth", { state: { returnUrl: "/post-job", action: "register" } });
     }
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
   };
 
   return (
@@ -45,8 +66,18 @@ const Hiring: React.FC = () => {
               <TabsTrigger value="contract">Contract</TabsTrigger>
             </TabsList>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="flex items-center gap-1.5">
-                <Filter className="h-4 w-4" /> Advanced Filters
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1.5"
+                onClick={toggleFilters}
+              >
+                <Filter className="h-4 w-4" />
+                {showFilters ? (
+                  <>Hide Filters <ChevronLeft className="h-4 w-4" /></>
+                ) : (
+                  <>Advanced Filters <ChevronRight className="h-4 w-4" /></>
+                )}
               </Button>
               <Button variant="outline" size="sm" className="flex items-center gap-1.5">
                 <LineChart className="h-4 w-4" /> Market Insights
@@ -56,34 +87,47 @@ const Hiring: React.FC = () => {
           
           <Separator className="my-6" />
 
-          <TabsContent value="all">
-            <JobListings />
-          </TabsContent>
-          
-          <TabsContent value="featured">
-            <JobListings featuredOnly={true} />
-          </TabsContent>
-          
-          <TabsContent value="remote">
-            <JobListings 
-              showFilters={false} 
-              limit={20}
-            />
-          </TabsContent>
-          
-          <TabsContent value="fulltime">
-            <JobListings 
-              showFilters={false} 
-              limit={20}
-            />
-          </TabsContent>
-          
-          <TabsContent value="contract">
-            <JobListings 
-              showFilters={false} 
-              limit={20}
-            />
-          </TabsContent>
+          <div className="flex flex-col lg:flex-row gap-6">
+            {showFilters && (
+              <div className="lg:w-1/4">
+                <JobFilterSidebar 
+                  jobCategories={jobCategories}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                />
+              </div>
+            )}
+            <div className={showFilters ? "lg:w-3/4" : "w-full"}>
+              <TabsContent value="all">
+                <JobListings />
+              </TabsContent>
+              
+              <TabsContent value="featured">
+                <JobListings featuredOnly={true} />
+              </TabsContent>
+              
+              <TabsContent value="remote">
+                <JobListings 
+                  showFilters={false} 
+                  limit={20}
+                />
+              </TabsContent>
+              
+              <TabsContent value="fulltime">
+                <JobListings 
+                  showFilters={false} 
+                  limit={20}
+                />
+              </TabsContent>
+              
+              <TabsContent value="contract">
+                <JobListings 
+                  showFilters={false} 
+                  limit={20}
+                />
+              </TabsContent>
+            </div>
+          </div>
         </Tabs>
 
         <div className="mt-16 bg-muted rounded-lg p-8 text-center">
