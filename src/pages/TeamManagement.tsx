@@ -18,6 +18,7 @@ import StyledUserProfileCard from "@/components/StyledUserProfileCard";
 import { DeleteTeamDialog } from "@/components/DeleteTeamDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHotkeys } from 'react-hotkeys-hook';
+import PendingInvites from '@/components/PendingInvites';
 
 type TeamRole = 'owner' | 'admin' | 'member' | 'viewer';
 type TeamStatus = 'active' | 'inactive' | 'pending';
@@ -108,17 +109,6 @@ const TeamManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const PendingInvites: React.FC<{
-    invites: Invite[];
-    onInvitesChange: (invites: Invite[]) => void;
-    showForm: boolean;
-    onShowFormChange: (show: boolean) => void;
-  }> = ({ invites, onInvitesChange, showForm, onShowFormChange }) => {
-    const [localEmail, setLocalEmail] = useState('');
-    const [localRole, setLocalRole] = useState<TeamRole>('member');
-    
-    const handleAddInvite = (e: React.FormEvent) => {
-      e.preventDefault();
       if (!localEmail || !localRole) return;
       
       const newInvite: Invite = {
@@ -141,100 +131,25 @@ const TeamManagement = () => {
       });
     };
     
-    return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>Pending Invites</CardTitle>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => onShowFormChange(!showForm)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {showForm ? 'Cancel' : 'Invite Member'}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {showForm && (
-          <form onSubmit={handleAddInvite} className="mb-6 p-4 border rounded-lg">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter email address"
-                  value={localEmail}
-                  onChange={(e) => setLocalEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="role">Role</Label>
-                <Select 
-                  value={localRole} 
-                  onValueChange={(value) => setLocalRole(value as TeamRole)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="viewer">Viewer</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => onShowFormChange(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">Send Invite</Button>
-              </div>
-            </div>
-          </form>
-        )}
-        {invites.length > 0 ? (
-          <div className="space-y-4">
-            {invites.map((invite) => (
-              <div key={invite.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <p className="font-medium">{invite.email}</p>
-                  <p className="text-sm text-muted-foreground">Invited as {invite.role}</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    onInvitesChange(invites.filter((i) => i.id !== invite.id));
-                    toast({
-                      title: "Invite revoked",
-                      description: `Invitation to ${invite.email} has been revoked.`,
-                    });
-                  }}
-                >
-                  Revoke
-                </Button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-muted-foreground text-center py-8">No pending invites</p>
-        )}
-      </CardContent>
-    </Card>
-  );
+    // Implementation replaced by shared PendingInvites component.
+// See usage in TeamManagement component below.
 
   const [pendingInvites, setPendingInvites] = useState<Invite[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [allowInvites, setAllowInvites] = useState(true);
   const [allowProjectCreation, setAllowProjectCreation] = useState(true);
+
+  // ...rest of TeamManagement component logic...
+
+  // Render shared PendingInvites component where pending invites should appear
+  // (You may want to place this in a tab or section as appropriate)
+  // Example usage:
+  // <PendingInvites
+  //   invites={pendingInvites}
+  //   onInvitesChange={setPendingInvites}
+  //   showForm={showInviteForm}
+  //   onShowFormChange={setShowInviteForm}
+  // />
 
   const canPerformAction = (action: string, userRole?: TeamRole, targetRole?: TeamRole, targetUserId?: string | number): boolean => {
     if (!userRole) return false;

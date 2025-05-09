@@ -1,0 +1,38 @@
+# Core dependencies
+fastapi>=0.115.0,<0.116.0
+uvicorn>=0.23.0,<0.35.0
+pydantic>=2.0.0,<3.0.0
+supabase>=2.0.0,<3.0.0
+httpx>=0.24.0,<0.29.0
+python-jose>=3.3.0,<4.0.0
+pytest>=7.0.0,<9.0.0
+pytest-mock>=3.10.0,<4.0.0
+
+# LLM dependencies
+vllm>=0.2.0  # Optional: requires CUDA
+llama-cpp-python>=0.2.0  # Optional: CPU-only fallback
+transformers>=4.30.0,<5.0.0
+torch>=2.0.0  # Optional: for some transformers
+sentencepiece>=0.1.99  # For tokenization
+
+# Memory dependencies
+qdrant-client>=1.6.0,<2.0.0
+sentence-transformers>=2.2.0,<3.0.0
+chromadb>=0.4.0  # Optional: alternative vector DB
+
+# Workflow dependencies
+prefect>=2.13.0  # Optional: for workflow orchestration
+langgraph>=0.0.15  # Optional: for LangGraph workflow engine
+
+# Monitoring and evaluation
+langsmith>=0.0.40  # Optional: for LangSmith evaluation
+
+# Tool dependencies
+beautifulsoup4>=4.12.0  # For web scraping tools
+newspaper3k>=0.2.8  # For article extraction
+openbb>=3.0.0  # Optional: for financial data tools
+tenacity>=8.0.0  # For retries
+
+# Security
+bcrypt>=4.0.0
+passlib>=1.7.0

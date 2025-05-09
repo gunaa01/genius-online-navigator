@@ -1,14 +1,87 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import {
   ArrowRight,
-  History
+  History,
+  Sparkles,
+  Settings
 } from "lucide-react";
 import { ContentForm } from '@/components/ai-content/ContentForm';
+import AIContentGenerator from '@/components/AIContentGenerator';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 
 const AiContent = () => {
+  const [generatorVariant, setGeneratorVariant] = useState<'basic' | 'advanced' | 'innovation'>('basic');
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+
+  // Basic content generator uses ContentForm
+  const renderBasicGenerator = () => (
+    <div className="lg:col-span-3">
+      <ContentForm
+        mode="ai-assisted"
+        onGenerate={async (prompt) => {
+          // Integrate AI content generation logic here
+          return 'AI generated content for: ' + prompt;
+        }}
+        onSubmit={(content) => {
+          // Save AI-generated content logic here
+          console.log('Submitting AI content:', content);
+        }}
+      />
+    </div>
+  );
+
+  // Advanced generator uses AIContentGenerator component
+  const renderAdvancedGenerator = () => (
+    <div className="lg:col-span-3">
+      <AIContentGenerator />
+    </div>
+  );
+
+  // Check which variant to render
+  const renderContentGenerator = () => {
+    switch(generatorVariant) {
+      case 'advanced':
+        return renderAdvancedGenerator();
+      case 'innovation':
+        // Innovation variant would render the innovation version or specialized implementation
+        return (
+          <div className="lg:col-span-3">
+            <Card>
+              <CardHeader>
+                <CardTitle>Innovation AI Content Generator</CardTitle>
+                <CardDescription>
+                  Advanced AI-powered content generation with specialized features
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* We would import and render the innovation version here */}
+                <div className="p-6 text-center">
+                  <Sparkles className="h-10 w-10 text-primary mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Innovation Content Generator</h3>
+                  <p className="text-muted-foreground mb-4">
+                    This is a placeholder for the innovation variant of the AI content generator.
+                  </p>
+                  <Button>
+                    Enable Innovation Features
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+      default:
+        return renderBasicGenerator();
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -18,28 +91,31 @@ const AiContent = () => {
             <h1 className="text-2xl font-bold">AI Content</h1>
             <p className="text-muted-foreground">Generate professional content for your marketing needs</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <Select 
+              value={generatorVariant} 
+              onValueChange={(value: any) => setGeneratorVariant(value)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select generator" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="basic">Basic</SelectItem>
+                <SelectItem value="advanced">Advanced</SelectItem>
+                <SelectItem value="innovation">Innovation</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}>
+              <Settings className="mr-2 h-4 w-4" /> Settings
+            </Button>
             <Button>
-              <History className="mr-2 h-4 w-4" /> View History
+              <History className="mr-2 h-4 w-4" /> History
             </Button>
           </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-3">
-            <ContentForm
-  mode="ai-assisted"
-  onGenerate={async (prompt) => {
-    // Integrate AI content generation logic here
-    // Example: return await fetchAIGeneratedContent(prompt);
-    return 'AI generated content for: ' + prompt;
-  }}
-  onSubmit={(content) => {
-    // Save AI-generated content logic here
-    console.log('Submitting AI content:', content);
-  }}
-/>
-          </div>
+          {renderContentGenerator()}
 
           <div>
             <Card className="card-shadow mb-6">
